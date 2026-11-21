@@ -15,7 +15,7 @@ from data.roadmap import ROADMAP_DAYS, get_day_by_number, get_days_by_phase
 from data.projects import PROJECTS, get_project_by_id
 from data.kql_queries import KQL_QUERIES, MOCK_LOGS, get_kql_by_id
 from data.interview_prep import POSITIONING_STRATEGY, ELEVATOR_PITCH, INTERVIEW_QUESTIONS, get_questions_by_category
-from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS
+from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS, FDE_BRIEFING_10MIN
 
 # Base paths configuration for absolute directory resolution (essential for Vercel serverless)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -210,6 +210,7 @@ def index():
         current_topic=current_topic,
         projects=PROJECTS,
         fde_course=FDE_MASTER_COURSE,
+        fde_briefing=FDE_BRIEFING_10MIN,
         pillars=PROJECT_EXPLORATION_PILLARS
     )
 

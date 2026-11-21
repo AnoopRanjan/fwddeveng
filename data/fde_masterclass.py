@@ -96,6 +96,24 @@ FDE_MASTER_COURSE = {
     ]
 }
 
+# Dedicated ~10 Minute Fast-Track Video for FDE Role Description (Palantir Official)
+FDE_BRIEFING_10MIN = {
+    "title": "What is a Forward Deployed Software Engineer (FDE)?",
+    "instructor": "Palantir Technologies",
+    "duration": "~10 Minutes",
+    "badge": "10-Min Role Overview",
+    "video_id": "5OYy_UtINo4",
+    "video_embed": "https://www.youtube-nocookie.com/embed/5OYy_UtINo4",
+    "video_url": "https://www.youtube.com/watch?v=5OYy_UtINo4",
+    "subtitle": "Palantir's Official Breakdown of Forward Deployed Software Engineering",
+    "summary": "The definitive 10-minute briefing explaining the Forward Deployed Engineer role: working on the frontline with client operations, uncovering real bottlenecks, building custom integrations, and deploying production code into live enterprise environments.",
+    "takeaways": [
+        "Customer-Embedded Discovery: Discovering real business bottlenecks, not just completing tickets.",
+        "Production Implementation: Writing custom glue code and deploying live solutions in client environments.",
+        "High Agency & Autonomy: Operating like a technical co-founder on customer frontlines with direct executive trust."
+    ]
+}
+
 PROJECT_EXPLORATION_PILLARS = [
     {
         "id": "pillar-1",

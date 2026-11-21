@@ -84,7 +84,12 @@
                             <span class="text-[10px] text-red-400 font-semibold">▶</span>
                             <span class="text-gray-300 truncate">{{ d.video_instructor }}</span>
                         </span>
-                        <span class="text-[10px] font-mono text-gray-500">P{{ d.phase }}</span>
+                        <div class="flex items-center gap-1.5 flex-shrink-0">
+                            {% if d.video_duration %}
+                            <span class="text-[9px] px-1.5 py-0.2 rounded bg-amber-950/70 border border-amber-800/80 text-amber-300 font-mono font-bold">{{ d.video_duration }}</span>
+                            {% endif %}
+                            <span class="text-[10px] font-mono text-gray-500">P{{ d.phase }}</span>
+                        </div>
                     </div>
                 </a>
                 {% endfor %}
@@ -108,7 +113,13 @@
                                 <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
                                 <span>{{ day_instructor }}</span>
                             </span>
-                            <span class="text-xs text-gray-400">Day {{ active_day.day }} Full Video Course</span>
+                            {% if active_day.video_duration %}
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-amber-950/80 text-amber-300 border border-amber-800 flex items-center gap-1">
+                                <svg class="w-3.5 h-3.5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+                                <span>{{ active_day.video_duration }} (&gt;1 Hr Long Deep Dive)</span>
+                            </span>
+                            {% endif %}
+                            <span class="text-xs text-gray-400">Day {{ active_day.day }} Masterclass Course</span>
                         </div>
                         <h2 class="text-base sm:text-lg font-bold text-white">{{ day_video_title }}</h2>
                     </div>

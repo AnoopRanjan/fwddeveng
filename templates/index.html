@@ -5,41 +5,98 @@
 {% block content %}
 <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-12">
 
-    <!-- 1. Hero Banner & Career Transformation Header -->
-    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 via-[#0d1627] to-[#121d33] border border-gray-800 p-6 sm:p-10 shadow-2xl">
+    <!-- 1. Hero Banner & Career Transformation Header with Right Small Corner 10-Min FDE Video -->
+    <div class="relative overflow-hidden rounded-3xl bg-gradient-to-r from-gray-900 via-[#0d1627] to-[#121d33] border border-gray-800 p-6 sm:p-8 lg:p-10 shadow-2xl">
         <div class="absolute -right-16 -top-16 w-96 h-96 rounded-full bg-cyan-500/10 blur-3xl pointer-events-none"></div>
         <div class="absolute -left-16 -bottom-16 w-96 h-96 rounded-full bg-indigo-500/10 blur-3xl pointer-events-none"></div>
         
-        <div class="relative z-10 max-w-4xl space-y-4">
-            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/90 border border-cyan-800/80 text-cyan-300 text-xs font-semibold uppercase tracking-wider">
-                <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
-                Strategic Advisory & Engineering Transformation
-            </div>
+        <div class="relative z-10 grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
             
-            <h1 class="text-3xl sm:text-5xl font-extrabold tracking-tight text-white leading-tight">
-                Forward Deployed Engineer <br class="hidden sm:inline">
-                <span class="bg-gradient-to-r from-cyan-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">+ AI + Cybersecurity Advisor</span>
-            </h1>
+            <!-- Left Column: Transformation Story & Navigation CTA Links -->
+            <div class="lg:col-span-7 space-y-4">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-cyan-950/90 border border-cyan-800/80 text-cyan-300 text-xs font-semibold uppercase tracking-wider">
+                    <span class="w-2 h-2 rounded-full bg-cyan-400 animate-pulse"></span>
+                    Strategic Advisory & Engineering Transformation
+                </div>
+                
+                <h1 class="text-3xl sm:text-4xl lg:text-5xl font-extrabold tracking-tight text-white leading-tight">
+                    Forward Deployed Engineer <br class="hidden sm:inline">
+                    <span class="bg-gradient-to-r from-cyan-400 via-indigo-300 to-emerald-400 bg-clip-text text-transparent">+ AI + Cybersecurity Advisor</span>
+                </h1>
 
-            <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
-                Transform from a Technical Lead in cloud migrations, Azure, and .NET into an elite, client-facing <strong class="text-white">Forward Deployed Engineer (FDE)</strong> and <strong class="text-white">Part-Time Technical Advisor</strong>. Leverage your real-world cloud engineering foundation to master Microsoft Sentinel, Defender for Cloud, Zero Trust, and secure GenAI implementations across a structured 35-day curriculum.
-            </p>
+                <p class="text-gray-300 text-sm sm:text-base leading-relaxed">
+                    Transform from a Technical Lead in cloud migrations, Azure, and .NET into an elite, client-facing <strong class="text-white">Forward Deployed Engineer (FDE)</strong> and <strong class="text-white">Part-Time Technical Advisor</strong>. Leverage your real-world cloud engineering foundation to master Microsoft Sentinel, Defender for Cloud, Zero Trust, and secure GenAI implementations across a structured 35-day curriculum.
+                </p>
 
-            <div class="flex flex-wrap items-center gap-3 pt-3">
-                <a href="{{ url_for('courses_hub') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 text-gray-900 font-extrabold text-sm shadow-xl shadow-cyan-500/20 hover:scale-[1.02] transition">
-                    <svg class="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                    <span>Explore Day-Wise Courses (Day 1–35)</span>
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
-                </a>
-                <a href="#fde-masterclass" class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-cyan-300 font-semibold text-sm transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
-                    <span>FDE Full Course Video (Longest Duration)</span>
-                </a>
-                <a href="{{ url_for('interview_studio') }}" class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-amber-300 font-semibold text-sm transition">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
-                    <span>Interview & Pitch Pack</span>
-                </a>
+                <div class="flex flex-wrap items-center gap-3 pt-2">
+                    <a href="{{ url_for('courses_hub') }}" class="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-indigo-500 text-gray-900 font-extrabold text-sm shadow-xl shadow-cyan-500/20 hover:scale-[1.02] transition">
+                        <svg class="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                        <span>Explore Day-Wise Courses (Day 1–35)</span>
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3"></path></svg>
+                    </a>
+                    <a href="#fde-masterclass" class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-cyan-300 font-semibold text-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M5 18h8a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v8a2 2 0 002 2z"></path></svg>
+                        <span>FDE Full Course Video (Longest Duration)</span>
+                    </a>
+                    <a href="{{ url_for('interview_studio') }}" class="inline-flex items-center gap-2 px-4 py-3 rounded-xl bg-gray-800/90 hover:bg-gray-700 border border-gray-700 text-amber-300 font-semibold text-sm transition">
+                        <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                        <span>Interview & Pitch Pack</span>
+                    </a>
+                </div>
             </div>
+
+            <!-- Right Small Corner: Dedicated 10-Min FDE Role Briefing Card -->
+            <div class="lg:col-span-5">
+                <div class="bg-gradient-to-b from-[#0f172a] to-[#0b101d] border border-cyan-500/50 hover:border-cyan-400 rounded-2xl p-4 sm:p-5 shadow-2xl space-y-3 relative group transition">
+                    <div class="flex items-center justify-between">
+                        <div class="flex items-center gap-2">
+                            <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+                            <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase tracking-wide">
+                                ⏱ ~10 Mins Role Briefing
+                            </span>
+                        </div>
+                        <span class="text-[10px] text-gray-400 font-mono">Palantir Official</span>
+                    </div>
+
+                    <div>
+                        <h2 class="text-sm sm:text-base font-extrabold text-white">
+                            What is a Forward Deployed Engineer (FDE)?
+                        </h2>
+                        <p class="text-[11px] text-gray-300 leading-snug mt-0.5">
+                            Palantir's official 10-minute briefing explaining how FDEs operate on customer frontlines: uncovering root problems and deploying live AI & cloud solutions.
+                        </p>
+                    </div>
+
+                    <!-- 10-Min Video Frame -->
+                    <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800 shadow-xl relative">
+                        <iframe class="w-full h-full" src="{{ fde_briefing.video_embed if fde_briefing else 'https://www.youtube-nocookie.com/embed/5OYy_UtINo4' }}" title="What is a Forward Deployed Software Engineer (FDE)?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    </div>
+
+                    <!-- 3 Fast Takeaways -->
+                    <div class="space-y-1 text-[11px] text-gray-300 bg-gray-900/90 p-2.5 rounded-xl border border-gray-800/80">
+                        <div class="flex items-start gap-1.5">
+                            <span class="text-cyan-400 font-bold">1.</span>
+                            <span><strong>Field Discovery:</strong> Uncover the client's actual bottleneck, not just their request.</span>
+                        </div>
+                        <div class="flex items-start gap-1.5">
+                            <span class="text-emerald-400 font-bold">2.</span>
+                            <span><strong>Live Engineering:</strong> Write real glue code & deploy working systems in client VPCs.</span>
+                        </div>
+                        <div class="flex items-start gap-1.5">
+                            <span class="text-amber-400 font-bold">3.</span>
+                            <span><strong>Startup Agency:</strong> Act as technical co-founder on the customer frontline.</span>
+                        </div>
+                    </div>
+
+                    <div class="flex items-center justify-between pt-1 text-[11px]">
+                        <span class="text-gray-400">Duration: <strong class="text-cyan-300">~10 Mins</strong></span>
+                        <a href="{{ fde_briefing.video_url if fde_briefing else 'https://www.youtube.com/watch?v=5OYy_UtINo4' }}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 hover:underline">
+                            <span>Open on YouTube ↗</span>
+                        </a>
+                    </div>
+                </div>
+            </div>
+
         </div>
     </div>
 
@@ -353,5 +410,43 @@
         </div>
     </div>
 
+    <!-- Floating Bottom-Right Corner Quick-Access 10-Min FDE Briefing -->
+    <div id="corner-fde-launcher" class="fixed bottom-6 right-6 z-40">
+        <button onclick="toggleCornerFdeModal()" class="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-cyan-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-2xl shadow-cyan-500/50 border border-cyan-400/50 transition transform hover:scale-105 group">
+            <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+            <svg class="w-4 h-4 text-cyan-200 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+            <span>10-Min FDE Overview</span>
+        </button>
+    </div>
+
+    <!-- Floating Corner Modal Player -->
+    <div id="corner-fde-modal" class="fixed bottom-20 right-6 z-50 hidden max-w-sm sm:max-w-md w-full bg-[#0b101d] border border-cyan-500/60 rounded-2xl p-4 shadow-2xl space-y-3 backdrop-blur-xl bg-gray-950/95 animate-fadeIn">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-2">
+            <div class="flex items-center gap-2">
+                <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase tracking-wide">
+                    Palantir Official • ~10 Mins
+                </span>
+                <span class="text-xs font-bold text-white">FDE Role Briefing</span>
+            </div>
+            <button onclick="toggleCornerFdeModal()" class="text-gray-400 hover:text-white text-base font-bold p-1 leading-none">
+                ✕
+            </button>
+        </div>
+        <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800">
+            <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/5OYy_UtINo4" title="The Role of a Forward Deployed Software Engineer (FDE)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+        <p class="text-[11px] text-gray-300 leading-relaxed">
+            Palantir's official overview explaining how Forward Deployed Engineers work directly with enterprise customers to solve complex operational problems with custom code and live deployments.
+        </p>
+    </div>
+
+    <script>
+    function toggleCornerFdeModal() {
+        const modal = document.getElementById('corner-fde-modal');
+        if (modal) {
+            modal.classList.toggle('hidden');
+        }
+    }
+    </script>
 </div>
 {% endblock %}
