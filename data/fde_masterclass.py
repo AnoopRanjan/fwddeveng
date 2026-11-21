@@ -12,11 +12,24 @@ FDE_MASTER_COURSE = {
     "primary_video_id": "FSZhPDzESPU",
     "primary_video_embed": "https://www.youtube-nocookie.com/embed/FSZhPDzESPU",
     "primary_video_url": "https://www.youtube.com/watch?v=FSZhPDzESPU",
-    "companion_video_id": "NFiDNzQTzXY",
-    "companion_video_embed": "https://www.youtube-nocookie.com/embed/NFiDNzQTzXY",
-    "companion_video_url": "https://www.youtube.com/watch?v=NFiDNzQTzXY",
-    "companion_title": "Forward Deployed Engineer Full Course for Beginners - Saurav Verma",
-    "companion_label": "Saurav Verma FDE Course",
+    
+    # Companion FDE Foundations Video: The longest Microsoft / MSDN Azure IaaS Basics full course
+    "companion_video_id": "0Knf9nub4-k",
+    "companion_video_embed": "https://www.youtube-nocookie.com/embed/0Knf9nub4-k",
+    "companion_video_url": "https://www.youtube.com/watch?v=0Knf9nub4-k",
+    "companion_title": "AZ-104 Azure Administrator Complete Study Cram - Full Azure IaaS Masterclass (John Savill / MSDN)",
+    "companion_label": "Azure IaaS Basics Full Course (3.5+ Hrs)",
+    "companion_duration": "3.5+ Hours Marathon Masterclass",
+    "companion_instructor": "John Savill's Technical Training (Official Microsoft / MSDN Curriculum)",
+    "companion_description": "The definitive, longest full-length Microsoft Azure IaaS video masterclass openly available on YouTube. Teaches core cloud infrastructure foundations essential for Forward Deployed Engineers: Virtual Machines (VMs), VM Scale Sets (VMSS), Virtual Networks (VNets), Subnets, NSGs, Peering, Azure Bastion, Storage Accounts, Managed Disks, Entra ID RBAC, and Cloud Monitoring.",
+    
+    # Alternative MSDN Foundations Video: AZ-900 Core Cloud Architecture Cram
+    "companion_alt_video_id": "tQp1YkB2Tgs",
+    "companion_alt_video_embed": "https://www.youtube-nocookie.com/embed/tQp1YkB2Tgs",
+    "companion_alt_video_url": "https://www.youtube.com/watch?v=tQp1YkB2Tgs",
+    "companion_alt_title": "AZ-900 Microsoft Azure Fundamentals Study Cram - Core Cloud & IaaS Architecture (John Savill)",
+    "companion_alt_label": "AZ-900 Core Cram (3.5+ Hrs)",
+
     "palantir_video_id": "5OYy_UtINo4",
     "palantir_video_embed": "https://www.youtube-nocookie.com/embed/5OYy_UtINo4",
     "palantir_video_url": "https://www.youtube.com/watch?v=5OYy_UtINo4",
@@ -40,6 +53,24 @@ FDE_MASTER_COURSE = {
         {
             "part": "Module 4: Production Deployment & CI/CD",
             "desc": "Docker containerization, automated GitHub Actions pipelines, cloud hosting, and client monitoring handover."
+        }
+    ],
+    "iaas_chapters": [
+        {
+            "part": "IaaS Module 1: Compute & Virtual Machines",
+            "desc": "Azure Virtual Machines (VMs), VM Scale Sets (VMSS), Availability Zones, Spot instances, auto-scaling, and Azure Bastion secure host management."
+        },
+        {
+            "part": "IaaS Module 2: Virtual Networking & Security",
+            "desc": "VNets, Subnets, Network Security Groups (NSGs), Application Security Groups (ASGs), VNet Peering, and User Defined Routes (UDRs)."
+        },
+        {
+            "part": "IaaS Module 3: Storage & Managed Disks",
+            "desc": "Azure Storage Accounts, Blob Storage, Azure Files, OS & Data Managed Disks, LRS/ZRS/GRS replication, and Private Endpoints."
+        },
+        {
+            "part": "IaaS Module 4: Cloud Governance & Monitoring",
+            "desc": "ARM/Bicep IaC, Azure Resource Groups, Entra ID RBAC, Azure Monitor, Log Analytics, and cost management baselines."
         }
     ],
     "core_stages": [

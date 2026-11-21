@@ -26,9 +26,9 @@ TOPICS = [
                 "desc": "Canonical security control baseline across identity, network, data protection, and logging."
             },
             {
-                "title": "AZ-500: Manage security operations in Azure",
-                "url": "https://learn.microsoft.com/en-us/training/paths/manage-security-operations-azure/",
-                "desc": "Core learning path for Azure Key Vault, Azure Policy, RBAC, and Microsoft Defender integration."
+                "title": "AZ-104 / AZ-900 Azure Infrastructure & IaaS Foundations (MSDN)",
+                "url": "https://learn.microsoft.com/en-us/training/paths/azure-administrator-prerequisites/",
+                "desc": "Official Microsoft IaaS curriculum: Virtual Machines, virtual networking, storage accounts, and cloud governance."
             },
             {
                 "title": "Azure Enterprise Landing Zone Architecture",
