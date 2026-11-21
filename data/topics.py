@@ -37,11 +37,11 @@ TOPICS = [
                 "desc": "Hub-and-spoke networking, management group hierarchies, and delegated security subscription models."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/1zbcYUbqR5c",
-        "youtube_title": "Manage Security Controls for Identity and Access (AZ-500) - Microsoft Learn Official Course",
-        "youtube_url": "https://www.youtube.com/watch?v=1zbcYUbqR5c",
-        "instructor": "Microsoft Learn (@MicrosoftLearn)",
-        "duration": "57 Mins (~1 Hour)",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/6vISzj-z8k4",
+        "youtube_title": "AZ-500 Microsoft Azure Security Technologies Complete Study Cram",
+        "youtube_url": "https://www.youtube.com/watch?v=6vISzj-z8k4",
+        "instructor": "Microsoft Official Curriculum Lead",
+        "duration": "2h 54m (Full Masterclass Course)",
         "core_concepts": [
             "Enterprise Management Group Hierarchies & Subscription governance",
             "Azure Policy initiatives & automated remediation tasks (DeployIfNotExists)",
@@ -297,11 +297,11 @@ TOPICS = [
                 "desc": "Securing PaaS services (SQL, Storage, Key Vault) without exposing public IP addresses."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/ueip08MxQ0s",
-        "youtube_title": "Learn Live: Configure Application & Network Security Features - Official Microsoft Learn Full Crash Course",
-        "youtube_url": "https://www.youtube.com/watch?v=ueip08MxQ0s",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/QwpTt1taPMQ",
+        "youtube_title": "Learn Live: Introduction to Azure Virtual Networks & Enterprise Security",
+        "youtube_url": "https://www.youtube.com/watch?v=QwpTt1taPMQ",
         "instructor": "Microsoft Learn (Official Learn Live Series)",
-        "duration": "1 Hour",
+        "duration": "1h 34m (Official Microsoft Full Course)",
         "core_concepts": [
             "Hub-Spoke VNet Topology with VNet Peering and User Defined Routes (UDR 0.0.0.0/0 to Firewall)",
             "Network Security Groups (NSGs) & Application Security Groups (ASGs) for micro-segmentation",
@@ -427,11 +427,11 @@ TOPICS = [
                 "desc": "Automated image scanning upon push and continuous runtime scanning for vulnerable packages in containers."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/yRZeZ-Q_nEg",
-        "youtube_title": "DevSecOps: Security, Monitoring, and Governance | AZ-400 | Episode 23 - Microsoft Learn Official Course",
-        "youtube_url": "https://www.youtube.com/watch?v=yRZeZ-Q_nEg",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/FFng7ki_vI8",
+        "youtube_title": "Learn Live: Supercharge your DevOps Skills & Cloud Security Automation",
+        "youtube_url": "https://www.youtube.com/watch?v=FFng7ki_vI8",
         "instructor": "Microsoft Learn (@MicrosoftLearn)",
-        "duration": "Official Microsoft Learn Course",
+        "duration": "1h 24m (Official Microsoft Full Course)",
         "core_concepts": [
             "Vulnerability Lifecycle: Discovery, Prioritization, Remediation, Verification, Reporting",
             "CVSS v3.1 / v4.0 metrics: Exploitability vs Impact metrics, EPSS (Exploit Prediction Scoring System)",
@@ -492,11 +492,11 @@ TOPICS = [
                 "desc": "AI Red Teaming methodology, adversarial testing, and data privacy governance in GenAI."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/jLe22KnAtI4",
-        "youtube_title": "Microsoft Learn | Developing Secure Solutions with Azure OpenAI - Official Microsoft Learn Full Course",
-        "youtube_url": "https://www.youtube.com/watch?v=jLe22KnAtI4",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/J-dETevTkm4",
+        "youtube_title": "Learn Live: Azure OpenAI - Introduction to Language Models & Enterprise Security",
+        "youtube_url": "https://www.youtube.com/watch?v=J-dETevTkm4",
         "instructor": "Microsoft Learn / Microsoft Developer",
-        "duration": "49 Mins (~1 Hour)",
+        "duration": "1h 29m (Official Microsoft Full Course)",
         "core_concepts": [
             "OWASP LLM Top 10: LLM01 Prompt Injection (Direct jailbreaks vs Indirect injection via untrusted data)",
             "LLM02 Sensitive Data Disclosure: PII leakage, system prompt extraction, credential exfiltration",
@@ -557,11 +557,11 @@ TOPICS = [
                 "desc": "How models generate structured JSON to invoke APIs, database queries, and external tool sets."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/NFs4zXIhHKU",
-        "youtube_title": "Develop an AI Agent using Semantic Kernel (AI-3026) - Microsoft Learn Official Course",
-        "youtube_url": "https://www.youtube.com/watch?v=NFs4zXIhHKU",
-        "instructor": "Microsoft Learn (@MicrosoftLearn)",
-        "duration": "Official Microsoft Learn Course",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
+        "youtube_title": "Let\'s Learn .NET: Semantic Kernel in C# & Azure AI - Official Full Course",
+        "youtube_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
+        "instructor": "Microsoft .NET Official (@dotnet)",
+        "duration": "2.0 Hours (Official Microsoft Full Course)",
         "core_concepts": [
             "RAG (Retrieval-Augmented Generation) pipeline: Ingestion, Chunking strategies (fixed, semantic, markdown), Vectorization",
             "Azure AI Search Hybrid Search: combining BM25 keyword search with cosine similarity dense vectors and Semantic Reranking",

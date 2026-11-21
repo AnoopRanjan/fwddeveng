@@ -8,12 +8,12 @@ Briefing: Microsoft C# & .NET 101 Architecture (Microsoft Developer - 4vHBgwcz_I
 """
 
 FDE_MASTER_COURSE = {
-    "title": "Generative AI with .NET & C# for Beginners - Official Microsoft Full Crash Course",
+    "title": "Let's Learn .NET: Semantic Kernel in C# & Azure AI - Official Microsoft Full Course",
     "instructor": "Microsoft .NET Official (@dotnet)",
-    "duration": "Official Microsoft Full Crash Course Series (C#, Semantic Kernel & Azure AI)",
-    "primary_video_id": "vISLS8aY0RU",
-    "primary_video_embed": "https://www.youtube-nocookie.com/embed/vISLS8aY0RU",
-    "primary_video_url": "https://www.youtube.com/watch?v=vISLS8aY0RU",
+    "duration": "2.0 Hours Official Microsoft Masterclass",
+    "primary_video_id": "lCQOCoH3Osk",
+    "primary_video_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
+    "primary_video_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
     
     # Companion FDE Foundations Video: The longest Microsoft / MSDN Azure IaaS Basics full course
     "companion_video_id": "0Knf9nub4-k",
@@ -32,9 +32,9 @@ FDE_MASTER_COURSE = {
     "companion_alt_title": "Let's Learn .NET: Semantic Kernel in C# - Building Intelligent Apps (Microsoft Official)",
     "companion_alt_label": "Semantic Kernel C# (2h)",
 
-    "palantir_video_id": "4vHBgwcz_I4",
-    "palantir_video_embed": "https://www.youtube-nocookie.com/embed/4vHBgwcz_I4",
-    "palantir_video_url": "https://www.youtube.com/watch?v=4vHBgwcz_I4",
+    "palantir_video_id": "VTnqUDMchXA",
+    "palantir_video_embed": "https://www.youtube-nocookie.com/embed/VTnqUDMchXA",
+    "palantir_video_url": "https://www.youtube.com/watch?v=VTnqUDMchXA",
     "tim_video_id": "lCQOCoH3Osk",
     "tim_video_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
     "tim_video_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
@@ -136,9 +136,9 @@ FDE_BRIEFING_10MIN = {
     "channel": "Microsoft Developer",
     "duration": "~10 Minutes Fast-Track",
     "badge": "Microsoft C# Cloud 101",
-    "video_id": "4vHBgwcz_I4",
-    "video_embed": "https://www.youtube-nocookie.com/embed/4vHBgwcz_I4",
-    "video_url": "https://www.youtube.com/watch?v=4vHBgwcz_I4",
+    "video_id": "VTnqUDMchXA",
+    "video_embed": "https://www.youtube-nocookie.com/embed/VTnqUDMchXA",
+    "video_url": "https://www.youtube.com/watch?v=VTnqUDMchXA",
     "subtitle": "Microsoft's Official C# & .NET Architecture Primer for Enterprise Engineers",
     "summary": "The official Microsoft primer on modern C# syntax, solution architecture, and building enterprise cloud systems on Azure with .NET.",
     "takeaways": [

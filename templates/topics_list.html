@@ -8,15 +8,15 @@
     <!-- Header -->
     <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-            <h1 class="text-3xl font-extrabold text-white">10 Core Focus Areas</h1>
-            <p class="text-sm text-gray-400 mt-1">
+            <h1 class="text-3xl font-extrabold text-slate-900">10 Core Focus Areas</h1>
+            <p class="text-sm text-slate-600 mt-1">
                 Deep architectural domains covering Microsoft exams, official MSDN documentation, hands-on labs, and FDE advisory perspectives.
             </p>
         </div>
         
         <div class="flex items-center gap-2">
-            <span class="text-xs text-gray-400">Mastery Progress:</span>
-            <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-800">
+            <span class="text-xs text-slate-500">Mastery Progress:</span>
+            <span class="px-3 py-1 rounded-full text-xs font-bold bg-indigo-50 text-indigo-700 border border-indigo-200 shadow-xs">
                 {{ metrics.completed_topics }} / {{ metrics.total_topics }} Topics Mastered
             </span>
         </div>
@@ -26,19 +26,19 @@
     <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
         {% for topic in topics %}
         {% set status = status_map[topic.id] or 'not_started' %}
-        <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 flex flex-col justify-between hover-card transition space-y-5">
+        <div class="bg-white border border-slate-200 rounded-2xl p-6 flex flex-col justify-between hover-card shadow-xs transition space-y-5">
             
             <div class="space-y-4">
                 <div class="flex items-center justify-between">
                     <div class="flex items-center gap-2">
-                        <span class="w-8 h-8 rounded-xl bg-gray-800 text-cyan-400 flex items-center justify-center font-bold text-sm border border-gray-700">
+                        <span class="w-8 h-8 rounded-xl bg-blue-50 text-blue-700 flex items-center justify-center font-bold text-sm border border-blue-200">
                             {{ topic.id }}
                         </span>
-                        <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ topic.category }}</span>
+                        <span class="text-xs font-semibold text-slate-500 uppercase tracking-wider">{{ topic.category }}</span>
                     </div>
 
                     <!-- Status Selector -->
-                    <select onchange="updateTopicStatus({{ topic.id }}, this.value)" class="bg-gray-900 border border-gray-700 rounded-lg text-xs px-2.5 py-1 text-gray-200 focus:outline-none focus:border-cyan-500">
+                    <select onchange="updateTopicStatus({{ topic.id }}, this.value)" class="bg-white border border-slate-300 rounded-lg text-xs px-2.5 py-1 text-slate-700 focus:outline-none focus:border-blue-500">
                         <option value="not_started" {% if status == 'not_started' %}selected{% endif %}>⚪ Not Started</option>
                         <option value="in_progress" {% if status == 'in_progress' %}selected{% endif %}>🟡 In Progress</option>
                         <option value="completed" {% if status == 'completed' %}selected{% endif %}>🟢 Completed</option>
@@ -46,25 +46,25 @@
                 </div>
 
                 <div>
-                    <h2 class="text-xl font-bold text-white hover:text-cyan-400 transition">
-                        <a href="{{ url_for('topic_detail', topic_id=topic.id) }}">{{ topic.title }}</a>
+                    <h2 class="text-xl font-bold text-slate-900 hover:text-blue-600 transition">
+                        <a href="{{ url_for('topic_detail', topic_id=topic.id) }}" class="text-decoration-none text-slate-900 hover:text-blue-600">{{ topic.title }}</a>
                     </h2>
-                    <p class="text-xs text-gray-300 mt-1 leading-relaxed">{{ topic.subtitle }}</p>
+                    <p class="text-xs text-slate-600 mt-1 leading-relaxed">{{ topic.subtitle }}</p>
                 </div>
 
                 <!-- Exam Mapping Badges -->
                 <div class="flex flex-wrap items-center gap-1.5 pt-1">
-                    <span class="text-[11px] text-gray-500 font-medium">Mapped Exams:</span>
+                    <span class="text-[11px] text-slate-500 font-medium">Mapped Exams:</span>
                     {% for exam in topic.exams %}
-                    <span class="px-2 py-0.5 rounded text-[11px] bg-gray-900 border border-gray-700 text-cyan-300 font-mono font-semibold">{{ exam }}</span>
+                    <span class="px-2 py-0.5 rounded text-[11px] bg-slate-100 border border-slate-200 text-blue-700 font-mono font-semibold">{{ exam }}</span>
                     {% endfor %}
                 </div>
 
                 <!-- Key Concepts Bullets -->
-                <div class="space-y-1.5 pt-2 border-t border-gray-800/80">
+                <div class="space-y-1.5 pt-2 border-t border-slate-200">
                     {% for concept in topic.core_concepts[:3] %}
-                    <div class="flex items-start gap-2 text-xs text-gray-300">
-                        <span class="w-1.5 h-1.5 rounded-full bg-cyan-400 mt-1.5 flex-shrink-0"></span>
+                    <div class="flex items-start gap-2 text-xs text-slate-600">
+                        <span class="w-1.5 h-1.5 rounded-full bg-blue-500 mt-1.5 flex-shrink-0"></span>
                         <span class="line-clamp-1">{{ concept }}</span>
                     </div>
                     {% endfor %}
@@ -72,9 +72,9 @@
             </div>
 
             <!-- Card Bottom Bar -->
-            <div class="pt-4 border-t border-gray-800 flex items-center justify-between text-xs">
-                <span class="text-gray-400">{{ topic.msdn_links | length }} MSDN Guides • Lab & Video Included</span>
-                <a href="{{ url_for('topic_detail', topic_id=topic.id) }}" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-cyan-400 font-semibold border border-gray-700 transition flex items-center gap-1">
+            <div class="pt-4 border-t border-slate-200 flex items-center justify-between text-xs">
+                <span class="text-slate-500">{{ topic.msdn_links | length }} MSDN Guides • Lab & Video Included</span>
+                <a href="{{ url_for('topic_detail', topic_id=topic.id) }}" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-blue-700 font-semibold border border-slate-300 transition flex items-center gap-1 text-decoration-none shadow-xs">
                     <span>Explore Subject</span> →
                 </a>
             </div>
