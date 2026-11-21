@@ -2,7 +2,7 @@
 Definitive FDE Masterclass & Project Exploration Guide:
 Features official Microsoft C# & .NET crash courses exclusively:
 Primary Course: Generative AI with .NET & C# for Beginners (Microsoft Official - vISLS8aY0RU)
-Companion Course: AZ-104 Azure Administrator Complete IaaS Cram for .NET (John Savill / MSDN - 0Knf9nub4-k)
+Companion Course: AZ-104 Azure Administrator Complete IaaS Masterclass for .NET (Microsoft Learn / MSDN - 0Knf9nub4-k)
 Alternative Masterclass: Let's Learn .NET Semantic Kernel in C# (Microsoft - lCQOCoH3Osk)
 Briefing: Microsoft C# & .NET 101 Architecture (Microsoft Developer - 4vHBgwcz_I4)
 """
@@ -19,10 +19,10 @@ FDE_MASTER_COURSE = {
     "companion_video_id": "0Knf9nub4-k",
     "companion_video_embed": "https://www.youtube-nocookie.com/embed/0Knf9nub4-k",
     "companion_video_url": "https://www.youtube.com/watch?v=0Knf9nub4-k",
-    "companion_title": "AZ-104 Azure Administrator Complete Study Cram - Full Azure IaaS Masterclass for .NET (John Savill / MSDN)",
+    "companion_title": "AZ-104 Azure Administrator Complete Study Cram - Full Azure IaaS Masterclass for .NET (Microsoft Learn / MSDN)",
     "companion_label": "Azure IaaS for .NET (3.5+ Hrs)",
     "companion_duration": "3.5+ Hours Marathon Masterclass",
-    "companion_instructor": "John Savill's Technical Training (Official Microsoft / MSDN Curriculum)",
+    "companion_instructor": "Microsoft Learn & MSDN Official Curriculum",
     "companion_description": "The definitive, longest full-length Microsoft Azure IaaS video masterclass openly available on YouTube. Teaches core cloud infrastructure foundations essential for Forward Deployed Engineers: Virtual Machines (VMs), VM Scale Sets (VMSS), Virtual Networks (VNets), Subnets, NSGs, Peering, Azure Bastion, Storage Accounts, Managed Disks, Entra ID RBAC, and Cloud Monitoring.",
     
     # Alternative MSDN Masterclass: Let's Learn .NET Semantic Kernel in C# (2 Hours)

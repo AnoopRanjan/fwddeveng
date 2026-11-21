@@ -1,8 +1,9 @@
 """
 Topics module: Contains exhaustive learning data for the 10 core subjects
 covering Azure exams (AZ-500, SC-200, SC-300, AI-102, AZ-305, SC-100),
-MSDN documentation, 10 completely distinct & playable YouTube video embeds
-from different top instructors, labs, and FDE advisory perspectives.
+MSDN documentation, 10 official Microsoft Learn website & @MicrosoftLearn
+video embeds with full crash courses (no third-party or other writer videos),
+labs, and FDE advisory perspectives.
 """
 
 TOPICS = [
@@ -36,11 +37,11 @@ TOPICS = [
                 "desc": "Hub-and-spoke networking, management group hierarchies, and delegated security subscription models."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/6vISzj-z8k4",
-        "youtube_title": "AZ-500 Microsoft Azure Security Technologies Study Cram - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=6vISzj-z8k4",
-        "instructor": "John Savill's Technical Training",
-        "duration": "3.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/1zbcYUbqR5c",
+        "youtube_title": "Manage Security Controls for Identity and Access (AZ-500) - Microsoft Learn Official Course",
+        "youtube_url": "https://www.youtube.com/watch?v=1zbcYUbqR5c",
+        "instructor": "Microsoft Learn (@MicrosoftLearn)",
+        "duration": "57 Mins (~1 Hour)",
         "core_concepts": [
             "Enterprise Management Group Hierarchies & Subscription governance",
             "Azure Policy initiatives & automated remediation tasks (DeployIfNotExists)",
@@ -101,10 +102,10 @@ TOPICS = [
                 "desc": "SOAR workflow orchestration using Azure Logic Apps, automated alert enrichment, and containment triggers."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/Pl8n6GaWEo0",
-        "youtube_title": "Kusto Query Language (KQL) & Microsoft Sentinel Deep Dive - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=Pl8n6GaWEo0",
-        "instructor": "John Savill's Technical Training",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/cG18isM7occ",
+        "youtube_title": "Learn Live: Configure your Microsoft Sentinel Environment - Official Microsoft Learn Full Crash Course",
+        "youtube_url": "https://www.youtube.com/watch?v=cG18isM7occ",
+        "instructor": "Microsoft Learn (Official Learn Live Series)",
         "duration": "1.5 Hours",
         "core_concepts": [
             "Log Analytics Workspace design: multi-workspace vs single centralized workspace & commitments",
@@ -166,11 +167,11 @@ TOPICS = [
                 "desc": "Vulnerability scanning for ACR, AKS runtime protection, and malware scanning for Blob storage."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/220xP-Ok92s",
-        "youtube_title": "Microsoft Defender for Cloud & SIEM/SOAR Architecture Masterclass",
-        "youtube_url": "https://www.youtube.com/watch?v=220xP-Ok92s",
-        "instructor": "Microsoft Security Specialists",
-        "duration": "1.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/iG1F_KSnae4",
+        "youtube_title": "Learn Live: Enable and Manage Microsoft Defender for Cloud - Official Microsoft Learn Full Crash Course",
+        "youtube_url": "https://www.youtube.com/watch?v=iG1F_KSnae4",
+        "instructor": "Microsoft Learn (Official Learn Live Series)",
+        "duration": "1h 18m",
         "core_concepts": [
             "CSPM vs CWPP distinction: proactive configuration auditing vs active runtime threat detection",
             "Secure Score calculation: prioritized security controls and remediation impact",
@@ -231,11 +232,11 @@ TOPICS = [
                 "desc": "Service principals, managed identities, credential rotation, and workload identity federation."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/LGpgqRVG65g",
-        "youtube_title": "SC-300 Microsoft Identity and Access Administrator Study Cram - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=LGpgqRVG65g",
-        "instructor": "John Savill's Technical Training",
-        "duration": "2.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/vYs2Fz9LmzU",
+        "youtube_title": "Learn Live: Create, Configure, and Manage Identities - Official Microsoft Learn Full Crash Course",
+        "youtube_url": "https://www.youtube.com/watch?v=vYs2Fz9LmzU",
+        "instructor": "Microsoft Learn (Official Learn Live Series)",
+        "duration": "1.5 Hours",
         "core_concepts": [
             "Modern Auth Protocols: OAuth 2.0, OpenID Connect (OIDC), SAML 2.0, token life cycles",
             "Conditional Access Architecture: Signals (User risk, Sign-in risk, Device compliance, Named locations) → Grant controls",
@@ -296,11 +297,11 @@ TOPICS = [
                 "desc": "Securing PaaS services (SQL, Storage, Key Vault) without exposing public IP addresses."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/0k5G6M0x5J8",
-        "youtube_title": "Azure Virtual Network & Network Security Master Class - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=0k5G6M0x5J8",
-        "instructor": "John Savill's Technical Training",
-        "duration": "1.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/ueip08MxQ0s",
+        "youtube_title": "Learn Live: Configure Application & Network Security Features - Official Microsoft Learn Full Crash Course",
+        "youtube_url": "https://www.youtube.com/watch?v=ueip08MxQ0s",
+        "instructor": "Microsoft Learn (Official Learn Live Series)",
+        "duration": "1 Hour",
         "core_concepts": [
             "Hub-Spoke VNet Topology with VNet Peering and User Defined Routes (UDR 0.0.0.0/0 to Firewall)",
             "Network Security Groups (NSGs) & Application Security Groups (ASGs) for micro-segmentation",
@@ -361,11 +362,11 @@ TOPICS = [
                 "desc": "How to snapshot compromised VM disks for offline forensic analysis without altering chain of custody."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/2Qu5gQjNQh4",
-        "youtube_title": "SC-100 Cloud Incident Response & Threat Modeling for .NET Systems - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=2Qu5gQjNQh4",
-        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
-        "duration": "3.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/8gCUtYEpTe8",
+        "youtube_title": "Mitigate Threats using Microsoft Defender XDR | SC-200 | Episode 1 - Microsoft Learn Official Course",
+        "youtube_url": "https://www.youtube.com/watch?v=8gCUtYEpTe8",
+        "instructor": "Microsoft Learn (@MicrosoftLearn)",
+        "duration": "53 Mins (~1 Hour)",
         "core_concepts": [
             "The 4-stage IR Lifecycle: Preparation, Detection & Analysis, Containment & Eradication, Recovery & Post-Incident Review (PIR)",
             "Triage & Scoping: Determining blast radius, compromised identities, and lateral movement",
@@ -426,11 +427,11 @@ TOPICS = [
                 "desc": "Automated image scanning upon push and continuous runtime scanning for vulnerable packages in containers."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/v5b53-PgEmI",
-        "youtube_title": "DevOps Master Class: CI/CD Pipelines, Containers & Enterprise Security for .NET - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=v5b53-PgEmI",
-        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
-        "duration": "1.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/yRZeZ-Q_nEg",
+        "youtube_title": "DevSecOps: Security, Monitoring, and Governance | AZ-400 | Episode 23 - Microsoft Learn Official Course",
+        "youtube_url": "https://www.youtube.com/watch?v=yRZeZ-Q_nEg",
+        "instructor": "Microsoft Learn (@MicrosoftLearn)",
+        "duration": "Official Microsoft Learn Course",
         "core_concepts": [
             "Vulnerability Lifecycle: Discovery, Prioritization, Remediation, Verification, Reporting",
             "CVSS v3.1 / v4.0 metrics: Exploitability vs Impact metrics, EPSS (Exploit Prediction Scoring System)",
@@ -491,11 +492,11 @@ TOPICS = [
                 "desc": "AI Red Teaming methodology, adversarial testing, and data privacy governance in GenAI."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/orLGv2LgWDE",
-        "youtube_title": "Azure OpenAI Deployment Types, Security & Resiliency in .NET - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=orLGv2LgWDE",
-        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
-        "duration": "1+ Hour",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/jLe22KnAtI4",
+        "youtube_title": "Microsoft Learn | Developing Secure Solutions with Azure OpenAI - Official Microsoft Learn Full Course",
+        "youtube_url": "https://www.youtube.com/watch?v=jLe22KnAtI4",
+        "instructor": "Microsoft Learn / Microsoft Developer",
+        "duration": "49 Mins (~1 Hour)",
         "core_concepts": [
             "OWASP LLM Top 10: LLM01 Prompt Injection (Direct jailbreaks vs Indirect injection via untrusted data)",
             "LLM02 Sensitive Data Disclosure: PII leakage, system prompt extraction, credential exfiltration",
@@ -556,11 +557,11 @@ TOPICS = [
                 "desc": "How models generate structured JSON to invoke APIs, database queries, and external tool sets."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
-        "youtube_title": "Let's Learn .NET: Semantic Kernel in C# & Azure OpenAI - Microsoft Official",
-        "youtube_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
-        "instructor": "Microsoft .NET Official (@dotnet)",
-        "duration": "2 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/NFs4zXIhHKU",
+        "youtube_title": "Develop an AI Agent using Semantic Kernel (AI-3026) - Microsoft Learn Official Course",
+        "youtube_url": "https://www.youtube.com/watch?v=NFs4zXIhHKU",
+        "instructor": "Microsoft Learn (@MicrosoftLearn)",
+        "duration": "Official Microsoft Learn Course",
         "core_concepts": [
             "RAG (Retrieval-Augmented Generation) pipeline: Ingestion, Chunking strategies (fixed, semantic, markdown), Vectorization",
             "Azure AI Search Hybrid Search: combining BM25 keyword search with cosine similarity dense vectors and Semantic Reranking",
@@ -621,11 +622,11 @@ TOPICS = [
                 "desc": "Publish-Subscribe, Asynchronous Request-Reply, Claim Check, and Saga distributed patterns."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/vq9LuCM4YP4",
-        "youtube_title": "AZ-305 Enterprise Cloud Modernization & Architecture for .NET - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=vq9LuCM4YP4",
-        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
-        "duration": "3.5+ Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/BF1Tw9MNa5U",
+        "youtube_title": "Learn Live: Introduction to the Microsoft Azure Well-Architected Framework (WAF) - Official Microsoft Learn Full Course",
+        "youtube_url": "https://www.youtube.com/watch?v=BF1Tw9MNa5U",
+        "instructor": "Microsoft Learn (Official Learn Live Series)",
+        "duration": "1.5 Hours",
         "core_concepts": [
             "The FDE Philosophy: Working at the nexus of Customer Problem, Architecture, Product, and Live Implementation",
             "Root Cause Discovery: Moving past 'what the client asked for' to uncover 'the underlying operational bottleneck'",
