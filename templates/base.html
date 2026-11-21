@@ -216,40 +216,45 @@
                 </p>
             </div>
 
-            <!-- Step 1: Request Email -->
+            <!-- Step 1: Request Email & Open Provider -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div class="flex items-center gap-2">
                     <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">1</span>
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Request Access via Email</h4>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Send Email Request to Administrator</h4>
                 </div>
-                <p class="text-xs text-slate-500 m-0">
-                    A unique <strong>6-digit passcode</strong> and an <strong>Allow Access button link</strong> will be delivered to your email.
+                <p class="text-xs text-slate-600 m-0 leading-relaxed">
+                    Clicking below opens your email provider with a pre-drafted purchase request template sent to <strong class="text-slate-800">azureanoopranjan@gmail.com</strong> with a unique payment reference passcode embedded for the receiver.
                 </p>
-                <div class="flex flex-col sm:flex-row gap-2">
-                    <input type="email" id="modal-email-input" placeholder="colleague@organization.com" class="form-control text-xs rounded-xl px-3.5 py-2 border-slate-300 focus:border-blue-500 bg-white flex-grow">
-                    <button onclick="submitModalEmailRequest()" id="modal-email-btn" class="btn btn-primary text-white text-xs font-bold px-4 py-2 rounded-xl flex-shrink-0 shadow-sm">
-                        Send Passcode
+                <div class="space-y-2">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <input type="text" id="modal-name-input" placeholder="Your Full Name" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
+                        <input type="email" id="modal-email-input" required placeholder="Your Email Address" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
+                    </div>
+                    <button onclick="submitModalEmailRequest()" id="modal-email-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
+                        <i class="bi bi-envelope-arrow-up-fill"></i>
+                        <span>Send Email & Open Email Provider</span>
                     </button>
                 </div>
-                <div id="modal-request-feedback" class="text-xs hidden p-2.5 rounded-xl border"></div>
+                <div id="modal-request-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
             </div>
 
             <!-- Step 2: Lock by Passcode Section -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div class="flex items-center gap-2">
                     <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">2</span>
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Enter Unique Passcode</h4>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Unlock with Payment Access Code</h4>
                 </div>
-                <p class="text-xs text-slate-500 m-0">
-                    Enter the 6-digit numeric code received in your email inbox to unlock immediately.
+                <p class="text-xs text-slate-600 m-0 leading-relaxed">
+                    When you complete payment, enter the unique reference code shared in your request below to unlock all website access:
                 </p>
                 <div class="flex items-center gap-2">
-                    <input type="text" id="access-passcode-input" maxlength="12" placeholder="Enter 6-digit passcode" class="form-control text-xs font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2 border-slate-300 focus:border-emerald-500 bg-white flex-grow">
-                    <button onclick="submitUnlockPasscode()" id="modal-passcode-btn" class="btn btn-success text-white text-xs font-bold px-4 py-2 rounded-xl flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 border-0 shadow-sm">
-                        Unlock Portal
+                    <input type="text" id="access-passcode-input" maxlength="12" placeholder="Enter code shared in request" class="form-control text-xs font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white flex-grow">
+                    <button onclick="submitUnlockPasscode()" id="modal-passcode-btn" class="btn btn-success text-white text-xs font-bold px-4 py-2.5 rounded-xl flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 border-0 shadow-sm flex items-center gap-1.5">
+                        <i class="bi bi-shield-check"></i>
+                        <span>Unlock All Access</span>
                     </button>
                 </div>
-                <div id="unlock-feedback" class="text-xs hidden p-2 rounded-xl border"></div>
+                <div id="unlock-feedback" class="text-xs hidden p-2.5 rounded-xl border"></div>
             </div>
 
             <!-- Footer options -->
@@ -295,11 +300,28 @@
             }
         }
 
+        function copyEmailTemplate(encodedText, btn) {
+            const decoded = decodeURIComponent(encodedText);
+            navigator.clipboard.writeText(decoded).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = `<i class="bi bi-check-lg"></i> Copied!`;
+                btn.classList.add("btn-success");
+                btn.classList.remove("btn-outline-secondary");
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.remove("btn-success");
+                    btn.classList.add("btn-outline-secondary");
+                }, 1800);
+            });
+        }
+
         async function submitModalEmailRequest() {
-            const input = document.getElementById('modal-email-input');
+            const emailInput = document.getElementById('modal-email-input');
+            const nameInput = document.getElementById('modal-name-input');
             const feedback = document.getElementById('modal-request-feedback');
             const btn = document.getElementById('modal-email-btn');
-            const email = input ? input.value.trim() : '';
+            const email = emailInput ? emailInput.value.trim() : '';
+            const name = nameInput ? nameInput.value.trim() : '';
 
             if (!email) {
                 if (feedback) {
@@ -310,24 +332,52 @@
             }
 
             btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Sending...`;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Preparing email...`;
 
             try {
                 const res = await fetch("/api/request-access", {
                     method: "POST",
                     headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: email })
+                    body: JSON.stringify({ email: email, name: name })
                 });
                 const data = await res.json();
 
                 if (res.ok && data.success) {
-                    feedback.className = "text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 block";
+                    // Automatically trigger opening default email client
+                    if (data.mailto_url) {
+                        try {
+                            window.location.href = data.mailto_url;
+                        } catch (e) {
+                            console.warn("Mailto launch notice:", e);
+                        }
+                    }
+
+                    feedback.className = "text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 block space-y-2";
                     feedback.innerHTML = `
-                        <strong>Sent!</strong> ${data.message}
-                        <div class="mt-1">
-                            <a href="${data.inbox_url || '/access/inbox'}" class="text-emerald-900 font-bold underline">
-                                Open Inbox to View Passcode & Allow Link →
+                        <div class="font-bold flex items-center gap-1.5 text-emerald-800">
+                            <i class="bi bi-check-circle-fill text-emerald-600"></i>
+                            <span>Email Provider Opened with Pre-filled Template!</span>
+                        </div>
+                        <p class="text-[11px] text-slate-700 m-0">
+                            Sent to receiver: <strong class="text-slate-900 font-mono">azureanoopranjan@gmail.com</strong> with your unique payment verification code embedded.
+                        </p>
+                        <div class="flex flex-wrap gap-1.5 pt-1">
+                            <a href="${data.mailto_url}" class="btn btn-sm btn-outline-primary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                                <i class="bi bi-envelope-fill"></i> Default Mail Client
                             </a>
+                            <a href="${data.gmail_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                                <i class="bi bi-google"></i> Open in Gmail (Web)
+                            </a>
+                            <a href="${data.outlook_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                                <i class="bi bi-microsoft"></i> Open in Outlook (Web)
+                            </a>
+                            <button onclick="copyEmailTemplate('${encodeURIComponent(data.body)}', this)" class="btn btn-sm btn-outline-secondary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                                <i class="bi bi-clipboard"></i> Copy Email Template
+                            </button>
+                        </div>
+                        <div class="text-[11px] text-amber-900 bg-amber-50/90 border border-amber-200 p-2 rounded-lg mt-1 font-medium">
+                            <i class="bi bi-info-circle-fill text-amber-600 me-1"></i>
+                            <strong>When payment is done:</strong> The code shared in your email request will unlock all website access in Step 2 below.
                         </div>
                     `;
                 } else {
@@ -339,7 +389,7 @@
                 feedback.textContent = "Network error. Please try again.";
             } finally {
                 btn.disabled = false;
-                btn.textContent = "Send Passcode";
+                btn.innerHTML = `<i class="bi bi-envelope-arrow-up-fill"></i> <span>Send Email & Open Email Provider</span>`;
             }
         }
 

@@ -58,14 +58,18 @@ def test_routes_and_access():
     assert "/access-gate" in res.headers["Location"]
     print("PASS: Courses page requires access and redirects to /access-gate.")
 
-    # 4. Request Access via Email -> generates unique 6-digit random passcode & Allow link
-    req_res = client.post('/api/request-access', json={'email': 'applicant@enterprise-ai.com'})
+    # 4. Request Access via Email -> generates unique 6-digit random passcode & email provider URLs
+    req_res = client.post('/api/request-access', json={'email': 'applicant@enterprise-ai.com', 'name': 'Alex Sharma'})
     assert req_res.status_code == 200
     data = req_res.get_json()
     assert data['success'] is True
     passcode = data['passcode']
     assert len(passcode) == 6 and passcode.isdigit(), f"Passcode {passcode} must be 6 digits"
-    print(f"PASS: Access request generated unique random passcode: {passcode}")
+    assert "mailto:azureanoopranjan@gmail.com" in data['mailto_url']
+    assert "mail.google.com" in data['gmail_url']
+    assert "outlook.live.com" in data['outlook_url']
+    assert passcode in data['body']
+    print(f"PASS: Access request generated email template and provider URLs with passcode: {passcode}")
 
     # 5. Check simulated inbox for received email
     inbox_res = client.get('/access/inbox')

@@ -32,24 +32,28 @@
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">1</span>
-                        <h2 class="text-base font-bold text-slate-900 m-0">Request Access via Email</h2>
+                        <h2 class="text-base font-bold text-slate-900 m-0">Send Email Request to Administrator</h2>
                     </div>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Enter your email address. A unique <strong>6-digit random passcode</strong> and a direct <strong>Allow Access link</strong> with an approval button will be sent directly to your inbox.
+                    <p class="text-xs text-slate-600 leading-relaxed m-0">
+                        Enter your details and click below. Your email provider will open with a pre-filled request template to receiver <strong class="text-slate-800">azureanoopranjan@gmail.com</strong> containing your unique payment verification code.
                     </p>
 
                     <form id="gate-request-form" onsubmit="handleGateRequest(event)" class="space-y-3">
+                        <div>
+                            <label for="gate-name-input" class="text-xs font-bold text-slate-700 block mb-1">Your Full Name</label>
+                            <input type="text" id="gate-name-input" placeholder="e.g. Alex Sharma" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
+                        </div>
                         <div>
                             <label for="gate-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Email Address</label>
                             <input type="email" id="gate-email-input" required placeholder="colleague@organization.com" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
                         </div>
                         <button type="submit" id="gate-request-submit-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
-                            <i class="bi bi-envelope-paper-fill"></i>
-                            <span>Send Access Request & Passcode</span>
+                            <i class="bi bi-envelope-arrow-up-fill"></i>
+                            <span>Send Email & Open Provider</span>
                         </button>
                     </form>
 
-                    <div id="gate-request-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
+                    <div id="gate-request-feedback" class="text-xs hidden p-3.5 rounded-xl border"></div>
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 flex items-center justify-between">
@@ -65,20 +69,20 @@
                 <div class="space-y-4">
                     <div class="flex items-center gap-3">
                         <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">2</span>
-                        <h2 class="text-base font-bold text-slate-900 m-0">Unlock with Passcode</h2>
+                        <h2 class="text-base font-bold text-slate-900 m-0">Unlock with Payment Code</h2>
                     </div>
-                    <p class="text-xs text-slate-600 leading-relaxed">
-                        Already submitted a request? Enter the <strong>unique 6-digit numeric passcode</strong> delivered to your email inbox.
+                    <p class="text-xs text-slate-600 leading-relaxed m-0">
+                        When you complete payment, enter the unique reference code shared in your email request below to unlock full website access:
                     </p>
 
                     <form id="gate-passcode-form" onsubmit="handleGatePasscode(event)" class="space-y-3">
                         <div>
-                            <label for="gate-passcode-input" class="text-xs font-bold text-slate-700 block mb-1">6-Digit Access Passcode</label>
-                            <input type="text" id="gate-passcode-input" maxlength="12" required placeholder="Enter 6-digit passcode" class="form-control text-sm font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white">
+                            <label for="gate-passcode-input" class="text-xs font-bold text-slate-700 block mb-1">Payment Reference Access Code</label>
+                            <input type="text" id="gate-passcode-input" maxlength="12" required placeholder="Enter code shared in request" class="form-control text-sm font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white">
                         </div>
                         <button type="submit" id="gate-passcode-submit-btn" class="w-full btn btn-success text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 border-0">
                             <i class="bi bi-shield-check"></i>
-                            <span>Unlock Full Portal</span>
+                            <span>Unlock All Website Access</span>
                         </button>
                     </form>
 
@@ -88,7 +92,7 @@
                 <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 space-y-1">
                     <div class="flex items-center gap-1.5 text-slate-700">
                         <i class="bi bi-check2-circle text-emerald-600"></i>
-                        <span>No hints provided. Unlocks via unique email code or link.</span>
+                        <span>No hints provided. Unlocks via unique request code or admin allow button.</span>
                     </div>
                 </div>
             </div>
@@ -118,39 +122,80 @@
 <script>
 const NEXT_URL = {{ next_url | tojson }};
 
+function copyEmailTemplate(encodedText, btn) {
+    const decoded = decodeURIComponent(encodedText);
+    navigator.clipboard.writeText(decoded).then(() => {
+        const orig = btn.innerHTML;
+        btn.innerHTML = `<i class="bi bi-check-lg"></i> Copied!`;
+        btn.classList.add("btn-success");
+        btn.classList.remove("btn-outline-secondary");
+        setTimeout(() => {
+            btn.innerHTML = orig;
+            btn.classList.remove("btn-success");
+            btn.classList.add("btn-outline-secondary");
+        }, 1800);
+    });
+}
+
 async function handleGateRequest(e) {
     e.preventDefault();
     const emailInput = document.getElementById('gate-email-input');
+    const nameInput = document.getElementById('gate-name-input');
     const feedback = document.getElementById('gate-request-feedback');
     const btn = document.getElementById('gate-request-submit-btn');
     const email = emailInput.value.trim();
+    const name = nameInput ? nameInput.value.trim() : '';
 
     if (!email) return;
 
     btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Sending request...`;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Preparing email...`;
     feedback.className = "text-xs hidden p-3 rounded-xl border";
 
     try {
         const res = await fetch("/api/request-access", {
             method: "POST",
             headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email })
+            body: JSON.stringify({ email: email, name: name })
         });
         const data = await res.json();
 
         if (res.ok && data.success) {
-            feedback.className = "text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex flex-col gap-1";
+            // Trigger default mail client
+            if (data.mailto_url) {
+                try {
+                    window.location.href = data.mailto_url;
+                } catch (err) {
+                    console.warn("Mailto notice:", err);
+                }
+            }
+
+            feedback.className = "text-xs p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 block space-y-2";
             feedback.innerHTML = `
-                <div class="font-bold flex items-center gap-1.5">
+                <div class="font-bold flex items-center gap-1.5 text-emerald-800">
                     <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                    <span>Request Sent Successfully!</span>
+                    <span>Email Provider Opened with Pre-Filled Request!</span>
                 </div>
-                <span>${data.message}</span>
-                <div class="mt-1">
-                    <a href="${data.inbox_url || '/access/inbox'}" class="text-emerald-900 font-bold underline">
-                        Open Simulated Inbox to View Received Mail & Passcode →
+                <p class="text-[11px] text-slate-700 m-0">
+                    Sent to receiver: <strong class="text-slate-900 font-mono">azureanoopranjan@gmail.com</strong> with your unique payment verification code embedded.
+                </p>
+                <div class="flex flex-wrap gap-1.5 pt-1">
+                    <a href="${data.mailto_url}" class="btn btn-sm btn-outline-primary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                        <i class="bi bi-envelope-fill"></i> Default Mail Client
                     </a>
+                    <a href="${data.gmail_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                        <i class="bi bi-google"></i> Open in Gmail (Web)
+                    </a>
+                    <a href="${data.outlook_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                        <i class="bi bi-microsoft"></i> Open in Outlook (Web)
+                    </a>
+                    <button type="button" onclick="copyEmailTemplate('${encodeURIComponent(data.body)}', this)" class="btn btn-sm btn-outline-secondary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
+                        <i class="bi bi-clipboard"></i> Copy Email Template
+                    </button>
+                </div>
+                <div class="text-[11px] text-amber-900 bg-amber-50/90 border border-amber-200 p-2 rounded-lg mt-1 font-medium">
+                    <i class="bi bi-info-circle-fill text-amber-600 me-1"></i>
+                    <strong>When payment is done:</strong> The code shared in your email request will unlock all website access in Step 2.
                 </div>
             `;
             feedback.classList.remove('hidden');
@@ -165,7 +210,7 @@ async function handleGateRequest(e) {
         feedback.classList.remove('hidden');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-envelope-paper-fill"></i> <span>Send Access Request & Passcode</span>`;
+        btn.innerHTML = `<i class="bi bi-envelope-arrow-up-fill"></i> <span>Send Email & Open Provider</span>`;
     }
 }
 
@@ -208,7 +253,7 @@ async function handleGatePasscode(e) {
         feedback.classList.remove('hidden');
     } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-shield-check"></i> <span>Unlock Full Portal</span>`;
+        btn.innerHTML = `<i class="bi bi-shield-check"></i> <span>Unlock All Website Access</span>`;
     }
 }
 </script>

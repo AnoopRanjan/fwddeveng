@@ -557,18 +557,24 @@ def access_gate():
 def request_access_api():
     data = request.get_json() or request.form or {}
     email = str(data.get("email") or "").strip().lower()
+    name = str(data.get("name") or "").strip()
     if not email or "@" not in email or "." not in email:
         return jsonify({"success": False, "message": "Please enter a valid email address."}), 400
 
     conn = get_db()
-    req_info = create_access_request(conn, email, request.host_url, request.remote_addr or "")
+    req_info = create_access_request(conn, email, request.host_url, request.remote_addr or "", requester_name=name)
     conn.close()
 
     return jsonify({
         "success": True,
-        "message": f"Unique 6-digit passcode and Allow link generated for {email}!",
+        "message": f"Pre-filled email prepared for receiver azureanoopranjan@gmail.com with your unique payment reference passcode!",
         "email": email,
         "passcode": req_info["passcode"],
+        "mailto_url": req_info["mailto_url"],
+        "gmail_url": req_info["gmail_url"],
+        "outlook_url": req_info["outlook_url"],
+        "subject": req_info["subject"],
+        "body": req_info["body"],
         "inbox_url": url_for("access_inbox")
     })
 
