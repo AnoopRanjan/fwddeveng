@@ -102,14 +102,24 @@
                 </div>
 
                 <div class="mt-4">
-                    <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider mb-2">Embedded Video Course</h3>
-                    <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800">
-                        <iframe class="w-full h-full" src="{{ topic.youtube_embed }}" title="{{ topic.youtube_title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
-                    </div>
-                    <div class="mt-2 text-right">
-                        <a href="{{ topic.youtube_url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-cyan-400 hover:underline">
-                            Open full course playlist on YouTube ↗
+                    {% set day_video_embed = day.video_embed or topic.youtube_embed %}
+                    {% set day_video_title = day.video_title or topic.youtube_title %}
+                    {% set day_video_url = day.video_url or topic.youtube_url %}
+                    {% set day_instructor = day.video_instructor or topic.instructor or 'Technical Training' %}
+
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[10px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800">
+                                {{ day_instructor }}
+                            </span>
+                            <h3 class="text-xs font-bold text-gray-400 uppercase tracking-wider">Video Course</h3>
+                        </div>
+                        <a href="{{ day_video_url }}" target="_blank" rel="noopener noreferrer" class="text-xs text-cyan-400 hover:underline">
+                            Open on YouTube ↗
                         </a>
+                    </div>
+                    <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800 shadow-xl">
+                        <iframe class="w-full h-full" src="{{ day_video_embed }}" title="{{ day_video_title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
                 </div>
             </div>

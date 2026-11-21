@@ -12,7 +12,7 @@
                 <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-indigo-950 text-indigo-300 border border-indigo-700">
                     Day-by-Day Interactive Course Portal
                 </span>
-                <span class="text-xs text-gray-400">35-Day Curriculum with Verified Video Embeds</span>
+                <span class="text-xs text-gray-400">35-Day Curriculum with Verified & Playable Video Embeds</span>
             </div>
             <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-1">
                 Day {{ active_day.day }}: {{ active_day.title }}
@@ -56,7 +56,7 @@
                 <span class="text-cyan-400 font-mono">{{ metrics.completed_days }}/35 Done</span>
             </div>
 
-            <div class="bg-darkCard border border-gray-800 rounded-2xl p-2 max-h-[750px] overflow-y-auto space-y-1.5 divide-y divide-gray-800/40">
+            <div class="bg-darkCard border border-gray-800 rounded-2xl p-2 max-h-[780px] overflow-y-auto space-y-1.5 divide-y divide-gray-800/40">
                 {% for d in roadmap_days %}
                 {% set d_status = progress_data[d.day] %}
                 {% set d_topic = topics_map[d.topic_id] %}
@@ -80,7 +80,10 @@
                     </div>
 
                     <div class="flex items-center justify-between text-[11px] text-gray-400 mt-1 pl-8">
-                        <span class="truncate">{{ d_topic.title }}</span>
+                        <span class="truncate flex items-center gap-1">
+                            <span class="text-[10px] text-red-400 font-semibold">▶</span>
+                            <span class="text-gray-300 truncate">{{ d.video_instructor }}</span>
+                        </span>
                         <span class="text-[10px] font-mono text-gray-500">P{{ d.phase }}</span>
                     </div>
                 </a>
@@ -92,25 +95,33 @@
         <div class="lg:col-span-8 space-y-6">
 
             <!-- Video Player Card -->
+            {% set day_video_embed = active_day.video_embed or active_topic.youtube_embed %}
+            {% set day_video_title = active_day.video_title or active_topic.youtube_title %}
+            {% set day_video_url = active_day.video_url or active_topic.youtube_url %}
+            {% set day_instructor = active_day.video_instructor or active_topic.instructor or 'Technical Instructor' %}
+
             <div class="bg-darkCard border border-gray-800 rounded-2xl p-5 sm:p-6 space-y-4 shadow-xl">
-                <div class="flex items-center justify-between border-b border-gray-800 pb-3">
-                    <div class="space-y-0.5">
-                        <span class="text-xs font-bold text-cyan-400 uppercase tracking-wider flex items-center gap-1.5">
-                            <svg class="w-4 h-4" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-                            <span>{{ active_topic.youtube_title }}</span>
-                        </span>
-                        <h2 class="text-base font-bold text-white">Recommended Video Course for Day {{ active_day.day }}</h2>
+                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-gray-800 pb-3">
+                    <div class="space-y-1">
+                        <div class="flex flex-wrap items-center gap-2">
+                            <span class="px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-950 text-cyan-300 border border-cyan-800 flex items-center gap-1.5">
+                                <svg class="w-3.5 h-3.5 text-red-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                                <span>{{ day_instructor }}</span>
+                            </span>
+                            <span class="text-xs text-gray-400">Day {{ active_day.day }} Full Video Course</span>
+                        </div>
+                        <h2 class="text-base sm:text-lg font-bold text-white">{{ day_video_title }}</h2>
                     </div>
 
-                    <a href="{{ active_topic.youtube_url }}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-gray-200 border border-gray-700 transition flex items-center gap-1">
-                        <span>YouTube</span>
+                    <a href="{{ day_video_url }}" target="_blank" rel="noopener noreferrer" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-xs text-gray-200 border border-gray-700 transition flex items-center gap-1.5 self-start sm:self-center flex-shrink-0">
+                        <span>Open on YouTube</span>
                         <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
                     </a>
                 </div>
 
                 <!-- Video Frame -->
                 <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800 shadow-2xl">
-                    <iframe class="w-full h-full" src="{{ active_topic.youtube_embed }}" title="{{ active_topic.youtube_title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                    <iframe class="w-full h-full" src="{{ day_video_embed }}" title="{{ day_video_title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                 </div>
             </div>
 

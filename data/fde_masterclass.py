@@ -1,46 +1,45 @@
 """
 Definitive FDE Masterclass & Project Exploration Guide:
-Features the longest-duration, comprehensive free full course for Forward Deployed Engineering,
-paired with enterprise project implementation and Palantir methodology.
+Features the full project implementation course by Krish Naik (FSZhPDzESPU)
+as the primary dashboard video, paired with Saurav Verma's FDE foundation course
+and Palantir methodology.
 """
 
 FDE_MASTER_COURSE = {
-    "title": "Forward Deployed Engineer Full Course (Zero to Production Field Deployment)",
-    "instructor": "Saurav Verma (GenAI / FDE Course) with Krish Naik & Palantir",
-    "duration": "Comprehensive Full Course (Multi-Hour Marathon)",
-    "primary_video_id": "NFiDNzQTzXY",
-    "primary_video_embed": "https://www.youtube-nocookie.com/embed/NFiDNzQTzXY",
-    "primary_video_url": "https://www.youtube.com/watch?v=NFiDNzQTzXY",
-    "project_video_id": "FSZhPDzESPU",
-    "project_video_embed": "https://www.youtube-nocookie.com/embed/FSZhPDzESPU",
-    "project_video_url": "https://www.youtube.com/watch?v=FSZhPDzESPU",
+    "title": "Complete End To End AI Forward Deployed Engineer (FDE) Project Implementation",
+    "instructor": "Krish Naik",
+    "duration": "Full Marathon Course (~3+ Hours End-to-End Implementation)",
+    "primary_video_id": "FSZhPDzESPU",
+    "primary_video_embed": "https://www.youtube-nocookie.com/embed/FSZhPDzESPU",
+    "primary_video_url": "https://www.youtube.com/watch?v=FSZhPDzESPU",
+    "companion_video_id": "NFiDNzQTzXY",
+    "companion_video_embed": "https://www.youtube-nocookie.com/embed/NFiDNzQTzXY",
+    "companion_video_url": "https://www.youtube.com/watch?v=NFiDNzQTzXY",
+    "companion_title": "Forward Deployed Engineer Full Course for Beginners - Saurav Verma",
+    "companion_label": "Saurav Verma FDE Course",
     "palantir_video_id": "5OYy_UtINo4",
     "palantir_video_embed": "https://www.youtube-nocookie.com/embed/5OYy_UtINo4",
     "palantir_video_url": "https://www.youtube.com/watch?v=5OYy_UtINo4",
     "tim_video_id": "vLlIBT0HSSc",
     "tim_video_embed": "https://www.youtube-nocookie.com/embed/vLlIBT0HSSc",
     "tim_video_url": "https://www.youtube.com/watch?v=vLlIBT0HSSc",
-    "description": "The definitive, longest-duration free full course on Forward Deployed Engineering (FDE) available on YouTube. Designed specifically to convert any developer at any level into an elite Forward Deployed Engineer. Covers the complete spectrum: role definitions, tech foundations from zero (APIs, SQL, Python, Git, Terminal, Models, RAG, MCP, Docker), end-to-end client project implementation, and interview preparation for $300k+ enterprise roles.",
+    "description": "The complete, hands-on enterprise AI project implementation course for Forward Deployed Engineers (FDE). Walks through the entire delivery lifecycle: data ingestion pipeline design, multi-agent AI orchestration with LangGraph, secure enterprise API integration, UI development, Docker containerization, and production cloud deployment.",
     "chapters": [
         {
-            "part": "Part 1: The FDE Job Profile & Mindset",
-            "time": "Module 1",
-            "desc": "How FDE fundamentally differs from standard SWE, Solutions Engineering, and IT consulting. Understanding customer empathy, discovering unstated operational bottlenecks, and the high-agency delivery loop."
+            "part": "Module 1: Enterprise Architecture & Project Setup",
+            "desc": "Project scoping, environment setup, architecture diagrams, modular coding standards, and virtual environments."
         },
         {
-            "part": "Part 2: The Core Tech Stack from Zero",
-            "time": "Module 2",
-            "desc": "Non-negotiable technical skills: APIs, HTTP protocols, SQL/database plumbing, Python backend systems, Git workflows, Docker containerization, and modern AI orchestration (RAG, vector search, MCP)."
+            "part": "Module 2: Ingestion & Vector Pipeline",
+            "desc": "Data preprocessing, custom chunking strategies, vector embeddings generation, and vector store configuration."
         },
         {
-            "part": "Part 3: End-to-End Enterprise Client Project",
-            "time": "Module 3",
-            "desc": "Building a full client solution from scratch: discovery interview, scoping requirements, designing the cloud & AI architecture, writing production glue code, live testing, and system handover."
+            "part": "Module 3: Multi-Agent AI Orchestration (LangGraph)",
+            "desc": "Designing stateful multi-agent workflows, tool execution loops, error handling, and human-in-the-loop validation."
         },
         {
-            "part": "Part 4: Getting Hired as an FDE",
-            "time": "Module 4",
-            "desc": "The 90-day transition roadmap, tailoring your resume from software engineering to FDE advisory, building convincing proof-of-work portfolio artifacts, and acing mock system design rounds."
+            "part": "Module 4: Production Deployment & CI/CD",
+            "desc": "Docker containerization, automated GitHub Actions pipelines, cloud hosting, and client monitoring handover."
         }
     ],
     "core_stages": [

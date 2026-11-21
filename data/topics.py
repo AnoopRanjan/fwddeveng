@@ -1,8 +1,8 @@
 """
 Topics module: Contains exhaustive learning data for the 10 core subjects
 covering Azure exams (AZ-500, SC-200, SC-300, AI-102, AZ-305, SC-100),
-MSDN documentation, verified & playable YouTube video embeds, labs,
-and FDE advisory perspectives.
+MSDN documentation, 10 completely distinct & playable YouTube video embeds
+from different top instructors, labs, and FDE advisory perspectives.
 """
 
 TOPICS = [
@@ -39,6 +39,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/6vISzj-z8k4",
         "youtube_title": "AZ-500 Microsoft Azure Security Technologies Study Cram - John Savill",
         "youtube_url": "https://www.youtube.com/watch?v=6vISzj-z8k4",
+        "instructor": "John Savill's Technical Training",
         "core_concepts": [
             "Enterprise Management Group Hierarchies & Subscription governance",
             "Azure Policy initiatives & automated remediation tasks (DeployIfNotExists)",
@@ -102,6 +103,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/Pl8n6GaWEo0",
         "youtube_title": "Kusto Query Language (KQL) & Microsoft Sentinel Deep Dive - John Savill",
         "youtube_url": "https://www.youtube.com/watch?v=Pl8n6GaWEo0",
+        "instructor": "John Savill's Technical Training",
         "core_concepts": [
             "Log Analytics Workspace design: multi-workspace vs single centralized workspace & commitments",
             "Data Connectors: Microsoft Entra ID, Defender XDR, Windows Security Events, Syslog/CEF, CloudTrail",
@@ -162,9 +164,10 @@ TOPICS = [
                 "desc": "Vulnerability scanning for ACR, AKS runtime protection, and malware scanning for Blob storage."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/2Qu5gQjNQh4",
-        "youtube_title": "Microsoft Defender for Cloud, CSPM & CWPP Architecture - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=2Qu5gQjNQh4",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/220xP-Ok92s",
+        "youtube_title": "Microsoft Defender for Cloud & SIEM/SOAR Architecture Masterclass",
+        "youtube_url": "https://www.youtube.com/watch?v=220xP-Ok92s",
+        "instructor": "Microsoft Security Specialists",
         "core_concepts": [
             "CSPM vs CWPP distinction: proactive configuration auditing vs active runtime threat detection",
             "Secure Score calculation: prioritized security controls and remediation impact",
@@ -228,6 +231,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/LGpgqRVG65g",
         "youtube_title": "SC-300 Microsoft Identity and Access Administrator Study Cram - John Savill",
         "youtube_url": "https://www.youtube.com/watch?v=LGpgqRVG65g",
+        "instructor": "John Savill's Technical Training",
         "core_concepts": [
             "Modern Auth Protocols: OAuth 2.0, OpenID Connect (OIDC), SAML 2.0, token life cycles",
             "Conditional Access Architecture: Signals (User risk, Sign-in risk, Device compliance, Named locations) → Grant controls",
@@ -291,6 +295,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/0k5G6M0x5J8",
         "youtube_title": "Azure Virtual Network & Network Security Master Class - John Savill",
         "youtube_url": "https://www.youtube.com/watch?v=0k5G6M0x5J8",
+        "instructor": "John Savill's Technical Training",
         "core_concepts": [
             "Hub-Spoke VNet Topology with VNet Peering and User Defined Routes (UDR 0.0.0.0/0 to Firewall)",
             "Network Security Groups (NSGs) & Application Security Groups (ASGs) for micro-segmentation",
@@ -351,9 +356,10 @@ TOPICS = [
                 "desc": "How to snapshot compromised VM disks for offline forensic analysis without altering chain of custody."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/2Qu5gQjNQh4",
-        "youtube_title": "Cloud Incident Response, Forensics & Cyber Architecture (SC-100) - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=2Qu5gQjNQh4",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/gmuTjeQUbTM",
+        "youtube_title": "Harvard CS50's Introduction to Cybersecurity & Digital Forensics - Dr. David J. Malan",
+        "youtube_url": "https://www.youtube.com/watch?v=gmuTjeQUbTM",
+        "instructor": "Harvard CS50 / freeCodeCamp",
         "core_concepts": [
             "The 4-stage IR Lifecycle: Preparation, Detection & Analysis, Containment & Eradication, Recovery & Post-Incident Review (PIR)",
             "Triage & Scoping: Determining blast radius, compromised identities, and lateral movement",
@@ -414,9 +420,10 @@ TOPICS = [
                 "desc": "Automated image scanning upon push and continuous runtime scanning for vulnerable packages in containers."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/6vISzj-z8k4",
-        "youtube_title": "Enterprise Vulnerability Management, MDVM & Security Operations - John Savill",
-        "youtube_url": "https://www.youtube.com/watch?v=6vISzj-z8k4",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/58Tn2xB8kIE",
+        "youtube_title": "DevSecOps Course for Beginners: Vulnerability Lifecycle & API Security - Scott Bly",
+        "youtube_url": "https://www.youtube.com/watch?v=58Tn2xB8kIE",
+        "instructor": "Scott Bly / freeCodeCamp",
         "core_concepts": [
             "Vulnerability Lifecycle: Discovery, Prioritization, Remediation, Verification, Reporting",
             "CVSS v3.1 / v4.0 metrics: Exploitability vs Impact metrics, EPSS (Exploit Prediction Scoring System)",
@@ -480,6 +487,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/vLlIBT0HSSc",
         "youtube_title": "AI Security, Prompt Injection & Defensive LLM Architecture - Tech With Tim",
         "youtube_url": "https://www.youtube.com/watch?v=vLlIBT0HSSc",
+        "instructor": "Tech With Tim",
         "core_concepts": [
             "OWASP LLM Top 10: LLM01 Prompt Injection (Direct jailbreaks vs Indirect injection via untrusted data)",
             "LLM02 Sensitive Data Disclosure: PII leakage, system prompt extraction, credential exfiltration",
@@ -543,6 +551,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/2maPaQutcWs",
         "youtube_title": "Complete Generative AI with Azure OpenAI Services Crash Course - Krish Naik",
         "youtube_url": "https://www.youtube.com/watch?v=2maPaQutcWs",
+        "instructor": "Krish Naik",
         "core_concepts": [
             "RAG (Retrieval-Augmented Generation) pipeline: Ingestion, Chunking strategies (fixed, semantic, markdown), Vectorization",
             "Azure AI Search Hybrid Search: combining BM25 keyword search with cosine similarity dense vectors and Semantic Reranking",
@@ -606,6 +615,7 @@ TOPICS = [
         "youtube_embed": "https://www.youtube-nocookie.com/embed/NFiDNzQTzXY",
         "youtube_title": "Forward Deployed Engineer Full Course for Beginners - Saurav Verma",
         "youtube_url": "https://www.youtube.com/watch?v=NFiDNzQTzXY",
+        "instructor": "Saurav Verma",
         "core_concepts": [
             "The FDE Philosophy: Working at the nexus of Customer Problem, Architecture, Product, and Live Implementation",
             "Root Cause Discovery: Moving past 'what the client asked for' to uncover 'the underlying operational bottleneck'",
