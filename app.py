@@ -17,6 +17,15 @@ from data.kql_queries import KQL_QUERIES, MOCK_LOGS, get_kql_by_id
 from data.interview_prep import POSITIONING_STRATEGY, ELEVATOR_PITCH, INTERVIEW_QUESTIONS, get_questions_by_category
 from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS, FDE_BRIEFING_10MIN
 from data.outreach import parse_institutes_from_upload, generate_sales_email, get_sample_csv_template, SAMPLE_INSTITUTIONS, DEFAULT_SENDER, SIGN_OFF_NAME
+from data.access_control import (
+    create_access_request,
+    verify_and_consume_passcode,
+    get_request_by_token,
+    approve_access_by_token,
+    get_all_inbox_messages,
+    ADMIN_EMAIL,
+    ADMIN_NAME
+)
 
 # Base paths configuration for absolute directory resolution (essential for Vercel serverless)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -88,6 +97,35 @@ def init_db():
             content TEXT,
             tag TEXT,
             created_at TEXT
+        )
+    """)
+
+    # Access requests table (unique passcode & allow link tracking)
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS access_requests (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            email TEXT NOT NULL,
+            passcode TEXT NOT NULL,
+            token TEXT NOT NULL UNIQUE,
+            status TEXT DEFAULT 'pending',
+            created_at TEXT NOT NULL,
+            approved_at TEXT,
+            ip_address TEXT
+        )
+    """)
+
+    # Simulated email inbox table
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS simulated_inbox (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            recipient TEXT NOT NULL,
+            sender TEXT NOT NULL,
+            subject TEXT NOT NULL,
+            body TEXT NOT NULL,
+            token TEXT,
+            passcode TEXT,
+            sent_at TEXT NOT NULL,
+            is_read INTEGER DEFAULT 0
         )
     """)
     
@@ -173,14 +211,38 @@ def inject_global_metrics():
     )
 
 
-# Ensure DB exists before handling request
+# Server-side Access Gate: Only home page ("/") and access endpoints are open
 @app.before_request
-def ensure_db_ready():
+def check_portal_access():
     if not os.path.exists(DB_PATH):
         try:
             init_db()
         except Exception:
             pass
+
+    # Completely public routes
+    public_paths = {
+        "/",
+        "/access-gate",
+        "/access/inbox",
+        "/download/sample-institutions.csv",
+        "/api/request-access",
+        "/api/unlock-portal",
+        "/api/lock-portal"
+    }
+
+    if (
+        request.path in public_paths
+        or request.path.startswith("/static")
+        or request.path.startswith("/access/allow")
+    ):
+        return None
+
+    # Restrict all other portal routes unless session is unlocked
+    if not session.get("fde_access"):
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "Access restricted. Please request an access passcode.", "restricted": True}), 403
+        return redirect(url_for("access_gate", next=request.path))
 
 
 # ================= ROUTES =================
@@ -481,31 +543,111 @@ def download_sample_csv():
     )
 
 
-# ================= PORTAL ACCESS CONTROL & VIP UNLOCK =================
+# ================= PORTAL ACCESS CONTROL, PASSCODES & ALLOW WORKFLOW =================
+
+@app.route("/access-gate")
+def access_gate():
+    next_url = request.args.get("next") or url_for("courses_hub")
+    if session.get("fde_access"):
+        return redirect(next_url)
+    return render_template("access_gate.html", next_url=next_url)
+
+
+@app.route("/api/request-access", methods=["POST"])
+def request_access_api():
+    data = request.get_json() or request.form or {}
+    email = str(data.get("email") or "").strip().lower()
+    if not email or "@" not in email or "." not in email:
+        return jsonify({"success": False, "message": "Please enter a valid email address."}), 400
+
+    conn = get_db()
+    req_info = create_access_request(conn, email, request.host_url, request.remote_addr or "")
+    conn.close()
+
+    return jsonify({
+        "success": True,
+        "message": f"Unique 6-digit passcode and Allow link generated for {email}!",
+        "email": email,
+        "passcode": req_info["passcode"],
+        "inbox_url": url_for("access_inbox")
+    })
+
 
 @app.route("/api/unlock-portal", methods=["POST"])
 def unlock_portal():
-    data = request.get_json() or {}
-    key = str(data.get("key") or data.get("passcode") or "").strip().upper()
+    data = request.get_json() or request.form or {}
+    passcode = str(data.get("passcode") or data.get("key") or "").strip()
     
-    # Valid passcodes (case-insensitive) or any key containing VIP / FDE
-    valid_keys = {"AZURE-FDE-VIP", "ANOOP-FDE-2026", "AZUREANOOPRANJAN", "AZUREANOOPRANJAN@GMAIL.COM", "VIP2026", "PRIYA-FDE", "FDE2026", "ACCESS"}
-    if key in valid_keys or "VIP" in key or "FDE" in key or "ANOOP" in key or "AZURE" in key:
+    conn = get_db()
+    success, email_or_msg, error_detail = verify_and_consume_passcode(conn, passcode)
+    conn.close()
+
+    if success:
         session["fde_access"] = True
-        return jsonify({"success": True, "message": "Access granted successfully!"})
+        session["access_email"] = email_or_msg
+        return jsonify({
+            "success": True,
+            "message": "Access granted successfully! Welcome to the Azure AI FDE Portal."
+        })
     
-    # Grant access if user simulated email request confirmation
-    if data.get("requested_via_email"):
-        session["fde_access"] = True
-        return jsonify({"success": True, "message": "Access pass unlocked via request!"})
+    return jsonify({
+        "success": False,
+        "message": error_detail or "Invalid passcode. Please enter the unique 6-digit code received in your email."
+    }), 400
+
+
+@app.route("/access/allow/<token>", methods=["GET"])
+def access_allow_page(token):
+    conn = get_db()
+    req_item = get_request_by_token(conn, token)
+    conn.close()
+    
+    if not req_item:
+        return render_template("access_allow.html", error="Invalid or expired access link.", token=token)
         
-    return jsonify({"success": False, "message": "Invalid access key. Please email azureanoopranjan@gmail.com to request access."}), 400
+    return render_template(
+        "access_allow.html",
+        request_item=dict(req_item),
+        token=token,
+        already_approved=(req_item["status"] == "approved" or bool(session.get("fde_access")))
+    )
 
 
-@app.route("/api/lock-portal", methods=["POST"])
+@app.route("/access/allow/<token>/submit", methods=["POST"], endpoint="access_allow_submit")
+def access_allow_submit(token):
+    conn = get_db()
+    success, req_dict = approve_access_by_token(conn, token)
+    conn.close()
+    
+    if not success:
+        return render_template("access_allow.html", error="Unable to approve access. Link may be invalid.", token=token)
+        
+    session["fde_access"] = True
+    session["access_email"] = req_dict.get("email")
+    
+    return render_template(
+        "access_allow.html",
+        request_item=req_dict,
+        token=token,
+        already_approved=True
+    )
+
+
+@app.route("/access/inbox")
+def access_inbox():
+    conn = get_db()
+    messages = get_all_inbox_messages(conn)
+    conn.close()
+    return render_template("access_inbox.html", messages=messages)
+
+
+@app.route("/api/lock-portal", methods=["GET", "POST"])
 def lock_portal():
     session.pop("fde_access", None)
-    return jsonify({"success": True, "message": "Portal locked."})
+    session.pop("access_email", None)
+    if request.is_json:
+        return jsonify({"success": True, "message": "Portal locked successfully."})
+    return redirect(url_for("index"))
 
 
 # ================= JSON API ENDPOINTS =================

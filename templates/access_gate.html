@@ -1,0 +1,215 @@
+{% extends "base.html" %}
+
+{% block title %}Restricted Access Gate | Azure AI FDE Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+
+    <!-- Hero Card -->
+    <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl mb-8">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
+            <div class="space-y-1">
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-wider">
+                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <span>Member Access Required</span>
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                    Azure AI Forward Deployed Engineer Access Gate
+                </h1>
+                <p class="text-slate-600 text-sm leading-relaxed max-w-2xl">
+                    The <strong class="text-blue-600 font-semibold">Home Dashboard</strong> is freely accessible to everyone. The full 35-day curriculum, hands-on lab sandbox guides, sentinel KQL attack simulator, and capstone architectures are reserved for verified members.
+                </p>
+            </div>
+            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm self-start sm:self-auto rounded-xl text-xs font-semibold px-4 py-2">
+                ← Back to Home
+            </a>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+            
+            <!-- Column 1: Request Access via Email -->
+            <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">1</span>
+                        <h2 class="text-base font-bold text-slate-900 m-0">Request Access via Email</h2>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Enter your email address. A unique <strong>6-digit random passcode</strong> and a direct <strong>Allow Access link</strong> with an approval button will be sent directly to your inbox.
+                    </p>
+
+                    <form id="gate-request-form" onsubmit="handleGateRequest(event)" class="space-y-3">
+                        <div>
+                            <label for="gate-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Email Address</label>
+                            <input type="email" id="gate-email-input" required placeholder="colleague@organization.com" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
+                        </div>
+                        <button type="submit" id="gate-request-submit-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
+                            <i class="bi bi-envelope-paper-fill"></i>
+                            <span>Send Access Request & Passcode</span>
+                        </button>
+                    </form>
+
+                    <div id="gate-request-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 flex items-center justify-between">
+                    <span>Admin: <strong class="text-slate-700 font-mono">azureanoopranjan@gmail.com</strong></span>
+                    <a href="{{ url_for('access_inbox') }}" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                        <i class="bi bi-inbox-fill"></i> View Inbox
+                    </a>
+                </div>
+            </div>
+
+            <!-- Column 2: Lock by Passcode Section -->
+            <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
+                <div class="space-y-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">2</span>
+                        <h2 class="text-base font-bold text-slate-900 m-0">Unlock with Passcode</h2>
+                    </div>
+                    <p class="text-xs text-slate-600 leading-relaxed">
+                        Already submitted a request? Enter the <strong>unique 6-digit numeric passcode</strong> delivered to your email inbox.
+                    </p>
+
+                    <form id="gate-passcode-form" onsubmit="handleGatePasscode(event)" class="space-y-3">
+                        <div>
+                            <label for="gate-passcode-input" class="text-xs font-bold text-slate-700 block mb-1">6-Digit Access Passcode</label>
+                            <input type="text" id="gate-passcode-input" maxlength="12" required placeholder="Enter 6-digit passcode" class="form-control text-sm font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white">
+                        </div>
+                        <button type="submit" id="gate-passcode-submit-btn" class="w-full btn btn-success text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 border-0">
+                            <i class="bi bi-shield-check"></i>
+                            <span>Unlock Full Portal</span>
+                        </button>
+                    </form>
+
+                    <div id="gate-passcode-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
+                </div>
+
+                <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 space-y-1">
+                    <div class="flex items-center gap-1.5 text-slate-700">
+                        <i class="bi bi-check2-circle text-emerald-600"></i>
+                        <span>No hints provided. Unlocks via unique email code or link.</span>
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- Or Email Allow Link Notice -->
+        <div class="mt-8 bg-blue-50/60 border border-blue-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 text-sm text-slate-700">
+                <span class="p-2.5 rounded-xl bg-blue-600 text-white flex-shrink-0 shadow-sm">
+                    <i class="bi bi-envelope-check-fill text-lg"></i>
+                </span>
+                <div>
+                    <strong class="text-slate-900 block font-semibold">Prefer instant 1-click email unlock?</strong>
+                    <span class="text-xs text-slate-600">Open the email received in your inbox and click the <strong class="text-blue-700">"Allow Access"</strong> button to unlock without typing a code.</span>
+                </div>
+            </div>
+            <a href="{{ url_for('access_inbox') }}" class="btn btn-outline-primary btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-semibold text-xs">
+                Check Received Emails →
+            </a>
+        </div>
+
+    </div>
+
+</div>
+
+<script>
+const NEXT_URL = {{ next_url | tojson }};
+
+async function handleGateRequest(e) {
+    e.preventDefault();
+    const emailInput = document.getElementById('gate-email-input');
+    const feedback = document.getElementById('gate-request-feedback');
+    const btn = document.getElementById('gate-request-submit-btn');
+    const email = emailInput.value.trim();
+
+    if (!email) return;
+
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Sending request...`;
+    feedback.className = "text-xs hidden p-3 rounded-xl border";
+
+    try {
+        const res = await fetch("/api/request-access", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ email: email })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            feedback.className = "text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex flex-col gap-1";
+            feedback.innerHTML = `
+                <div class="font-bold flex items-center gap-1.5">
+                    <i class="bi bi-check-circle-fill text-emerald-600"></i>
+                    <span>Request Sent Successfully!</span>
+                </div>
+                <span>${data.message}</span>
+                <div class="mt-1">
+                    <a href="${data.inbox_url || '/access/inbox'}" class="text-emerald-900 font-bold underline">
+                        Open Simulated Inbox to View Received Mail & Passcode →
+                    </a>
+                </div>
+            `;
+            feedback.classList.remove('hidden');
+        } else {
+            feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
+            feedback.textContent = data.message || "Failed to submit request. Please try again.";
+            feedback.classList.remove('hidden');
+        }
+    } catch (err) {
+        feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
+        feedback.textContent = "Network error. Please try again.";
+        feedback.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-envelope-paper-fill"></i> <span>Send Access Request & Passcode</span>`;
+    }
+}
+
+async function handleGatePasscode(e) {
+    e.preventDefault();
+    const input = document.getElementById('gate-passcode-input');
+    const feedback = document.getElementById('gate-passcode-feedback');
+    const btn = document.getElementById('gate-passcode-submit-btn');
+    const passcode = input.value.trim();
+
+    if (!passcode) return;
+
+    btn.disabled = true;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Verifying...`;
+    feedback.className = "text-xs hidden p-3 rounded-xl border";
+
+    try {
+        const res = await fetch("/api/unlock-portal", {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ passcode: passcode })
+        });
+        const data = await res.json();
+
+        if (res.ok && data.success) {
+            feedback.className = "text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 font-semibold";
+            feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600 me-1"></i> ${data.message} Redirecting...`;
+            feedback.classList.remove('hidden');
+            setTimeout(() => {
+                window.location.href = NEXT_URL || "/courses";
+            }, 800);
+        } else {
+            feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
+            feedback.textContent = data.message || "Invalid passcode.";
+            feedback.classList.remove('hidden');
+        }
+    } catch (err) {
+        feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
+        feedback.textContent = "Error verifying passcode.";
+        feedback.classList.remove('hidden');
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = `<i class="bi bi-shield-check"></i> <span>Unlock Full Portal</span>`;
+    }
+}
+</script>
+{% endblock %}

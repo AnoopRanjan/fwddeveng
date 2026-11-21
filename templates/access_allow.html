@@ -1,0 +1,117 @@
+{% extends "base.html" %}
+
+{% block title %}Allow Access Verification | Azure AI FDE Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-2xl mx-auto px-4 sm:px-6 py-12 sm:py-20">
+
+    <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+
+        <!-- Top Header -->
+        <div class="text-center space-y-2 pb-6 border-b border-slate-100">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider">
+                <i class="bi bi-shield-lock-fill text-blue-600"></i>
+                <span>Official Access Verification</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
+                Azure AI FDE Portal Access Request
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-600">
+                Verify and allow portal access for this email request.
+            </p>
+        </div>
+
+        {% if error %}
+        <div class="p-4 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-sm flex items-center gap-3">
+            <i class="bi bi-exclamation-triangle-fill text-red-500 text-lg flex-shrink-0"></i>
+            <div>
+                <strong>Verification Error:</strong> {{ error }}
+            </div>
+        </div>
+        <div class="text-center pt-2">
+            <a href="{{ url_for('access_gate') }}" class="btn btn-outline-primary btn-sm rounded-xl px-4 py-2 font-semibold">
+                Go to Access Gate
+            </a>
+        </div>
+        {% else %}
+
+        <!-- Request Details Table -->
+        <div class="bg-slate-50 border border-slate-200 rounded-2xl p-5 space-y-3">
+            <div class="flex items-center justify-between text-xs sm:text-sm py-1.5 border-b border-slate-200">
+                <span class="text-slate-500 font-medium">Recipient / Requester:</span>
+                <strong class="text-slate-900 font-mono">{{ request_item.email }}</strong>
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm py-1.5 border-b border-slate-200">
+                <span class="text-slate-500 font-medium">Unique Generated Passcode:</span>
+                <span class="badge bg-slate-900 text-white font-mono text-sm px-3 py-1 rounded-lg tracking-wider">
+                    {{ request_item.passcode }}
+                </span>
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm py-1.5 border-b border-slate-200">
+                <span class="text-slate-500 font-medium">Request Submitted:</span>
+                <span class="text-slate-700 text-xs font-mono">{{ request_item.created_at }}</span>
+            </div>
+            <div class="flex items-center justify-between text-xs sm:text-sm py-1.5">
+                <span class="text-slate-500 font-medium">Current Status:</span>
+                {% if request_item.status == 'approved' or already_approved %}
+                <span class="badge bg-emerald-100 text-emerald-800 border border-emerald-300 px-2.5 py-1 rounded-full text-xs font-bold">
+                    <i class="bi bi-check-circle-fill me-1"></i> APPROVED & UNLOCKED
+                </span>
+                {% else %}
+                <span class="badge bg-amber-100 text-amber-800 border border-amber-300 px-2.5 py-1 rounded-full text-xs font-bold">
+                    <i class="bi bi-hourglass-split me-1"></i> PENDING ALLOW
+                </span>
+                {% endif %}
+            </div>
+        </div>
+
+        {% if request_item.status == 'approved' or already_approved %}
+        <!-- Already Approved / Success Banner -->
+        <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-5 text-center space-y-3">
+            <div class="w-12 h-12 rounded-full bg-emerald-600 text-white flex items-center justify-center mx-auto text-xl shadow-sm">
+                <i class="bi bi-check-lg"></i>
+            </div>
+            <div class="space-y-1">
+                <h3 class="text-lg font-bold text-emerald-950 m-0">Portal Access Granted!</h3>
+                <p class="text-xs text-emerald-800 m-0">
+                    Your session is now unlocked. You have full access to all 35 days, hands-on labs, Sentinel KQL simulator, and capstones.
+                </p>
+            </div>
+            <div class="pt-2">
+                <a href="{{ url_for('courses_hub') }}" class="btn btn-primary btn-lg rounded-xl px-6 py-2.5 font-bold text-sm shadow-md">
+                    Proceed to Interactive Courses →
+                </a>
+            </div>
+        </div>
+        {% else %}
+        <!-- Action Form: Allow Access Button -->
+        <form method="POST" action="{{ url_for('access_allow_submit', token=token) }}" class="space-y-4 text-center pt-2">
+            <p class="text-xs text-slate-600 leading-relaxed max-w-md mx-auto">
+                Click the button below to allow full access to the complete Azure AI Forward Deployed Engineer curriculum.
+            </p>
+            
+            <button type="submit" class="btn btn-primary btn-lg rounded-2xl px-8 py-3.5 font-extrabold text-base shadow-lg shadow-blue-500/20 hover:scale-[1.02] transition-transform duration-150 inline-flex items-center gap-2.5">
+                <i class="bi bi-check2-circle text-xl"></i>
+                <span>Allow Access</span>
+            </button>
+            
+            <div class="text-[11px] text-slate-500 pt-2">
+                Clicking Allow grants access to the portal for this browser session.
+            </div>
+        </form>
+        {% endif %}
+
+        {% endif %}
+
+        <!-- Footer -->
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>Administrator: <strong class="text-slate-700">Anoop Ranjan</strong></span>
+            <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline">
+                Home Dashboard →
+            </a>
+        </div>
+
+    </div>
+
+</div>
+{% endblock %}

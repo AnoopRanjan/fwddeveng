@@ -43,32 +43,53 @@ def test_video_metadata():
 def test_routes_and_access():
     client = app.app.test_client()
 
-    # Home page always 200 and accessible
+    # 1. Home page always 200 and accessible without any access pass
     res = client.get('/')
     assert res.status_code == 200
+    print("PASS: Home page is publicly accessible.")
 
-    # Courses page 200
+    # 2. Access gate page is publicly accessible
+    res = client.get('/access-gate')
+    assert res.status_code == 200
+
+    # 3. Restricted pages redirect to /access-gate when user has no access
     res = client.get('/courses')
-    assert res.status_code == 200
+    assert res.status_code == 302
+    assert "/access-gate" in res.headers["Location"]
+    print("PASS: Courses page requires access and redirects to /access-gate.")
 
-    # Institutional Outreach page 200
-    res = client.get('/institutional-outreach?load_samples=1')
-    assert res.status_code == 200
-    assert "priyaanoopranjan@gmail.com" in res.data.decode('utf-8')
-    assert "Priya Gupta" in res.data.decode('utf-8')
+    # 4. Request Access via Email -> generates unique 6-digit random passcode & Allow link
+    req_res = client.post('/api/request-access', json={'email': 'applicant@enterprise-ai.com'})
+    assert req_res.status_code == 200
+    data = req_res.get_json()
+    assert data['success'] is True
+    passcode = data['passcode']
+    assert len(passcode) == 6 and passcode.isdigit(), f"Passcode {passcode} must be 6 digits"
+    print(f"PASS: Access request generated unique random passcode: {passcode}")
 
-    # Download CSV template
-    res = client.get('/download/sample-institutions.csv')
-    assert res.status_code == 200
-    assert "Institute Name,Address,Email Address" in res.data.decode('utf-8')
+    # 5. Check simulated inbox for received email
+    inbox_res = client.get('/access/inbox')
+    assert inbox_res.status_code == 200
+    inbox_html = inbox_res.data.decode('utf-8')
+    assert passcode in inbox_html
+    assert "applicant@enterprise-ai.com" in inbox_html
+    print("PASS: Email with unique random passcode delivered to inbox.")
 
-    # Unlock API
-    res = client.post('/api/unlock-portal', json={'passcode': 'AZURE-FDE-VIP'})
-    assert res.status_code == 200
-    assert res.json['success'] == True
+    # 6. Verify incorrect passcode fails with no hints
+    fail_res = client.post('/api/unlock-portal', json={'passcode': '000000'})
+    assert fail_res.status_code == 400
+    assert "VIP" not in fail_res.data.decode('utf-8')
+    print("PASS: Invalid passcode rejected without giving bypass hints.")
 
-    # Test other core routes render with 200 OK
+    # 7. Unlock with valid 6-digit passcode
+    unlock_res = client.post('/api/unlock-portal', json={'passcode': passcode})
+    assert unlock_res.status_code == 200
+    assert unlock_res.get_json()['success'] is True
+    print("PASS: Portal unlocked using unique random passcode.")
+
+    # 8. Now all restricted pages render with 200 OK
     routes_to_test = [
+        '/courses',
         '/roadmap',
         '/topics',
         '/topic/1',
@@ -76,13 +97,52 @@ def test_routes_and_access():
         '/projects',
         '/interview-studio',
         '/kql-workbench',
+        '/institutional-outreach?load_samples=1',
         '/notes'
     ]
     for r in routes_to_test:
         resp = client.get(r)
         assert resp.status_code == 200, f"Route {r} returned {resp.status_code}"
+    print("PASS: All portal sub-routes accessible after unlocking.")
 
-    print("PASS: Routes, outreach, template download, and access unlock API verified.")
+    # 9. Test Lock portal
+    lock_res = client.get('/api/lock-portal')
+    # After lock, visiting /courses redirects to /access-gate again
+    res = client.get('/courses')
+    assert res.status_code == 302
+    assert "/access-gate" in res.headers["Location"]
+    print("PASS: Lock portal successfully re-locks restricted pages.")
+
+    # 10. Test Allow link approval workflow
+    # Request access again
+    req_res2 = client.post('/api/request-access', json={'email': 'student@university.edu'})
+    assert req_res2.status_code == 200
+    conn = app.get_db()
+    cursor = conn.cursor()
+    cursor.execute("SELECT token FROM access_requests WHERE email = 'student@university.edu' ORDER BY id DESC LIMIT 1")
+    token = cursor.fetchone()["token"]
+    conn.close()
+
+    # Open allow page
+    allow_page = client.get(f'/access/allow/{token}')
+    assert allow_page.status_code == 200
+    assert "student@university.edu" in allow_page.data.decode('utf-8')
+    assert "Allow Access" in allow_page.data.decode('utf-8')
+
+    # Submit allow action (clicking the button)
+    allow_submit = client.post(f'/access/allow/{token}/submit')
+    assert allow_submit.status_code == 200
+    assert "Portal Access Granted!" in allow_submit.data.decode('utf-8')
+
+    # Now courses is accessible directly
+    res_after_allow = client.get('/courses')
+    assert res_after_allow.status_code == 200
+    print("PASS: Allow link with button click grants full portal access.")
+
+    # 11. Download CSV template
+    res = client.get('/download/sample-institutions.csv')
+    assert res.status_code == 200
+    assert "Institute Name,Address,Email Address" in res.data.decode('utf-8')
 
 if __name__ == '__main__':
     test_xlsx()

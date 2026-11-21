@@ -106,15 +106,18 @@
                 <!-- Access Gate Status / VIP Unlock Button -->
                 <div class="hidden sm:flex items-center gap-2 mr-2">
                     {% if has_access %}
-                    <span class="px-3 py-1.5 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 shadow-xs">
-                        <span class="w-2 h-2 rounded-full bg-emerald-500"></span>
-                        <span>Full Access Active</span>
+                    <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 shadow-xs">
+                        <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
+                        <span>Access Active</span>
                     </span>
+                    <a href="{{ url_for('lock_portal') }}" class="btn btn-outline-secondary btn-sm py-1 px-2.5 rounded-xl text-[11px] font-semibold text-slate-600 hover:text-red-600 hover:border-red-300" title="Lock Portal">
+                        <i class="bi bi-lock-fill"></i> Lock
+                    </a>
                     {% else %}
-                    <button onclick="openAccessModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition transform hover:scale-105">
-                        <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                    <a href="{{ url_for('access_gate') }}" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition transform hover:scale-105 text-decoration-none">
+                        <i class="bi bi-shield-lock-fill"></i>
                         <span>Request Access</span>
-                    </button>
+                    </a>
                     {% endif %}
                 </div>
 
@@ -155,11 +158,15 @@
                     <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200 font-bold uppercase">Pitch</span>
                 </a>
                 <a href="{{ url_for('notes_view') }}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">Journal</a>
-                {% if not has_access %}
-                <button onclick="openAccessModal()" class="w-full text-left mt-2 px-3 py-2 rounded-md text-base font-bold text-amber-700 bg-amber-50 border border-amber-200 hover:bg-amber-100 flex items-center gap-2">
-                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
+                {% if has_access %}
+                <a href="{{ url_for('lock_portal') }}" class="block px-3 py-2 rounded-md text-base font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 text-decoration-none">
+                    <i class="bi bi-lock-fill text-slate-500"></i> Lock Portal
+                </a>
+                {% else %}
+                <a href="{{ url_for('access_gate') }}" class="block px-3 py-2 rounded-md text-base font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-decoration-none flex items-center gap-2">
+                    <i class="bi bi-shield-lock-fill text-blue-600"></i>
                     <span>Request Full Access</span>
-                </button>
+                </a>
                 {% endif %}
             </div>
         </div>
@@ -196,69 +203,63 @@
             </button>
 
             <!-- Modal Header -->
-            <div class="space-y-2">
+            <div class="space-y-1.5">
                 <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-wider">
                     <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span>Restricted Course Access</span>
+                    <span>Member Access Required</span>
                 </div>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900">
-                    Request Full Access to C# Azure AI & FDE Portal
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 m-0">
+                    Unlock Full C# Azure AI FDE Portal
                 </h3>
-                <p class="text-xs sm:text-sm text-slate-600 leading-relaxed">
-                    The <strong class="text-blue-600">Home Dashboard</strong> is freely accessible to all. To unlock the complete <strong class="text-slate-900">35-day interactive video course portal</strong>, hands-on lab sandbox guides, production capstone architectures, and interview studio, please request access from the portal administrator.
+                <p class="text-xs text-slate-600 leading-relaxed m-0">
+                    The <strong class="text-blue-600">Home Dashboard</strong> is freely accessible. To unlock complete day-by-day courses, hands-on labs, Sentinel simulator, and blueprints, request access below.
                 </p>
             </div>
 
-            <!-- Email Request Box -->
+            <!-- Step 1: Request Email -->
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                <div class="flex items-center justify-between text-xs text-slate-500">
-                    <span class="font-semibold uppercase tracking-wider text-blue-700">Official Access Request Email:</span>
-                    <span class="font-mono text-[11px] text-slate-500">ID: azureanoopranjan</span>
+                <div class="flex items-center gap-2">
+                    <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">1</span>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Request Access via Email</h4>
                 </div>
-
-                <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-white rounded-xl border border-slate-200 shadow-xs">
-                    <div class="flex items-center gap-2.5">
-                        <span class="p-2 rounded-lg bg-blue-50 text-blue-600">
-                            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                        </span>
-                        <div>
-                            <span class="text-xs text-slate-500 block">Recipient Address</span>
-                            <strong class="text-sm font-mono text-blue-700 select-all" id="target-access-email">azureanoopranjan@gmail.com</strong>
-                        </div>
-                    </div>
-                    <div class="flex items-center gap-2 flex-shrink-0">
-                        <button onclick="copyAccessEmail()" class="px-3 py-1.5 rounded-lg bg-slate-100 hover:bg-slate-200 text-slate-700 text-xs font-semibold border border-slate-300 transition flex items-center gap-1.5" title="Copy email address to clipboard">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 5H6a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2v-1M8 5a2 2 0 002 2h2a2 2 0 002-2M8 5a2 2 0 012-2h2a2 2 0 012 2m0 0h2a2 2 0 012 2v3m2 4H10m0 0l3-3m-3 3l3 3"></path></svg>
-                            <span id="copy-email-btn-text">Copy</span>
-                        </button>
-                        <a href="mailto:azureanoopranjan@gmail.com?subject=Access%20Request%3A%20FDE%20C%23%20Azure%20AI%20Website&body=Hi%20Anoop%2C%0A%0AI%20would%20like%20to%20request%20full%20access%20to%20the%20complete%20FDE%20C%23%20Azure%20AI%20%26%20Cybersecurity%20Interactive%20Course%20Portal.%0A%0AMy%20Details%3A%0AFull%20Name%3A%20%0AInstitute%20%2F%20Organization%3A%20%0AContact%20Number%3A%20%0APurpose%20of%20Study%3A%20%0A%0AThank%20you!" class="px-3.5 py-1.5 rounded-lg bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white text-xs font-bold transition flex items-center gap-1.5 shadow-md shadow-blue-500/20 text-decoration-none">
-                            <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                            <span>Send Email Request</span>
-                        </a>
-                    </div>
+                <p class="text-xs text-slate-500 m-0">
+                    A unique <strong>6-digit passcode</strong> and an <strong>Allow Access button link</strong> will be delivered to your email.
+                </p>
+                <div class="flex flex-col sm:flex-row gap-2">
+                    <input type="email" id="modal-email-input" placeholder="colleague@organization.com" class="form-control text-xs rounded-xl px-3.5 py-2 border-slate-300 focus:border-blue-500 bg-white flex-grow">
+                    <button onclick="submitModalEmailRequest()" id="modal-email-btn" class="btn btn-primary text-white text-xs font-bold px-4 py-2 rounded-xl flex-shrink-0 shadow-sm">
+                        Send Passcode
+                    </button>
                 </div>
+                <div id="modal-request-feedback" class="text-xs hidden p-2.5 rounded-xl border"></div>
             </div>
 
-            <!-- Instant VIP Passcode Unlock -->
-            <div class="space-y-2 pt-2 border-t border-slate-200">
-                <label for="access-passcode-input" class="text-xs font-bold text-slate-700 block">
-                    Already have an Access Key or Passcode?
-                </label>
+            <!-- Step 2: Lock by Passcode Section -->
+            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div class="flex items-center gap-2">
-                    <input type="text" id="access-passcode-input" placeholder="e.g. AZURE-FDE-VIP or azureanoopranjan" class="flex-grow bg-white border border-slate-300 focus:border-blue-500 rounded-xl px-3.5 py-2 text-xs text-slate-800 placeholder-slate-400 focus:outline-none font-mono">
-                    <button onclick="submitUnlockPasscode()" class="px-4 py-2 rounded-xl bg-emerald-600 hover:bg-emerald-500 text-white text-xs font-bold transition flex-shrink-0 shadow-sm">
+                    <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">2</span>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Enter Unique Passcode</h4>
+                </div>
+                <p class="text-xs text-slate-500 m-0">
+                    Enter the 6-digit numeric code received in your email inbox to unlock immediately.
+                </p>
+                <div class="flex items-center gap-2">
+                    <input type="text" id="access-passcode-input" maxlength="12" placeholder="Enter 6-digit passcode" class="form-control text-xs font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2 border-slate-300 focus:border-emerald-500 bg-white flex-grow">
+                    <button onclick="submitUnlockPasscode()" id="modal-passcode-btn" class="btn btn-success text-white text-xs font-bold px-4 py-2 rounded-xl flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 border-0 shadow-sm">
                         Unlock Portal
                     </button>
                 </div>
-                <div id="unlock-feedback" class="text-xs hidden mt-1"></div>
+                <div id="unlock-feedback" class="text-xs hidden p-2 rounded-xl border"></div>
             </div>
 
             <!-- Footer options -->
-            <div class="flex items-center justify-between text-xs text-slate-500 pt-2">
-                <span>Free Home Access is always available.</span>
-                <a href="{{ url_for('index') }}" onclick="closeAccessModal()" class="text-blue-600 hover:underline">
-                    Back to Home Dashboard →
+            <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
+                <a href="{{ url_for('access_inbox') }}" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">
+                    <i class="bi bi-inbox-fill"></i> View Received Emails / Inbox Simulator
                 </a>
+                <button onclick="closeAccessModal()" class="text-slate-500 hover:text-slate-800">
+                    Close
+                </button>
             </div>
 
         </div>
@@ -294,36 +295,70 @@
             }
         }
 
-        function copyAccessEmail() {
-            const email = "azureanoopranjan@gmail.com";
-            navigator.clipboard.writeText(email).then(() => {
-                const btnText = document.getElementById('copy-email-btn-text');
-                if (btnText) btnText.textContent = "Copied!";
-                if (typeof showToast === 'function') {
-                    showToast('Copied azureanoopranjan@gmail.com to clipboard!', 'success');
+        async function submitModalEmailRequest() {
+            const input = document.getElementById('modal-email-input');
+            const feedback = document.getElementById('modal-request-feedback');
+            const btn = document.getElementById('modal-email-btn');
+            const email = input ? input.value.trim() : '';
+
+            if (!email) {
+                if (feedback) {
+                    feedback.className = "text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
+                    feedback.textContent = "Please enter an email address.";
                 }
-                setTimeout(() => {
-                    if (btnText) btnText.textContent = "Copy";
-                }, 2500);
-            }).catch(() => {
-                if (typeof showToast === 'function') {
-                    showToast('Please email: azureanoopranjan@gmail.com', 'info');
+                return;
+            }
+
+            btn.disabled = true;
+            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Sending...`;
+
+            try {
+                const res = await fetch("/api/request-access", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify({ email: email })
+                });
+                const data = await res.json();
+
+                if (res.ok && data.success) {
+                    feedback.className = "text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 block";
+                    feedback.innerHTML = `
+                        <strong>Sent!</strong> ${data.message}
+                        <div class="mt-1">
+                            <a href="${data.inbox_url || '/access/inbox'}" class="text-emerald-900 font-bold underline">
+                                Open Inbox to View Passcode & Allow Link →
+                            </a>
+                        </div>
+                    `;
+                } else {
+                    feedback.className = "text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
+                    feedback.textContent = data.message || "Failed to submit request.";
                 }
-            });
+            } catch (err) {
+                feedback.className = "text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
+                feedback.textContent = "Network error. Please try again.";
+            } finally {
+                btn.disabled = false;
+                btn.textContent = "Send Passcode";
+            }
         }
 
         async function submitUnlockPasscode() {
             const input = document.getElementById('access-passcode-input');
             const feedback = document.getElementById('unlock-feedback');
+            const btn = document.getElementById('modal-passcode-btn');
             if (!input) return;
             const passcode = input.value.trim();
+
             if (!passcode) {
                 if (feedback) {
-                    feedback.className = "text-xs text-rose-600 block";
-                    feedback.textContent = "Please enter an access passcode.";
+                    feedback.className = "text-xs p-2 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
+                    feedback.textContent = "Please enter the 6-digit access passcode.";
                 }
                 return;
             }
+
+            if (btn) btn.disabled = true;
 
             try {
                 const res = await fetch('{{ url_for("unlock_portal") }}', {
@@ -334,7 +369,7 @@
                 const data = await res.json();
                 if (data.success) {
                     if (feedback) {
-                        feedback.className = "text-xs text-emerald-600 block font-semibold";
+                        feedback.className = "text-xs p-2 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 block font-semibold";
                         feedback.textContent = "Access Granted! Unlocking portal...";
                     }
                     if (typeof showToast === 'function') {
@@ -345,25 +380,19 @@
                     }, 800);
                 } else {
                     if (feedback) {
-                        feedback.className = "text-xs text-rose-600 block";
-                        feedback.textContent = data.message || "Invalid passcode. Please email azureanoopranjan@gmail.com to request access.";
+                        feedback.className = "text-xs p-2 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
+                        feedback.textContent = data.message || "Invalid passcode.";
                     }
                 }
             } catch (err) {
                 if (feedback) {
-                    feedback.className = "text-xs text-rose-600 block";
-                    feedback.textContent = "Error verifying passcode. Please try again or email azureanoopranjan@gmail.com.";
+                    feedback.className = "text-xs p-2 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
+                    feedback.textContent = "Error verifying passcode.";
                 }
+            } finally {
+                if (btn) btn.disabled = false;
             }
         }
-
-        // Auto-open modal if user navigates to courses or subpages without access
-        {% if not has_access and (request.path != '/' and request.path != '/institutional-outreach') %}
-        document.addEventListener('DOMContentLoaded', function() {
-            // Check if user specifically opened modal or arrived on restricted page
-            setTimeout(openAccessModal, 300);
-        });
-        {% endif %}
 
         // Check for query param ?request_access=1
         if (new URLSearchParams(window.location.search).get('request_access') === '1') {
