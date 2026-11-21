@@ -58,26 +58,32 @@ def test_routes_and_access():
     assert "/access-gate" in res.headers["Location"]
     print("PASS: Courses page requires access and redirects to /access-gate.")
 
-    # 4. Request Access via Email -> generates unique 6-digit random passcode & email provider URLs
+    # 4. Request Access via Email -> passcode is ENCRYPTED in outgoing request draft
     req_res = client.post('/api/request-access', json={'email': 'applicant@enterprise-ai.com', 'name': 'Alex Sharma'})
     assert req_res.status_code == 200
     data = req_res.get_json()
     assert data['success'] is True
-    passcode = data['passcode']
-    assert len(passcode) == 6 and passcode.isdigit(), f"Passcode {passcode} must be 6 digits"
+    decrypted_passcode = data['passcode']
+    encrypted_passcode = data['encrypted_passcode']
+    assert len(decrypted_passcode) == 6 and decrypted_passcode.isdigit(), f"Passcode {decrypted_passcode} must be 6 digits"
+    assert encrypted_passcode.startswith('ENC-'), f"Encrypted passcode {encrypted_passcode} must start with ENC-"
     assert "mailto:azureanoopranjan@gmail.com" in data['mailto_url']
     assert "mail.google.com" in data['gmail_url']
     assert "outlook.live.com" in data['outlook_url']
-    assert passcode in data['body']
-    print(f"PASS: Access request generated email template and provider URLs with passcode: {passcode}")
+    
+    # Verify passcode is ENCRYPTED in the outgoing request template
+    assert encrypted_passcode in data['body'], "Encrypted token must be in the outgoing email request body"
+    assert decrypted_passcode not in data['body'], "Clear 6-digit passcode must NOT be revealed in the outgoing email request body"
+    print(f"PASS: Passcode is encrypted in request template: {encrypted_passcode}")
 
-    # 5. Check simulated inbox for received email
+    # 5. Check receiver inbox: Passcode is DECRYPTED in received email so admin can tell the requester
     inbox_res = client.get('/access/inbox')
     assert inbox_res.status_code == 200
     inbox_html = inbox_res.data.decode('utf-8')
-    assert passcode in inbox_html
+    assert decrypted_passcode in inbox_html, "Decrypted 6-digit code must be visible to the receiver in received email"
+    assert "Decrypted Code (To Tell Candidate)" in inbox_html
     assert "applicant@enterprise-ai.com" in inbox_html
-    print("PASS: Email with unique random passcode delivered to inbox.")
+    print(f"PASS: Receiver email inbox displays decrypted code for admin: {decrypted_passcode}")
 
     # 6. Verify incorrect passcode fails with no hints
     fail_res = client.post('/api/unlock-portal', json={'passcode': '000000'})
@@ -85,11 +91,11 @@ def test_routes_and_access():
     assert "VIP" not in fail_res.data.decode('utf-8')
     print("PASS: Invalid passcode rejected without giving bypass hints.")
 
-    # 7. Unlock with valid 6-digit passcode
-    unlock_res = client.post('/api/unlock-portal', json={'passcode': passcode})
+    # 7. Unlock using the decrypted 6-digit passcode told to candidate by admin
+    unlock_res = client.post('/api/unlock-portal', json={'passcode': decrypted_passcode})
     assert unlock_res.status_code == 200
     assert unlock_res.get_json()['success'] is True
-    print("PASS: Portal unlocked using unique random passcode.")
+    print("PASS: Portal unlocked using decrypted 6-digit passcode.")
 
     # 8. Now all restricted pages render with 200 OK
     routes_to_test = [

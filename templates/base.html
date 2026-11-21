@@ -223,7 +223,7 @@
                     <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Send Email Request to Administrator</h4>
                 </div>
                 <p class="text-xs text-slate-600 m-0 leading-relaxed">
-                    Clicking below opens your email provider with a pre-drafted purchase request template sent to <strong class="text-slate-800">azureanoopranjan@gmail.com</strong> with a unique payment reference passcode embedded for the receiver.
+                    Clicking below opens your email provider with a pre-drafted purchase template sent to <strong class="text-slate-800">azureanoopranjan@gmail.com</strong>. The access passcode is <strong class="text-indigo-700">encrypted</strong> in your request. When the receiver gets the email and verifies payment, they will tell you your <strong class="text-emerald-700">decrypted 6-digit passcode</strong>.
                 </p>
                 <div class="space-y-2">
                     <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
@@ -232,7 +232,7 @@
                     </div>
                     <button onclick="submitModalEmailRequest()" id="modal-email-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
                         <i class="bi bi-envelope-arrow-up-fill"></i>
-                        <span>Send Email & Open Email Provider</span>
+                        <span>Send Email (With Encrypted Passcode)</span>
                     </button>
                 </div>
                 <div id="modal-request-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
@@ -242,13 +242,13 @@
             <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
                 <div class="flex items-center gap-2">
                     <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">2</span>
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Unlock with Payment Access Code</h4>
+                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Unlock with Decrypted Passcode</h4>
                 </div>
                 <p class="text-xs text-slate-600 m-0 leading-relaxed">
-                    When you complete payment, enter the unique reference code shared in your request below to unlock all website access:
+                    When you complete payment, enter the decrypted 6-digit code told to you by the administrator to unlock all website access:
                 </p>
                 <div class="flex items-center gap-2">
-                    <input type="text" id="access-passcode-input" maxlength="12" placeholder="Enter code shared in request" class="form-control text-xs font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white flex-grow">
+                    <input type="text" id="access-passcode-input" maxlength="24" placeholder="Enter decrypted 6-digit passcode" class="form-control text-xs font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white flex-grow">
                     <button onclick="submitUnlockPasscode()" id="modal-passcode-btn" class="btn btn-success text-white text-xs font-bold px-4 py-2.5 rounded-xl flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 border-0 shadow-sm flex items-center gap-1.5">
                         <i class="bi bi-shield-check"></i>
                         <span>Unlock All Access</span>
@@ -359,7 +359,7 @@
                             <span>Email Provider Opened with Pre-filled Template!</span>
                         </div>
                         <p class="text-[11px] text-slate-700 m-0">
-                            Sent to receiver: <strong class="text-slate-900 font-mono">azureanoopranjan@gmail.com</strong> with your unique payment verification code embedded.
+                            Email draft opened for receiver <strong class="text-slate-900 font-mono">azureanoopranjan@gmail.com</strong> with your <strong class="text-indigo-700">encrypted passcode</strong>: <code class="text-indigo-800 font-mono text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">${data.encrypted_passcode || ''}</code>.
                         </p>
                         <div class="flex flex-wrap gap-1.5 pt-1">
                             <a href="${data.mailto_url}" class="btn btn-sm btn-outline-primary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
@@ -377,7 +377,7 @@
                         </div>
                         <div class="text-[11px] text-amber-900 bg-amber-50/90 border border-amber-200 p-2 rounded-lg mt-1 font-medium">
                             <i class="bi bi-info-circle-fill text-amber-600 me-1"></i>
-                            <strong>When payment is done:</strong> The code shared in your email request will unlock all website access in Step 2 below.
+                            <strong>When payment is done:</strong> The administrator will tell you your decrypted 6-digit passcode to unlock the website in Step 2.
                         </div>
                     `;
                 } else {

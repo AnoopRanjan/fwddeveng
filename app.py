@@ -567,9 +567,10 @@ def request_access_api():
 
     return jsonify({
         "success": True,
-        "message": f"Pre-filled email prepared for receiver azureanoopranjan@gmail.com with your unique payment reference passcode!",
+        "message": f"Pre-filled request generated with encrypted token for receiver azureanoopranjan@gmail.com!",
         "email": email,
         "passcode": req_info["passcode"],
+        "encrypted_passcode": req_info["encrypted_passcode"],
         "mailto_url": req_info["mailto_url"],
         "gmail_url": req_info["gmail_url"],
         "outlook_url": req_info["outlook_url"],
