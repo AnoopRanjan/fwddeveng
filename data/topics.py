@@ -361,11 +361,11 @@ TOPICS = [
                 "desc": "How to snapshot compromised VM disks for offline forensic analysis without altering chain of custody."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/gmuTjeQUbTM",
-        "youtube_title": "Harvard CS50's Introduction to Cybersecurity & Digital Forensics - Dr. David J. Malan",
-        "youtube_url": "https://www.youtube.com/watch?v=gmuTjeQUbTM",
-        "instructor": "Harvard CS50 / freeCodeCamp",
-        "duration": "2.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/2Qu5gQjNQh4",
+        "youtube_title": "SC-100 Cloud Incident Response & Threat Modeling for .NET Systems - John Savill",
+        "youtube_url": "https://www.youtube.com/watch?v=2Qu5gQjNQh4",
+        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
+        "duration": "3.5 Hours",
         "core_concepts": [
             "The 4-stage IR Lifecycle: Preparation, Detection & Analysis, Containment & Eradication, Recovery & Post-Incident Review (PIR)",
             "Triage & Scoping: Determining blast radius, compromised identities, and lateral movement",
@@ -426,11 +426,11 @@ TOPICS = [
                 "desc": "Automated image scanning upon push and continuous runtime scanning for vulnerable packages in containers."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/58Tn2xB8kIE",
-        "youtube_title": "DevSecOps Course for Beginners: Vulnerability Lifecycle & API Security - Scott Bly",
-        "youtube_url": "https://www.youtube.com/watch?v=58Tn2xB8kIE",
-        "instructor": "Scott Bly / freeCodeCamp",
-        "duration": "2+ Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/v5b53-PgEmI",
+        "youtube_title": "DevOps Master Class: CI/CD Pipelines, Containers & Enterprise Security for .NET - John Savill",
+        "youtube_url": "https://www.youtube.com/watch?v=v5b53-PgEmI",
+        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
+        "duration": "1.5 Hours",
         "core_concepts": [
             "Vulnerability Lifecycle: Discovery, Prioritization, Remediation, Verification, Reporting",
             "CVSS v3.1 / v4.0 metrics: Exploitability vs Impact metrics, EPSS (Exploit Prediction Scoring System)",
@@ -491,10 +491,10 @@ TOPICS = [
                 "desc": "AI Red Teaming methodology, adversarial testing, and data privacy governance in GenAI."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/vLlIBT0HSSc",
-        "youtube_title": "AI Security, Prompt Injection & Defensive LLM Architecture - Tech With Tim",
-        "youtube_url": "https://www.youtube.com/watch?v=vLlIBT0HSSc",
-        "instructor": "Tech With Tim",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/orLGv2LgWDE",
+        "youtube_title": "Azure OpenAI Deployment Types, Security & Resiliency in .NET - John Savill",
+        "youtube_url": "https://www.youtube.com/watch?v=orLGv2LgWDE",
+        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
         "duration": "1+ Hour",
         "core_concepts": [
             "OWASP LLM Top 10: LLM01 Prompt Injection (Direct jailbreaks vs Indirect injection via untrusted data)",
@@ -556,11 +556,11 @@ TOPICS = [
                 "desc": "How models generate structured JSON to invoke APIs, database queries, and external tool sets."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/2maPaQutcWs",
-        "youtube_title": "Complete Generative AI with Azure OpenAI Services Crash Course - Krish Naik",
-        "youtube_url": "https://www.youtube.com/watch?v=2maPaQutcWs",
-        "instructor": "Krish Naik",
-        "duration": "2.5 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
+        "youtube_title": "Let's Learn .NET: Semantic Kernel in C# & Azure OpenAI - Microsoft Official",
+        "youtube_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
+        "instructor": "Microsoft .NET Official (@dotnet)",
+        "duration": "2 Hours",
         "core_concepts": [
             "RAG (Retrieval-Augmented Generation) pipeline: Ingestion, Chunking strategies (fixed, semantic, markdown), Vectorization",
             "Azure AI Search Hybrid Search: combining BM25 keyword search with cosine similarity dense vectors and Semantic Reranking",
@@ -621,11 +621,11 @@ TOPICS = [
                 "desc": "Publish-Subscribe, Asynchronous Request-Reply, Claim Check, and Saga distributed patterns."
             }
         ],
-        "youtube_embed": "https://www.youtube-nocookie.com/embed/NFiDNzQTzXY",
-        "youtube_title": "Forward Deployed Engineer Full Course for Beginners - Saurav Verma",
-        "youtube_url": "https://www.youtube.com/watch?v=NFiDNzQTzXY",
-        "instructor": "Saurav Verma",
-        "duration": "1.2 Hours",
+        "youtube_embed": "https://www.youtube-nocookie.com/embed/vq9LuCM4YP4",
+        "youtube_title": "AZ-305 Enterprise Cloud Modernization & Architecture for .NET - John Savill",
+        "youtube_url": "https://www.youtube.com/watch?v=vq9LuCM4YP4",
+        "instructor": "John Savill's Technical Training (Official Microsoft Curriculum)",
+        "duration": "3.5+ Hours",
         "core_concepts": [
             "The FDE Philosophy: Working at the nexus of Customer Problem, Architecture, Product, and Live Implementation",
             "Root Cause Discovery: Moving past 'what the client asked for' to uncover 'the underlying operational bottleneck'",

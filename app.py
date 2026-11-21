@@ -8,7 +8,7 @@ import shutil
 import sqlite3
 import tempfile
 from datetime import datetime
-from flask import Flask, render_template, request, jsonify, redirect, url_for
+from flask import Flask, render_template, request, jsonify, redirect, url_for, session, Response
 
 from data.topics import TOPICS, get_topic_by_id
 from data.roadmap import ROADMAP_DAYS, get_day_by_number, get_days_by_phase
@@ -16,6 +16,7 @@ from data.projects import PROJECTS, get_project_by_id
 from data.kql_queries import KQL_QUERIES, MOCK_LOGS, get_kql_by_id
 from data.interview_prep import POSITIONING_STRATEGY, ELEVATOR_PITCH, INTERVIEW_QUESTIONS, get_questions_by_category
 from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS, FDE_BRIEFING_10MIN
+from data.outreach import parse_institutes_from_upload, generate_sales_email, get_sample_csv_template, SAMPLE_INSTITUTIONS, DEFAULT_SENDER, SIGN_OFF_NAME
 
 # Base paths configuration for absolute directory resolution (essential for Vercel serverless)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -159,10 +160,17 @@ def calculate_metrics():
         }
 
 
-# Context processor to make metrics available to all templates
+# Context processor to make metrics, access state and sender emails available to all templates
 @app.context_processor
 def inject_global_metrics():
-    return dict(metrics=calculate_metrics(), is_vercel=IS_VERCEL)
+    return dict(
+        metrics=calculate_metrics(),
+        is_vercel=IS_VERCEL,
+        has_access=bool(session.get("fde_access", False)),
+        access_email="azureanoopranjan@gmail.com",
+        outreach_sender=DEFAULT_SENDER,
+        outreach_sign_off=SIGN_OFF_NAME
+    )
 
 
 # Ensure DB exists before handling request
@@ -431,6 +439,73 @@ def notes_view():
     conn.close()
     
     return render_template("notes.html", notes=notes)
+
+
+# ================= INSTITUTIONAL OUTREACH & CAMPUS SALES =================
+
+@app.route("/institutional-outreach", methods=["GET", "POST"])
+def outreach_page():
+    institutes = []
+    
+    if request.method == "POST":
+        uploaded_file = request.files.get("file")
+        if uploaded_file and uploaded_file.filename:
+            try:
+                institutes = parse_institutes_from_upload(uploaded_file)
+            except Exception as e:
+                print(f"File upload parse error: {e}")
+                institutes = []
+    
+    # If no file uploaded or requested sample data
+    if not institutes and (request.args.get("load_samples") == "1" or request.method == "GET"):
+        institutes = SAMPLE_INSTITUTIONS
+
+    emails = [generate_sales_email(inst.get("name", ""), inst.get("address", ""), inst.get("email", "")) for inst in institutes]
+    
+    return render_template(
+        "outreach.html",
+        institutes=institutes,
+        emails=emails,
+        sender_email=DEFAULT_SENDER,
+        sign_off_name=SIGN_OFF_NAME
+    )
+
+
+@app.route("/download/sample-institutions.csv")
+def download_sample_csv():
+    csv_content = get_sample_csv_template()
+    return Response(
+        csv_content,
+        mimetype="text/csv",
+        headers={"Content-Disposition": "attachment;filename=sample_institutions.csv"}
+    )
+
+
+# ================= PORTAL ACCESS CONTROL & VIP UNLOCK =================
+
+@app.route("/api/unlock-portal", methods=["POST"])
+def unlock_portal():
+    data = request.get_json() or {}
+    key = str(data.get("key") or data.get("passcode") or "").strip().upper()
+    
+    # Valid passcodes (case-insensitive) or any key containing VIP / FDE
+    valid_keys = {"AZURE-FDE-VIP", "ANOOP-FDE-2026", "AZUREANOOPRANJAN", "AZUREANOOPRANJAN@GMAIL.COM", "VIP2026", "PRIYA-FDE", "FDE2026", "ACCESS"}
+    if key in valid_keys or "VIP" in key or "FDE" in key or "ANOOP" in key or "AZURE" in key:
+        session["fde_access"] = True
+        return jsonify({"success": True, "message": "Access granted successfully!"})
+    
+    # Grant access if user simulated email request confirmation
+    if data.get("requested_via_email"):
+        session["fde_access"] = True
+        return jsonify({"success": True, "message": "Access pass unlocked via request!"})
+        
+    return jsonify({"success": False, "message": "Invalid access key. Please email azureanoopranjan@gmail.com to request access."}), 400
+
+
+@app.route("/api/lock-portal", methods=["POST"])
+def lock_portal():
+    session.pop("fde_access", None)
+    return jsonify({"success": True, "message": "Portal locked."})
 
 
 # ================= JSON API ENDPOINTS =================

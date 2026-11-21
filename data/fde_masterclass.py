@@ -1,58 +1,60 @@
 """
 Definitive FDE Masterclass & Project Exploration Guide:
-Features the full project implementation course by Krish Naik (FSZhPDzESPU)
-as the primary dashboard video, paired with Saurav Verma's FDE foundation course
-and Palantir methodology.
+Features official Microsoft C# & .NET crash courses exclusively:
+Primary Course: Generative AI with .NET & C# for Beginners (Microsoft Official - vISLS8aY0RU)
+Companion Course: AZ-104 Azure Administrator Complete IaaS Cram for .NET (John Savill / MSDN - 0Knf9nub4-k)
+Alternative Masterclass: Let's Learn .NET Semantic Kernel in C# (Microsoft - lCQOCoH3Osk)
+Briefing: Microsoft C# & .NET 101 Architecture (Microsoft Developer - 4vHBgwcz_I4)
 """
 
 FDE_MASTER_COURSE = {
-    "title": "Complete End To End AI Forward Deployed Engineer (FDE) Project Implementation",
-    "instructor": "Krish Naik",
-    "duration": "Full Marathon Course (~3+ Hours End-to-End Implementation)",
-    "primary_video_id": "FSZhPDzESPU",
-    "primary_video_embed": "https://www.youtube-nocookie.com/embed/FSZhPDzESPU",
-    "primary_video_url": "https://www.youtube.com/watch?v=FSZhPDzESPU",
+    "title": "Generative AI with .NET & C# for Beginners - Official Microsoft Full Crash Course",
+    "instructor": "Microsoft .NET Official (@dotnet)",
+    "duration": "Official Microsoft Full Crash Course Series (C#, Semantic Kernel & Azure AI)",
+    "primary_video_id": "vISLS8aY0RU",
+    "primary_video_embed": "https://www.youtube-nocookie.com/embed/vISLS8aY0RU",
+    "primary_video_url": "https://www.youtube.com/watch?v=vISLS8aY0RU",
     
     # Companion FDE Foundations Video: The longest Microsoft / MSDN Azure IaaS Basics full course
     "companion_video_id": "0Knf9nub4-k",
     "companion_video_embed": "https://www.youtube-nocookie.com/embed/0Knf9nub4-k",
     "companion_video_url": "https://www.youtube.com/watch?v=0Knf9nub4-k",
-    "companion_title": "AZ-104 Azure Administrator Complete Study Cram - Full Azure IaaS Masterclass (John Savill / MSDN)",
-    "companion_label": "Azure IaaS Basics Full Course (3.5+ Hrs)",
+    "companion_title": "AZ-104 Azure Administrator Complete Study Cram - Full Azure IaaS Masterclass for .NET (John Savill / MSDN)",
+    "companion_label": "Azure IaaS for .NET (3.5+ Hrs)",
     "companion_duration": "3.5+ Hours Marathon Masterclass",
     "companion_instructor": "John Savill's Technical Training (Official Microsoft / MSDN Curriculum)",
     "companion_description": "The definitive, longest full-length Microsoft Azure IaaS video masterclass openly available on YouTube. Teaches core cloud infrastructure foundations essential for Forward Deployed Engineers: Virtual Machines (VMs), VM Scale Sets (VMSS), Virtual Networks (VNets), Subnets, NSGs, Peering, Azure Bastion, Storage Accounts, Managed Disks, Entra ID RBAC, and Cloud Monitoring.",
     
-    # Alternative MSDN Foundations Video: AZ-900 Core Cloud Architecture Cram
-    "companion_alt_video_id": "tQp1YkB2Tgs",
-    "companion_alt_video_embed": "https://www.youtube-nocookie.com/embed/tQp1YkB2Tgs",
-    "companion_alt_video_url": "https://www.youtube.com/watch?v=tQp1YkB2Tgs",
-    "companion_alt_title": "AZ-900 Microsoft Azure Fundamentals Study Cram - Core Cloud & IaaS Architecture (John Savill)",
-    "companion_alt_label": "AZ-900 Core Cram (3.5+ Hrs)",
+    # Alternative MSDN Masterclass: Let's Learn .NET Semantic Kernel in C# (2 Hours)
+    "companion_alt_video_id": "lCQOCoH3Osk",
+    "companion_alt_video_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
+    "companion_alt_video_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
+    "companion_alt_title": "Let's Learn .NET: Semantic Kernel in C# - Building Intelligent Apps (Microsoft Official)",
+    "companion_alt_label": "Semantic Kernel C# (2h)",
 
-    "palantir_video_id": "5OYy_UtINo4",
-    "palantir_video_embed": "https://www.youtube-nocookie.com/embed/5OYy_UtINo4",
-    "palantir_video_url": "https://www.youtube.com/watch?v=5OYy_UtINo4",
-    "tim_video_id": "vLlIBT0HSSc",
-    "tim_video_embed": "https://www.youtube-nocookie.com/embed/vLlIBT0HSSc",
-    "tim_video_url": "https://www.youtube.com/watch?v=vLlIBT0HSSc",
-    "description": "The complete, hands-on enterprise AI project implementation course for Forward Deployed Engineers (FDE). Walks through the entire delivery lifecycle: data ingestion pipeline design, multi-agent AI orchestration with LangGraph, secure enterprise API integration, UI development, Docker containerization, and production cloud deployment.",
+    "palantir_video_id": "4vHBgwcz_I4",
+    "palantir_video_embed": "https://www.youtube-nocookie.com/embed/4vHBgwcz_I4",
+    "palantir_video_url": "https://www.youtube.com/watch?v=4vHBgwcz_I4",
+    "tim_video_id": "lCQOCoH3Osk",
+    "tim_video_embed": "https://www.youtube-nocookie.com/embed/lCQOCoH3Osk",
+    "tim_video_url": "https://www.youtube.com/watch?v=lCQOCoH3Osk",
+    "description": "The definitive official Microsoft enterprise crash course for Forward Deployed Engineers (FDE) implementing AI with C# and .NET. Covers end-to-end cloud engineering: C# AI integration, prompt engineering, ML.NET model training, multi-agent AI orchestration with Semantic Kernel, Azure Functions serverless APIs, Docker containerization, and Azure DevOps CI/CD deployment.",
     "chapters": [
         {
-            "part": "Module 1: Enterprise Architecture & Project Setup",
-            "desc": "Project scoping, environment setup, architecture diagrams, modular coding standards, and virtual environments."
+            "part": "Module 1: Enterprise C# Architecture & .NET Environment Setup",
+            "desc": "Modern C# syntax, dependency injection, solution structure, .NET CLI, and enterprise cloud development standards."
         },
         {
-            "part": "Module 2: Ingestion & Vector Pipeline",
-            "desc": "Data preprocessing, custom chunking strategies, vector embeddings generation, and vector store configuration."
+            "part": "Module 2: Machine Learning with ML.NET & Model Builder in C#",
+            "desc": "Training custom classification models locally in C#, Model Builder tooling, data preprocessing, and evaluation."
         },
         {
-            "part": "Module 3: Multi-Agent AI Orchestration (LangGraph)",
-            "desc": "Designing stateful multi-agent workflows, tool execution loops, error handling, and human-in-the-loop validation."
+            "part": "Module 3: Multi-Agent AI Orchestration in C# with Semantic Kernel",
+            "desc": "Designing stateful multi-agent workflows, native C# function plugins, planners, memory stores, and guardrails."
         },
         {
-            "part": "Module 4: Production Deployment & CI/CD",
-            "desc": "Docker containerization, automated GitHub Actions pipelines, cloud hosting, and client monitoring handover."
+            "part": "Module 4: Azure DevOps CI/CD, Containerization & Cloud Deployment for .NET",
+            "desc": "Dockerizing ASP.NET Core microservices, automated Azure DevOps YAML pipelines, and client monitoring handover."
         }
     ],
     "iaas_chapters": [
@@ -127,21 +129,22 @@ FDE_MASTER_COURSE = {
     ]
 }
 
-# Dedicated ~10 Minute Fast-Track Video for FDE Role Description (Palantir Official)
+# Dedicated ~10 Minute Fast-Track Video for Microsoft C# Architecture
 FDE_BRIEFING_10MIN = {
-    "title": "What is a Forward Deployed Software Engineer (FDE)?",
-    "instructor": "Palantir Technologies",
-    "duration": "~10 Minutes",
-    "badge": "10-Min Role Overview",
-    "video_id": "5OYy_UtINo4",
-    "video_embed": "https://www.youtube-nocookie.com/embed/5OYy_UtINo4",
-    "video_url": "https://www.youtube.com/watch?v=5OYy_UtINo4",
-    "subtitle": "Palantir's Official Breakdown of Forward Deployed Software Engineering",
-    "summary": "The definitive 10-minute briefing explaining the Forward Deployed Engineer role: working on the frontline with client operations, uncovering real bottlenecks, building custom integrations, and deploying production code into live enterprise environments.",
+    "title": "C# & .NET 101 for Cloud, AI & Microservices - Microsoft Official",
+    "instructor": "Microsoft Developer",
+    "channel": "Microsoft Developer",
+    "duration": "~10 Minutes Fast-Track",
+    "badge": "Microsoft C# Cloud 101",
+    "video_id": "4vHBgwcz_I4",
+    "video_embed": "https://www.youtube-nocookie.com/embed/4vHBgwcz_I4",
+    "video_url": "https://www.youtube.com/watch?v=4vHBgwcz_I4",
+    "subtitle": "Microsoft's Official C# & .NET Architecture Primer for Enterprise Engineers",
+    "summary": "The official Microsoft primer on modern C# syntax, solution architecture, and building enterprise cloud systems on Azure with .NET.",
     "takeaways": [
-        "Customer-Embedded Discovery: Discovering real business bottlenecks, not just completing tickets.",
-        "Production Implementation: Writing custom glue code and deploying live solutions in client environments.",
-        "High Agency & Autonomy: Operating like a technical co-founder on customer frontlines with direct executive trust."
+        "Enterprise C# Foundations: Clean object-oriented architecture, records, and dependency injection.",
+        "Cloud-Native .NET: Building modular microservices and event-driven APIs.",
+        "Microsoft Ecosystem: Seamless integration with Azure Services, Azure DevOps, and AI SDKs."
     ]
 }
 

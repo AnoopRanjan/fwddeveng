@@ -52,45 +52,45 @@
                         <div class="flex items-center gap-2">
                             <span class="w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
                             <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase tracking-wide">
-                                ⏱ ~10 Mins Role Briefing
+                                ⏱ {{ fde_briefing.duration if fde_briefing else '~10-15 Mins' }} Overview
                             </span>
                         </div>
-                        <span class="text-[10px] text-gray-400 font-mono">Palantir Official</span>
+                        <span class="text-[10px] text-cyan-400 font-mono font-semibold">{{ fde_briefing.channel if fde_briefing else 'Microsoft Developer' }}</span>
                     </div>
 
                     <div>
                         <h2 class="text-sm sm:text-base font-extrabold text-white">
-                            What is a Forward Deployed Engineer (FDE)?
+                            {{ fde_briefing.title if fde_briefing else 'C# & .NET 101 for Cloud, AI & Microservices' }}
                         </h2>
                         <p class="text-[11px] text-gray-300 leading-snug mt-0.5">
-                            Palantir's official 10-minute briefing explaining how FDEs operate on customer frontlines: uncovering root problems and deploying live AI & cloud solutions.
+                            Official Microsoft briefing for cloud developers: modern C# fundamentals, cloud-native architecture, Azure microservices, and AI client foundations for FDEs.
                         </p>
                     </div>
 
                     <!-- 10-Min Video Frame -->
                     <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800 shadow-xl relative">
-                        <iframe class="w-full h-full" src="{{ fde_briefing.video_embed if fde_briefing else 'https://www.youtube-nocookie.com/embed/5OYy_UtINo4' }}" title="What is a Forward Deployed Software Engineer (FDE)?" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+                        <iframe class="w-full h-full" src="{{ fde_briefing.video_embed if fde_briefing else 'https://www.youtube-nocookie.com/embed/4vHBgwcz_I4' }}" title="C# & .NET 101 for Cloud, AI & Microservices" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
                     </div>
 
                     <!-- 3 Fast Takeaways -->
                     <div class="space-y-1 text-[11px] text-gray-300 bg-gray-900/90 p-2.5 rounded-xl border border-gray-800/80">
                         <div class="flex items-start gap-1.5">
                             <span class="text-cyan-400 font-bold">1.</span>
-                            <span><strong>Field Discovery:</strong> Uncover the client's actual bottleneck, not just their request.</span>
+                            <span><strong>C# Cloud Runtime:</strong> High-throughput ASP.NET Core APIs and serverless Azure Functions.</span>
                         </div>
                         <div class="flex items-start gap-1.5">
                             <span class="text-emerald-400 font-bold">2.</span>
-                            <span><strong>Live Engineering:</strong> Write real glue code & deploy working systems in client VPCs.</span>
+                            <span><strong>Live Engineering:</strong> Clean dependency injection, async patterns, and Azure SDK integrations.</span>
                         </div>
                         <div class="flex items-start gap-1.5">
                             <span class="text-amber-400 font-bold">3.</span>
-                            <span><strong>Startup Agency:</strong> Act as technical co-founder on the customer frontline.</span>
+                            <span><strong>AI Ready:</strong> Native Semantic Kernel and ML.NET pipelines directly in enterprise C#.</span>
                         </div>
                     </div>
 
                     <div class="flex items-center justify-between pt-1 text-[11px]">
-                        <span class="text-gray-400">Duration: <strong class="text-cyan-300">~10 Mins</strong></span>
-                        <a href="{{ fde_briefing.video_url if fde_briefing else 'https://www.youtube.com/watch?v=5OYy_UtINo4' }}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 hover:underline">
+                        <span class="text-gray-400">Duration: <strong class="text-cyan-300">{{ fde_briefing.duration if fde_briefing else '~10-15 Mins' }}</strong></span>
+                        <a href="{{ fde_briefing.video_url if fde_briefing else 'https://www.youtube.com/watch?v=4vHBgwcz_I4' }}" target="_blank" rel="noopener noreferrer" class="text-cyan-400 hover:text-cyan-300 font-semibold flex items-center gap-1 hover:underline">
                             <span>Open on YouTube ↗</span>
                         </a>
                     </div>
@@ -444,12 +444,12 @@
         </div>
     </div>
 
-    <!-- Floating Bottom-Right Corner Quick-Access 10-Min FDE Briefing -->
+    <!-- Floating Bottom-Right Corner Quick-Access 10-Min C# & Cloud Briefing -->
     <div id="corner-fde-launcher" class="fixed bottom-6 right-6 z-40">
         <button onclick="toggleCornerFdeModal()" class="flex items-center gap-2.5 px-4 py-2.5 rounded-full bg-gradient-to-r from-cyan-600 via-indigo-600 to-cyan-600 hover:from-cyan-500 hover:to-indigo-500 text-white font-extrabold text-xs shadow-2xl shadow-cyan-500/50 border border-cyan-400/50 transition transform hover:scale-105 group">
             <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
             <svg class="w-4 h-4 text-cyan-200 group-hover:text-white" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
-            <span>10-Min FDE Overview</span>
+            <span>{{ fde_briefing.duration if fde_briefing else '~10-15 Min' }} C# Cloud Overview</span>
         </button>
     </div>
 
@@ -458,19 +458,19 @@
         <div class="flex items-center justify-between border-b border-gray-800 pb-2">
             <div class="flex items-center gap-2">
                 <span class="px-2 py-0.5 rounded text-[10px] font-extrabold bg-cyan-950 text-cyan-300 border border-cyan-800 uppercase tracking-wide">
-                    Palantir Official • ~10 Mins
+                    {{ fde_briefing.channel if fde_briefing else 'Microsoft Developer' }} • {{ fde_briefing.duration if fde_briefing else '~10-15 Mins' }}
                 </span>
-                <span class="text-xs font-bold text-white">FDE Role Briefing</span>
+                <span class="text-xs font-bold text-white">C# Cloud 101</span>
             </div>
             <button onclick="toggleCornerFdeModal()" class="text-gray-400 hover:text-white text-base font-bold p-1 leading-none">
                 ✕
             </button>
         </div>
         <div class="aspect-video w-full rounded-xl overflow-hidden bg-black border border-gray-800">
-            <iframe class="w-full h-full" src="https://www.youtube-nocookie.com/embed/5OYy_UtINo4" title="The Role of a Forward Deployed Software Engineer (FDE)" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+            <iframe class="w-full h-full" src="{{ fde_briefing.video_embed if fde_briefing else 'https://www.youtube-nocookie.com/embed/4vHBgwcz_I4' }}" title="C# & .NET 101 for Cloud, AI & Microservices" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
         </div>
         <p class="text-[11px] text-gray-300 leading-relaxed">
-            Palantir's official overview explaining how Forward Deployed Engineers work directly with enterprise customers to solve complex operational problems with custom code and live deployments.
+            Microsoft Developer's official quick overview: Learn modern C# runtime architecture, high-performance web APIs, and cloud services essentials for enterprise forward deployed engineering.
         </p>
     </div>
 
