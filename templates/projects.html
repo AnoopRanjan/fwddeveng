@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+
+{% block title %}Portfolio Projects - FDE & AI Cybersecurity Portal{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-10">
+
+    <!-- Header -->
+    <div class="space-y-3">
+        <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-950/80 border border-amber-800/80 text-amber-300 text-xs font-semibold uppercase tracking-wider">
+            Hands-on Implementation Evidence
+        </div>
+        <h1 class="text-3xl sm:text-4xl font-extrabold text-white">3 High-Impact Portfolio Project Blueprints</h1>
+        <p class="text-gray-300 text-sm sm:text-base leading-relaxed max-w-4xl">
+            You don't need 10 years of penetration testing to be a credible FDE Advisor. By implementing these three end-to-end architectures, you provide concrete, production-grade proof of <strong class="text-white">Cloud Security Operations</strong>, <strong class="text-white">Zero Trust Architecture</strong>, and <strong class="text-white">Enterprise AI Engineering</strong>.
+        </p>
+    </div>
+
+    <!-- Projects List -->
+    <div class="space-y-12">
+        {% for project in projects %}
+        <div id="{{ project.id }}" class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl scroll-mt-20">
+            
+            <!-- Top Badges & Header -->
+            <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-gray-800 pb-5">
+                <div class="space-y-1">
+                    <div class="flex items-center gap-2">
+                        <span class="px-2.5 py-0.5 rounded-full text-xs font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40">{{ project.badge }}</span>
+                        <span class="text-xs text-gray-400 font-medium">{{ project.category }}</span>
+                    </div>
+                    <h2 class="text-2xl font-extrabold text-white mt-1">{{ project.title }}</h2>
+                    <p class="text-sm text-cyan-300 font-medium">{{ project.subtitle }}</p>
+                </div>
+
+                <div class="flex flex-wrap gap-1.5 self-start sm:self-center">
+                    {% for tech in project.tech_stack %}
+                    <span class="px-2.5 py-1 rounded text-xs bg-gray-900 border border-gray-700 text-gray-300 font-mono">{{ tech }}</span>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- Summary -->
+            <p class="text-sm text-gray-300 leading-relaxed">{{ project.summary }}</p>
+
+            <!-- Architecture Diagram -->
+            <div class="space-y-2">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 5a1 1 0 011-1h14a1 1 0 011 1v2a1 1 0 01-1 1H5a1 1 0 01-1-1V5zM4 13a1 1 0 011-1h6a1 1 0 011 1v6a1 1 0 01-1 1H5a1 1 0 01-1-1v-6zM16 13a1 1 0 011-1h2a1 1 0 011 1v6a1 1 0 01-1 1h-2a1 1 0 01-1-1v-6z"></path></svg>
+                    <span>System Architecture Blueprint</span>
+                </span>
+                <div class="bg-black/85 border border-gray-800 rounded-xl p-4 overflow-x-auto">
+                    <pre><code class="text-xs text-cyan-300 font-mono leading-tight">{{ project.architecture_diagram }}</code></pre>
+                </div>
+            </div>
+
+            <!-- Step by Step Implementation Plan -->
+            <div class="space-y-3">
+                <span class="text-xs font-bold text-gray-400 uppercase tracking-wider flex items-center gap-1.5">
+                    <svg class="w-4 h-4 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-6 9l2 2 4-4"></path></svg>
+                    <span>Implementation Checklist</span>
+                </span>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+                    {% for item in project.step_by_step %}
+                    <div class="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 space-y-1">
+                        <div class="text-xs font-bold text-emerald-400 font-mono">{{ item.step }}</div>
+                        <p class="text-xs text-gray-300 leading-relaxed">{{ item.details }}</p>
+                    </div>
+                    {% endfor %}
+                </div>
+            </div>
+
+            <!-- KQL Query for this project -->
+            <div class="space-y-2">
+                <div class="flex items-center justify-between">
+                    <span class="text-xs font-bold text-gray-400 uppercase tracking-wider">Associated KQL Detection / Audit Query</span>
+                    <button onclick="copyToClipboard(`{{ project.kql_snippet | replace('\n', '\\n') | replace('"', '\\"') }}`, this)" class="text-xs text-cyan-400 hover:underline">Copy Query</button>
+                </div>
+                <div class="bg-black/90 border border-gray-800 rounded-xl p-3.5 overflow-x-auto">
+                    <pre><code class="text-xs text-emerald-400 font-mono">{{ project.kql_snippet }}</code></pre>
+                </div>
+            </div>
+
+            <!-- The Interviewer Pitch Box -->
+            <div class="p-5 rounded-xl bg-gradient-to-r from-amber-950/30 to-gray-900 border border-amber-800/50 space-y-2">
+                <span class="text-xs font-bold text-amber-300 uppercase tracking-wider flex items-center gap-1.5">
+                    <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                    <span>How to Pitch This Project to Hiring Managers</span>
+                </span>
+                <p class="text-xs sm:text-sm text-gray-200 leading-relaxed italic">
+                    "{{ project.interviewer_pitch }}"
+                </p>
+            </div>
+
+        </div>
+        {% endfor %}
+    </div>
+
+</div>
+{% endblock %}

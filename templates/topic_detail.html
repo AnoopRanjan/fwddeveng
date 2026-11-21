@@ -1,0 +1,203 @@
+{% extends "base.html" %}
+
+{% block title %}Topic {{ topic.id }}: {{ topic.title }} - FDE Deep Dive{% endblock %}
+
+{% block content %}
+<div class="max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 py-8 space-y-8">
+
+    <!-- Breadcrumb & Prev/Next Navigation -->
+    <div class="flex items-center justify-between">
+        <a href="{{ url_for('topics_list') }}" class="inline-flex items-center gap-1.5 text-xs text-gray-400 hover:text-white transition">
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 19l-7-7m0 0l7-7m-7 7h18"></path></svg>
+            <span>Back to All 10 Topics</span>
+        </a>
+
+        <div class="flex items-center gap-2">
+            {% if prev_topic %}
+            <a href="{{ url_for('topic_detail', topic_id=prev_topic.id) }}" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold border border-gray-700 transition">
+                ← Topic {{ prev_topic.id }}: {{ prev_topic.title }}
+            </a>
+            {% endif %}
+            {% if next_topic %}
+            <a href="{{ url_for('topic_detail', topic_id=next_topic.id) }}" class="px-3 py-1.5 rounded-lg bg-gray-800 hover:bg-gray-700 text-gray-300 text-xs font-semibold border border-gray-700 transition">
+                Topic {{ next_topic.id }}: {{ next_topic.title }} →
+            </a>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Header Card -->
+    <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-4 shadow-xl">
+        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
+            <div class="space-y-1">
+                <div class="flex flex-wrap items-center gap-2">
+                    <span class="w-7 h-7 rounded-lg bg-cyan-950 text-cyan-400 font-bold text-xs flex items-center justify-center border border-cyan-800">
+                        #{{ topic.id }}
+                    </span>
+                    <span class="text-xs font-semibold text-gray-400 uppercase tracking-wider">{{ topic.category }}</span>
+                    {% for exam in topic.exams %}
+                    <span class="px-2 py-0.5 rounded text-[11px] bg-gray-900 border border-gray-700 text-cyan-300 font-mono font-semibold">{{ exam }}</span>
+                    {% endfor %}
+                </div>
+                <h1 class="text-2xl sm:text-3xl font-extrabold text-white mt-2">{{ topic.title }}</h1>
+                <p class="text-sm text-gray-300 leading-relaxed">{{ topic.subtitle }}</p>
+            </div>
+
+            <!-- Status Dropdown -->
+            <div class="flex items-center gap-2">
+                <span class="text-xs text-gray-400">Status:</span>
+                <select onchange="updateTopicStatus({{ topic.id }}, this.value)" class="bg-gray-900 border border-gray-700 rounded-xl text-xs px-3 py-2 text-gray-200 focus:outline-none focus:border-cyan-500 font-medium">
+                    <option value="not_started" {% if topic_status.status == 'not_started' %}selected{% endif %}>⚪ Not Started</option>
+                    <option value="in_progress" {% if topic_status.status == 'in_progress' %}selected{% endif %}>🟡 In Progress</option>
+                    <option value="completed" {% if topic_status.status == 'completed' %}selected{% endif %}>🟢 Completed</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- Associated Roadmap Days -->
+        {% if associated_days %}
+        <div class="pt-3 border-t border-gray-800 flex flex-wrap items-center gap-2 text-xs">
+            <span class="text-gray-400 font-semibold">Taught on 35-Day Roadmap:</span>
+            {% for d in associated_days %}
+            <a href="{{ url_for('day_detail', day_num=d.day) }}" class="px-2 py-0.5 rounded bg-gray-800 hover:bg-gray-700 text-cyan-300 border border-gray-700 transition">
+                Day {{ d.day }}: {{ d.title }}
+            </a>
+            {% endfor %}
+        </div>
+        {% endif %}
+    </div>
+
+    <!-- Video Embed & YouTube Playlist Section -->
+    <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="flex items-center justify-between border-b border-gray-800 pb-4">
+            <div>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-rose-500" fill="currentColor" viewBox="0 0 24 24"><path d="M19.615 3.184c-3.604-.246-11.631-.245-15.23 0-3.897.266-4.356 2.62-4.385 8.816.029 6.185.484 8.549 4.385 8.816 3.6.245 11.626.246 15.23 0 3.897-.266 4.356-2.62 4.385-8.816-.029-6.185-.484-8.549-4.385-8.816zm-10.615 12.816v-8l8 3.993-8 4.007z"/></svg>
+                    <span>Curated Video Masterclass & YouTube Course</span>
+                </h2>
+                <p class="text-xs text-gray-400 mt-0.5">{{ topic.youtube_title }}</p>
+            </div>
+
+            <a href="{{ topic.youtube_url }}" target="_blank" rel="noopener noreferrer" class="px-3.5 py-1.5 rounded-xl bg-gray-800 hover:bg-gray-700 text-xs font-semibold text-gray-200 border border-gray-700 transition flex items-center gap-1.5">
+                <span>Open in YouTube</span>
+                <svg class="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+            </a>
+        </div>
+
+        <div class="aspect-video w-full rounded-2xl overflow-hidden bg-black border border-gray-800 shadow-2xl">
+            <iframe class="w-full h-full" src="{{ topic.youtube_embed }}" title="{{ topic.youtube_title }}" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+        </div>
+    </div>
+
+    <!-- Official MSDN / Microsoft Learn Reading Plan -->
+    <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="border-b border-gray-800 pb-3">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6.253v13m0-13C10.832 5.477 9.246 5 7.5 5S4.168 5.477 3 6.253v13C4.168 18.477 5.754 18 7.5 18s3.332.477 4.5 1.253m0-13C13.168 5.477 14.754 5 16.5 5c1.747 0 3.332.477 4.5 1.253v13C19.832 18.477 18.247 18 16.5 18c-1.746 0-3.332.477-4.5 1.253"></path></svg>
+                <span>Official MSDN & Microsoft Learn Documentation Modules</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Authoritative architecture blueprints, security controls, and Microsoft learning paths</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {% for link in topic.msdn_links %}
+            <a href="{{ link.url }}" target="_blank" rel="noopener noreferrer" class="p-4 rounded-xl bg-gray-900/80 border border-gray-800 hover:border-cyan-500/50 hover:bg-gray-800/60 transition group flex flex-col justify-between">
+                <div class="space-y-1.5">
+                    <div class="flex items-center justify-between text-xs">
+                        <span class="text-cyan-400 font-semibold group-hover:underline">Microsoft Learn Module</span>
+                        <svg class="w-4 h-4 text-gray-500 group-hover:text-cyan-400 transition" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"></path></svg>
+                    </div>
+                    <h3 class="text-sm font-bold text-gray-200 group-hover:text-white transition">{{ link.title }}</h3>
+                    <p class="text-xs text-gray-400 leading-relaxed">{{ link.desc }}</p>
+                </div>
+            </a>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Core Concepts & Architectural Foundation -->
+    <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="border-b border-gray-800 pb-3">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 11H5m14 0a2 2 0 012 2v6a2 2 0 01-2 2H5a2 2 0 01-2-2v-6a2 2 0 012-2m14 0V9a2 2 0 00-2-2M5 11V9a2 2 0 012-2m0 0V5a2 2 0 012-2h6a2 2 0 012 2v2M7 7h10"></path></svg>
+                <span>Key Architectural Concepts & Technologies</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Core principles you must be able to architect, defend, and configure</p>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-3">
+            {% for concept in topic.core_concepts %}
+            <div class="p-3.5 rounded-xl bg-gray-900/60 border border-gray-800/80 flex items-start gap-3">
+                <span class="w-2 h-2 rounded-full bg-indigo-400 mt-1.5 flex-shrink-0"></span>
+                <span class="text-xs sm:text-sm text-gray-300 leading-relaxed">{{ concept }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- FDE Advisory Perspective: How to Position to Clients -->
+    <div class="bg-gradient-to-r from-cyan-950/40 via-darkCard to-indigo-950/40 border border-cyan-800/50 rounded-2xl p-6 sm:p-8 space-y-3 shadow-lg">
+        <div class="flex items-center gap-2 text-cyan-400 text-xs font-bold uppercase tracking-wider">
+            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path></svg>
+            <span>The FDE Advisory Angle: Executive & Client Consulting</span>
+        </div>
+        <h3 class="text-lg font-bold text-white">How to Speak About {{ topic.title }} to Clients</h3>
+        <p class="text-sm text-gray-200 leading-relaxed">
+            {{ topic.fde_perspective }}
+        </p>
+    </div>
+
+    <!-- Hands-on Lab Exercise -->
+    <div id="lab-section" class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="border-b border-gray-800 pb-3 flex items-center justify-between">
+            <div>
+                <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                    <svg class="w-5 h-5 text-emerald-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path></svg>
+                    <span>Hands-on Lab Exercise</span>
+                </h2>
+                <p class="text-xs text-emerald-400 font-medium mt-0.5">{{ topic.lab_guide.title }}</p>
+            </div>
+            <span class="px-2.5 py-1 rounded-full text-xs font-semibold bg-emerald-950 text-emerald-300 border border-emerald-800">
+                Step-by-Step
+            </span>
+        </div>
+
+        <div class="space-y-3 bg-gray-900/90 p-5 rounded-xl border border-gray-800">
+            {% for step in topic.lab_guide.steps %}
+            <div class="flex items-start gap-3 text-xs sm:text-sm text-gray-300 leading-relaxed font-mono">
+                <span class="w-6 h-6 rounded-lg bg-gray-800 text-emerald-400 flex items-center justify-center font-bold text-xs flex-shrink-0 border border-gray-700">
+                    {{ loop.index }}
+                </span>
+                <span class="pt-0.5">{{ step }}</span>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+    <!-- Interview Readiness & Model Answers -->
+    <div class="bg-darkCard border border-gray-800 rounded-2xl p-6 sm:p-8 space-y-4">
+        <div class="border-b border-gray-800 pb-3">
+            <h2 class="text-lg font-bold text-white flex items-center gap-2">
+                <svg class="w-5 h-5 text-amber-400" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"></path></svg>
+                <span>Interview Practice Questions & Model Answers</span>
+            </h2>
+            <p class="text-xs text-gray-400 mt-0.5">Tailored responses demonstrating your cloud architecture and tech lead foundation</p>
+        </div>
+
+        <div class="space-y-4">
+            {% for qa in topic.interview_qa %}
+            <div class="p-5 rounded-xl bg-gray-900/70 border border-gray-800 space-y-3">
+                <h3 class="text-sm font-bold text-amber-300 flex items-start gap-2">
+                    <span class="text-xs px-2 py-0.5 rounded bg-amber-950 border border-amber-800 text-amber-300 font-mono">Q</span>
+                    <span>{{ qa.q }}</span>
+                </h3>
+                <div class="text-xs sm:text-sm text-gray-300 leading-relaxed pl-6 border-l-2 border-gray-700 space-y-2">
+                    <p>{{ qa.a }}</p>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+    </div>
+
+</div>
+{% endblock %}
