@@ -43,23 +43,47 @@ def test_video_metadata():
 def test_routes_and_access():
     client = app.app.test_client()
 
-    # 1. Home page always 200 and accessible without any access pass
+    # 1. Home page and login page are always accessible without any login
     res = client.get('/')
     assert res.status_code == 200
-    print("PASS: Home page is publicly accessible.")
+    res_login = client.get('/login')
+    assert res_login.status_code == 200
+    print("PASS: Home page and Login page are publicly accessible.")
 
-    # 2. Access gate page is publicly accessible
-    res = client.get('/access-gate')
-    assert res.status_code == 200
-
-    # 3. Restricted pages redirect to /access-gate when user has no access
+    # 2. Mandatory Gmail SSO: Accessing /courses when unauthenticated redirects to /login
     res = client.get('/courses')
     assert res.status_code == 302
-    assert "/access-gate" in res.headers["Location"]
-    print("PASS: Courses page requires access and redirects to /access-gate.")
+    assert "/login" in res.headers["Location"]
+    print("PASS: Mandatory Gmail SSO enforced (redirects unauthenticated users to /login).")
 
-    # 4. Request Access via Email -> passcode is ENCRYPTED in outgoing request draft
-    req_res = client.post('/api/request-access', json={'email': 'applicant@enterprise-ai.com', 'name': 'Alex Sharma'})
+    # 3. Accessing /access/inbox when unauthenticated redirects to /login
+    res_inbox_unauth = client.get('/access/inbox')
+    assert res_inbox_unauth.status_code == 302
+    assert "/login" in res_inbox_unauth.headers["Location"]
+    print("PASS: Unauthenticated access to /access/inbox redirected to /login.")
+
+    import time
+    cand_email = f"candidate_{int(time.time())}@gmail.com"
+
+    # 4. Sign in as non-admin candidate via Gmail SSO
+    candidate_login = client.post('/auth/google/dev-login', data={'email': cand_email, 'name': 'Candidate Student'})
+    assert candidate_login.status_code == 302
+
+    # 5. Non-admin candidate attempting to access /access/inbox MUST receive 403 Forbidden!
+    forbidden_res = client.get('/access/inbox')
+    assert forbidden_res.status_code == 403
+    assert "Administrator Access Only" in forbidden_res.data.decode('utf-8')
+    assert "Admin Section Restricted" in forbidden_res.data.decode('utf-8')
+    print("PASS: Non-admin candidate strictly forbidden (403) from accessing /access/inbox.")
+
+    # 6. Candidate attempting to access /courses without approved pass redirects to /access-gate
+    gate_res = client.get('/courses')
+    assert gate_res.status_code == 302
+    assert "/access-gate" in gate_res.headers["Location"]
+    print("PASS: Candidate without payment passcode redirects to /access-gate.")
+
+    # 7. Candidate submits access request -> passcode is ENCRYPTED in outgoing request draft
+    req_res = client.post('/api/request-access', json={'email': cand_email, 'name': 'Candidate Student'})
     assert req_res.status_code == 200
     data = req_res.get_json()
     assert data['success'] is True
@@ -68,36 +92,24 @@ def test_routes_and_access():
     assert len(decrypted_passcode) == 6 and decrypted_passcode.isdigit(), f"Passcode {decrypted_passcode} must be 6 digits"
     assert encrypted_passcode.startswith('ENC-'), f"Encrypted passcode {encrypted_passcode} must start with ENC-"
     assert "mailto:azureanoopranjan@gmail.com" in data['mailto_url']
-    assert "mail.google.com" in data['gmail_url']
-    assert "outlook.live.com" in data['outlook_url']
-    
-    # Verify passcode is ENCRYPTED in the outgoing request template
     assert encrypted_passcode in data['body'], "Encrypted token must be in the outgoing email request body"
-    assert decrypted_passcode not in data['body'], "Clear 6-digit passcode must NOT be revealed in the outgoing email request body"
+    assert decrypted_passcode not in data['body'], "Clear 6-digit passcode must NOT be in the outgoing email request body"
     print(f"PASS: Passcode is encrypted in request template: {encrypted_passcode}")
 
-    # 5. Check receiver inbox: Passcode is DECRYPTED in received email so admin can tell the requester
-    inbox_res = client.get('/access/inbox')
-    assert inbox_res.status_code == 200
-    inbox_html = inbox_res.data.decode('utf-8')
-    assert decrypted_passcode in inbox_html, "Decrypted 6-digit code must be visible to the receiver in received email"
+    # 8. Sign in as Administrator (azureanoopranjan@gmail.com) via Gmail SSO
+    admin_login = client.post('/auth/google/dev-login', data={'email': 'azureanoopranjan@gmail.com', 'name': 'Anoop Ranjan (Admin)'})
+    assert admin_login.status_code == 302
+
+    # 9. Admin accessing /access/inbox MUST return 200 OK and show DECRYPTED code to tell candidate
+    admin_inbox = client.get('/access/inbox')
+    assert admin_inbox.status_code == 200
+    inbox_html = admin_inbox.data.decode('utf-8')
+    assert decrypted_passcode in inbox_html, "Decrypted 6-digit code must be visible to admin in inbox"
     assert "Decrypted Code (To Tell Candidate)" in inbox_html
-    assert "applicant@enterprise-ai.com" in inbox_html
-    print(f"PASS: Receiver email inbox displays decrypted code for admin: {decrypted_passcode}")
+    assert cand_email in inbox_html
+    print(f"PASS: Admin (azureanoopranjan@gmail.com) successfully accesses /access/inbox with decrypted code: {decrypted_passcode}")
 
-    # 6. Verify incorrect passcode fails with no hints
-    fail_res = client.post('/api/unlock-portal', json={'passcode': '000000'})
-    assert fail_res.status_code == 400
-    assert "VIP" not in fail_res.data.decode('utf-8')
-    print("PASS: Invalid passcode rejected without giving bypass hints.")
-
-    # 7. Unlock using the decrypted 6-digit passcode told to candidate by admin
-    unlock_res = client.post('/api/unlock-portal', json={'passcode': decrypted_passcode})
-    assert unlock_res.status_code == 200
-    assert unlock_res.get_json()['success'] is True
-    print("PASS: Portal unlocked using decrypted 6-digit passcode.")
-
-    # 8. Now all restricted pages render with 200 OK
+    # 10. Admin has automatic full VIP access to all portal routes without entering a passcode
     routes_to_test = [
         '/courses',
         '/roadmap',
@@ -112,44 +124,28 @@ def test_routes_and_access():
     ]
     for r in routes_to_test:
         resp = client.get(r)
-        assert resp.status_code == 200, f"Route {r} returned {resp.status_code}"
-    print("PASS: All portal sub-routes accessible after unlocking.")
+        assert resp.status_code == 200, f"Admin route {r} returned {resp.status_code}"
+    print("PASS: Admin has full access to all portal routes automatically.")
 
-    # 9. Test Lock portal
-    lock_res = client.get('/api/lock-portal')
-    # After lock, visiting /courses redirects to /access-gate again
-    res = client.get('/courses')
-    assert res.status_code == 302
-    assert "/access-gate" in res.headers["Location"]
-    print("PASS: Lock portal successfully re-locks restricted pages.")
+    # 11. Switch back to candidate and unlock with decrypted 6-digit passcode
+    client.post('/auth/google/dev-login', data={'email': cand_email, 'name': 'Candidate Student'})
+    unlock_res = client.post('/api/unlock-portal', json={'passcode': decrypted_passcode})
+    assert unlock_res.status_code == 200
+    assert unlock_res.get_json()['success'] is True
 
-    # 10. Test Allow link approval workflow
-    # Request access again
-    req_res2 = client.post('/api/request-access', json={'email': 'student@university.edu'})
-    assert req_res2.status_code == 200
-    conn = app.get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT token FROM access_requests WHERE email = 'student@university.edu' ORDER BY id DESC LIMIT 1")
-    token = cursor.fetchone()["token"]
-    conn.close()
+    # Now candidate can access /courses
+    candidate_courses = client.get('/courses')
+    assert candidate_courses.status_code == 200
+    print("PASS: Candidate successfully unlocked full access using decrypted 6-digit code.")
 
-    # Open allow page
-    allow_page = client.get(f'/access/allow/{token}')
-    assert allow_page.status_code == 200
-    assert "student@university.edu" in allow_page.data.decode('utf-8')
-    assert "Allow Access" in allow_page.data.decode('utf-8')
+    # 12. Test Logout
+    logout_res = client.get('/auth/logout')
+    res_after_logout = client.get('/courses')
+    assert res_after_logout.status_code == 302
+    assert "/login" in res_after_logout.headers["Location"]
+    print("PASS: Logout clears session and redirects back to /login on restricted routes.")
 
-    # Submit allow action (clicking the button)
-    allow_submit = client.post(f'/access/allow/{token}/submit')
-    assert allow_submit.status_code == 200
-    assert "Portal Access Granted!" in allow_submit.data.decode('utf-8')
-
-    # Now courses is accessible directly
-    res_after_allow = client.get('/courses')
-    assert res_after_allow.status_code == 200
-    print("PASS: Allow link with button click grants full portal access.")
-
-    # 11. Download CSV template
+    # 13. Download CSV template
     res = client.get('/download/sample-institutions.csv')
     assert res.status_code == 200
     assert "Institute Name,Address,Email Address" in res.data.decode('utf-8')

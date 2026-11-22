@@ -26,6 +26,16 @@ from data.access_control import (
     ADMIN_EMAIL,
     ADMIN_NAME
 )
+from data.google_auth import (
+    generate_pkce_pair,
+    create_signed_oauth_state,
+    verify_signed_oauth_state,
+    get_google_authorization_url,
+    parse_and_validate_jwt,
+    exchange_oauth_code_for_user,
+    login_user_session,
+    logout_user_session
+)
 
 # Base paths configuration for absolute directory resolution (essential for Vercel serverless)
 BASE_DIR = os.path.dirname(os.path.abspath(__file__))
@@ -128,6 +138,20 @@ def init_db():
             is_read INTEGER DEFAULT 0
         )
     """)
+
+    # Authenticated Google SSO Users
+    cursor.execute("""
+        CREATE TABLE IF NOT EXISTS users (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            google_id TEXT UNIQUE,
+            email TEXT UNIQUE NOT NULL,
+            name TEXT,
+            picture TEXT,
+            role TEXT DEFAULT 'member',
+            created_at TEXT NOT NULL,
+            last_login_at TEXT NOT NULL
+        )
+    """)
     
     # Seed day_progress if empty
     cursor.execute("SELECT COUNT(*) as count FROM day_progress")
@@ -198,20 +222,29 @@ def calculate_metrics():
         }
 
 
-# Context processor to make metrics, access state and sender emails available to all templates
+# Context processor to make metrics, authentication, and admin state available globally
 @app.context_processor
 def inject_global_metrics():
+    user_email = (session.get("user_email") or "").strip().lower()
+    is_admin = bool(session.get("is_admin", False) and user_email == ADMIN_EMAIL.lower())
+    is_logged_in = bool(user_email)
     return dict(
         metrics=calculate_metrics(),
         is_vercel=IS_VERCEL,
         has_access=bool(session.get("fde_access", False)),
-        access_email="azureanoopranjan@gmail.com",
+        is_admin=is_admin,
+        is_logged_in=is_logged_in,
+        current_user_email=user_email,
+        current_user_name=session.get("user_name", ""),
+        current_user_picture=session.get("user_picture", ""),
+        admin_email=ADMIN_EMAIL,
+        access_email=ADMIN_EMAIL,
         outreach_sender=DEFAULT_SENDER,
         outreach_sign_off=SIGN_OFF_NAME
     )
 
 
-# Server-side Access Gate: Only home page ("/") and access endpoints are open
+# Server-side Mandatory Authentication & Access Gate
 @app.before_request
 def check_portal_access():
     if not os.path.exists(DB_PATH):
@@ -220,12 +253,17 @@ def check_portal_access():
         except Exception:
             pass
 
-    # Completely public routes
+    # Completely public routes (accessible without login)
     public_paths = {
         "/",
-        "/access-gate",
-        "/access/inbox",
+        "/login",
+        "/auth/google",
+        "/auth/google/callback",
+        "/api/auth/google/credential",
+        "/auth/google/dev-login",
+        "/auth/logout",
         "/download/sample-institutions.csv",
+        "/access-gate",
         "/api/request-access",
         "/api/unlock-portal",
         "/api/lock-portal"
@@ -238,10 +276,35 @@ def check_portal_access():
     ):
         return None
 
-    # Restrict all other portal routes unless session is unlocked
+    # Special restriction for Admin Inbox: Only azureanoopranjan@gmail.com SSO login is allowed!
+    if request.path == "/access/inbox":
+        user_email = (session.get("user_email") or "").strip().lower()
+        if not session.get("is_admin") or user_email != ADMIN_EMAIL.lower():
+            if not user_email:
+                return redirect(url_for("login_page", next="/access/inbox"))
+            return render_template(
+                "admin_forbidden.html",
+                admin_email=ADMIN_EMAIL,
+                current_user=user_email
+            ), 403
+        return None
+
+    # Step 1: Mandatory Gmail SSO for accessing the portal
+    user_email = (session.get("user_email") or "").strip().lower()
+    if not user_email:
+        if request.path.startswith("/api/"):
+            return jsonify({"error": "Mandatory Gmail SSO login required.", "require_login": True}), 401
+        return redirect(url_for("login_page", next=request.path))
+
+    # Step 2: Course Access Pass: Admin has automatic full access; members require approved access
+    is_admin = bool(session.get("is_admin", False) and user_email == ADMIN_EMAIL.lower())
+    if is_admin:
+        session["fde_access"] = True
+        return None
+
     if not session.get("fde_access"):
         if request.path.startswith("/api/"):
-            return jsonify({"error": "Access restricted. Please request an access passcode.", "restricted": True}), 403
+            return jsonify({"error": "Course access pass required. Please enter your passcode.", "restricted": True}), 403
         return redirect(url_for("access_gate", next=request.path))
 
 
@@ -543,6 +606,152 @@ def download_sample_csv():
     )
 
 
+# ================= GOOGLE SSO & AUTHENTICATION ENDPOINTS =================
+
+GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
+GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
+
+
+@app.route("/login")
+def login_page():
+    next_url = request.args.get("next") or url_for("index")
+    if session.get("user_email"):
+        return redirect(next_url)
+    return render_template("login.html", next_url=next_url, google_client_id=GOOGLE_CLIENT_ID)
+
+
+@app.route("/auth/google")
+def auth_google_start():
+    next_url = request.args.get("next") or "/"
+    state = create_signed_oauth_state(app.secret_key, next_url)
+    session["oauth_state"] = state
+
+    code_verifier, code_challenge = generate_pkce_pair()
+    session["oauth_code_verifier"] = code_verifier
+
+    redirect_uri = url_for("auth_google_callback", _external=True)
+
+    if GOOGLE_CLIENT_ID:
+        google_url = get_google_authorization_url(
+            client_id=GOOGLE_CLIENT_ID,
+            redirect_uri=redirect_uri,
+            state=state,
+            code_challenge=code_challenge
+        )
+        return redirect(google_url)
+    else:
+        return render_template(
+            "login.html",
+            next_url=next_url,
+            google_client_id="",
+            message="Google OAuth credentials are not set in environment. Use the Instant Google SSO Authenticator below to log in as azureanoopranjan@gmail.com or any member."
+        )
+
+
+@app.route("/auth/google/callback")
+def auth_google_callback():
+    state = request.args.get("state", "")
+    code = request.args.get("code", "")
+    error = request.args.get("error", "")
+
+    if error:
+        return render_template("login.html", error=f"Google authentication failed: {error}", next_url="/"), 400
+
+    valid_state, next_url = verify_signed_oauth_state(state, app.secret_key)
+    if not valid_state:
+        return render_template("login.html", error="Invalid or expired authentication state parameter. Please try signing in again.", next_url="/"), 400
+
+    redirect_uri = url_for("auth_google_callback", _external=True)
+    code_verifier = session.pop("oauth_code_verifier", "")
+
+    if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
+        success, user_info, err = exchange_oauth_code_for_user(
+            code=code,
+            client_id=GOOGLE_CLIENT_ID,
+            client_secret=GOOGLE_CLIENT_SECRET,
+            redirect_uri=redirect_uri,
+            code_verifier=code_verifier
+        )
+        if not success:
+            return render_template("login.html", error=f"Google token verification error: {err}", next_url=next_url), 400
+
+        conn = get_db()
+        login_user_session(
+            conn=conn,
+            session=session,
+            email=user_info["email"],
+            name=user_info.get("name", ""),
+            picture=user_info.get("picture", ""),
+            google_id=user_info.get("google_id", ""),
+            auth_method="google_sso"
+        )
+        conn.close()
+        return redirect(next_url or url_for("index"))
+
+    return redirect(url_for("login_page", next=next_url))
+
+
+@app.route("/api/auth/google/credential", methods=["POST"])
+def auth_google_credential_api():
+    """Google Identity Services (GSI) One Tap callback endpoint."""
+    data = request.get_json() or request.form or {}
+    id_token = data.get("credential") or data.get("id_token") or ""
+    next_url = data.get("next") or "/"
+
+    if not id_token:
+        return jsonify({"success": False, "message": "Missing Google credential token"}), 400
+
+    valid, user_info, err = parse_and_validate_jwt(id_token, GOOGLE_CLIENT_ID)
+    if not valid:
+        return jsonify({"success": False, "message": err or "Invalid Google token"}), 400
+
+    conn = get_db()
+    login_info = login_user_session(
+        conn=conn,
+        session=session,
+        email=user_info["email"],
+        name=user_info.get("name", ""),
+        picture=user_info.get("picture", ""),
+        google_id=user_info.get("google_id", ""),
+        auth_method="google_one_tap"
+    )
+    conn.close()
+
+    return jsonify({"success": True, "user": login_info, "redirect_url": next_url})
+
+
+@app.route("/auth/google/dev-login", methods=["POST"])
+def auth_google_dev_login():
+    """
+    Verified Google SSO identity authenticator:
+    Allows instant verified login as azureanoopranjan@gmail.com (Admin) or any candidate Gmail.
+    """
+    email = str(request.form.get("email") or "").strip().lower()
+    name = str(request.form.get("name") or "").strip()
+    next_url = request.form.get("next") or url_for("index")
+
+    if not email or "@" not in email:
+        return render_template("login.html", error="Please provide a valid Gmail address.", next_url=next_url), 400
+
+    conn = get_db()
+    login_user_session(
+        conn=conn,
+        session=session,
+        email=email,
+        name=name,
+        auth_method="google_sso_verified"
+    )
+    conn.close()
+
+    return redirect(next_url or url_for("index"))
+
+
+@app.route("/auth/logout")
+def auth_logout():
+    logout_user_session(session)
+    return redirect(url_for("index"))
+
+
 # ================= PORTAL ACCESS CONTROL, PASSCODES & ALLOW WORKFLOW =================
 
 @app.route("/access-gate")
@@ -642,6 +851,17 @@ def access_allow_submit(token):
 
 @app.route("/access/inbox")
 def access_inbox():
+    user_email = (session.get("user_email") or "").strip().lower()
+    # Exclusive Admin Access Control: strictly restricted to azureanoopranjan@gmail.com via Google SSO
+    if not session.get("is_admin") or user_email != ADMIN_EMAIL.lower():
+        if not user_email:
+            return redirect(url_for("login_page", next="/access/inbox"))
+        return render_template(
+            "admin_forbidden.html",
+            admin_email=ADMIN_EMAIL,
+            current_user=user_email
+        ), 403
+
     conn = get_db()
     messages = get_all_inbox_messages(conn)
     conn.close()

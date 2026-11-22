@@ -103,17 +103,43 @@
                     </a>
                 </nav>
 
-                <!-- Access Gate Status / VIP Unlock Button -->
+                <!-- Admin Exclusive [View Inbox] Section: Visible ONLY to azureanoopranjan@gmail.com SSO -->
+                {% if is_admin %}
+                <a href="{{ url_for('access_inbox') }}" class="btn btn-sm text-xs font-bold py-1.5 px-3 rounded-xl border border-purple-300 text-purple-800 bg-purple-50 hover:bg-purple-100 transition shadow-xs flex items-center gap-1.5 text-decoration-none mr-2">
+                    <i class="bi bi-inbox-fill text-purple-600"></i>
+                    <span>View Inbox</span>
+                    <span class="badge bg-purple-700 text-white text-[10px] px-1.5 py-0.5 rounded-full font-mono">Admin</span>
+                </a>
+                {% endif %}
+
+                <!-- Google SSO User Status & Access Gate Controls -->
                 <div class="hidden sm:flex items-center gap-2 mr-2">
+                    {% if is_logged_in %}
+                    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 shadow-2xs">
+                        <i class="bi bi-google text-blue-600"></i>
+                        <span class="font-mono text-[11px] font-semibold truncate max-w-[150px]" title="{{ current_user_email }}">{{ current_user_email }}</span>
+                    </div>
+
                     {% if has_access %}
                     <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 shadow-xs">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
                         <span>Access Active</span>
                     </span>
-                    <a href="{{ url_for('lock_portal') }}" class="btn btn-outline-secondary btn-sm py-1 px-2.5 rounded-xl text-[11px] font-semibold text-slate-600 hover:text-red-600 hover:border-red-300" title="Lock Portal">
-                        <i class="bi bi-lock-fill"></i> Lock
+                    {% else %}
+                    <a href="{{ url_for('access_gate') }}" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 flex items-center gap-1 transition text-decoration-none">
+                        <i class="bi bi-shield-lock-fill text-blue-600"></i>
+                        <span>Unlock</span>
+                    </a>
+                    {% endif %}
+
+                    <a href="{{ url_for('auth_logout') }}" class="btn btn-outline-secondary btn-sm py-1 px-2.5 rounded-xl text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:border-red-300" title="Sign Out of Gmail SSO">
+                        <i class="bi bi-box-arrow-right"></i>
                     </a>
                     {% else %}
+                    <a href="{{ url_for('login_page') }}" class="btn btn-outline-primary btn-sm py-1.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs text-decoration-none">
+                        <i class="bi bi-google"></i>
+                        <span>Sign In</span>
+                    </a>
                     <a href="{{ url_for('access_gate') }}" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition transform hover:scale-105 text-decoration-none">
                         <i class="bi bi-shield-lock-fill"></i>
                         <span>Request Access</span>
@@ -158,14 +184,20 @@
                     <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200 font-bold uppercase">Pitch</span>
                 </a>
                 <a href="{{ url_for('notes_view') }}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">Journal</a>
-                {% if has_access %}
-                <a href="{{ url_for('lock_portal') }}" class="block px-3 py-2 rounded-md text-base font-bold text-slate-700 bg-slate-100 hover:bg-slate-200 text-decoration-none">
-                    <i class="bi bi-lock-fill text-slate-500"></i> Lock Portal
+                {% if is_admin %}
+                <a href="{{ url_for('access_inbox') }}" class="block px-3 py-2 rounded-md text-base font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 flex items-center justify-between text-decoration-none">
+                    <span>View Inbox (Admin)</span>
+                    <span class="badge bg-purple-700 text-white font-mono text-[10px]">ADMIN ONLY</span>
                 </a>
+                {% endif %}
+                {% if is_logged_in %}
+                <div class="px-3 py-2 text-xs text-slate-500 border-t border-slate-100 flex items-center justify-between">
+                    <span>Signed in as: <strong class="text-slate-800 font-mono">{{ current_user_email }}</strong></span>
+                    <a href="{{ url_for('auth_logout') }}" class="text-red-600 font-semibold hover:underline">Sign Out</a>
+                </div>
                 {% else %}
-                <a href="{{ url_for('access_gate') }}" class="block px-3 py-2 rounded-md text-base font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 text-decoration-none flex items-center gap-2">
-                    <i class="bi bi-shield-lock-fill text-blue-600"></i>
-                    <span>Request Full Access</span>
+                <a href="{{ url_for('login_page') }}" class="block px-3 py-2 rounded-md text-base font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 flex items-center gap-2 text-decoration-none">
+                    <i class="bi bi-google text-blue-600"></i> Sign In with Google
                 </a>
                 {% endif %}
             </div>
@@ -259,9 +291,13 @@
 
             <!-- Footer options -->
             <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-                <a href="{{ url_for('access_inbox') }}" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">
-                    <i class="bi bi-inbox-fill"></i> View Received Emails / Inbox Simulator
+                {% if is_admin %}
+                <a href="{{ url_for('access_inbox') }}" class="text-purple-700 hover:underline font-semibold flex items-center gap-1">
+                    <i class="bi bi-inbox-fill"></i> View Inbox (Admin Section)
                 </a>
+                {% else %}
+                <span class="text-slate-500">Official Portal Access</span>
+                {% endif %}
                 <button onclick="closeAccessModal()" class="text-slate-500 hover:text-slate-800">
                     Close
                 </button>

@@ -41,11 +41,11 @@
                     <form id="gate-request-form" onsubmit="handleGateRequest(event)" class="space-y-3">
                         <div>
                             <label for="gate-name-input" class="text-xs font-bold text-slate-700 block mb-1">Your Full Name</label>
-                            <input type="text" id="gate-name-input" placeholder="e.g. Alex Sharma" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
+                            <input type="text" id="gate-name-input" value="{{ current_user_name }}" placeholder="e.g. Alex Sharma" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
                         </div>
                         <div>
-                            <label for="gate-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Email Address</label>
-                            <input type="email" id="gate-email-input" required placeholder="colleague@organization.com" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
+                            <label for="gate-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Gmail Address</label>
+                            <input type="email" id="gate-email-input" required value="{{ current_user_email }}" placeholder="colleague@gmail.com" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
                         </div>
                         <button type="submit" id="gate-request-submit-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
                             <i class="bi bi-envelope-arrow-up-fill"></i>
@@ -58,9 +58,11 @@
 
                 <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 flex items-center justify-between">
                     <span>Admin: <strong class="text-slate-700 font-mono">azureanoopranjan@gmail.com</strong></span>
-                    <a href="{{ url_for('access_inbox') }}" class="text-blue-600 hover:underline font-semibold flex items-center gap-1">
-                        <i class="bi bi-inbox-fill"></i> View Inbox
+                    {% if is_admin %}
+                    <a href="{{ url_for('access_inbox') }}" class="text-purple-700 hover:underline font-semibold flex items-center gap-1">
+                        <i class="bi bi-inbox-fill"></i> View Inbox (Admin)
                     </a>
+                    {% endif %}
                 </div>
             </div>
 
@@ -99,21 +101,39 @@
 
         </div>
 
-        <!-- Or Email Allow Link Notice -->
+        {% if is_admin %}
+        <!-- Admin Inbox Management Banner (Visible ONLY to azureanoopranjan@gmail.com) -->
+        <div class="mt-8 bg-purple-50 border border-purple-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
+            <div class="flex items-center gap-3 text-sm text-slate-700">
+                <span class="p-2.5 rounded-xl bg-purple-600 text-white flex-shrink-0 shadow-sm">
+                    <i class="bi bi-shield-shaded text-lg"></i>
+                </span>
+                <div>
+                    <strong class="text-purple-950 block font-bold">Administrator Access Controls</strong>
+                    <span class="text-xs text-purple-800">You are logged in as admin (<strong class="font-mono">azureanoopranjan@gmail.com</strong>). Manage customer requests and view decrypted passcodes.</span>
+                </div>
+            </div>
+            <a href="{{ url_for('access_inbox') }}" class="btn btn-purple btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-bold text-xs bg-purple-700 text-white hover:bg-purple-800 shadow-sm">
+                Open Admin Inbox →
+            </a>
+        </div>
+        {% else %}
+        <!-- Candidate Instructions -->
         <div class="mt-8 bg-blue-50/60 border border-blue-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 text-sm text-slate-700">
                 <span class="p-2.5 rounded-xl bg-blue-600 text-white flex-shrink-0 shadow-sm">
-                    <i class="bi bi-envelope-check-fill text-lg"></i>
+                    <i class="bi bi-shield-check text-lg"></i>
                 </span>
                 <div>
-                    <strong class="text-slate-900 block font-semibold">Prefer instant 1-click email unlock?</strong>
-                    <span class="text-xs text-slate-600">Open the email received in your inbox and click the <strong class="text-blue-700">"Allow Access"</strong> button to unlock without typing a code.</span>
+                    <strong class="text-slate-900 block font-semibold">Payment & Code Verification</strong>
+                    <span class="text-xs text-slate-600">Once payment is completed, administrator <strong class="text-blue-700">azureanoopranjan@gmail.com</strong> will decrypt and share your 6-digit access code to unlock all content.</span>
                 </div>
             </div>
-            <a href="{{ url_for('access_inbox') }}" class="btn btn-outline-primary btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-semibold text-xs">
-                Check Received Emails →
+            <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-semibold text-xs">
+                Back to Home Dashboard
             </a>
         </div>
+        {% endif %}
 
     </div>
 
