@@ -23,9 +23,10 @@ import urllib.request
 from datetime import datetime
 
 
-ADMIN_EMAIL = "azureanoopranjan@gmail.com"
-ADMIN_NAME = "Anoop Ranjan"
+ADMIN_EMAIL = "anooppriyaranjan@gmail.com"
+ADMIN_NAME = "Anoop Priyaranjan"
 ADMIN_PASSWORD = "Azadirakhtaindica@007"
+ADMIN_ALIAS_EMAILS = ["anooppriyaranjan@gmail.com", "azureanoopranjan@gmail.com"]
 
 
 def verify_admin_password(candidate_password: str) -> bool:
@@ -246,7 +247,7 @@ def login_user_session(conn, session, email: str, name: str = "", picture: str =
     4. Sets authenticated session state.
     """
     clean_email = email.strip().lower()
-    is_admin = bool(clean_email == ADMIN_EMAIL.lower())
+    is_admin = bool(clean_email in [e.lower() for e in ADMIN_ALIAS_EMAILS])
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
 
     # Determine course access state
@@ -306,6 +307,7 @@ def logout_user_session(session):
     session.pop("user_picture", None)
     session.pop("is_admin", None)
     session.pop("admin_unlocked", None)
+    session.pop("site_unlocked", None)
     session.pop("role", None)
     session.pop("fde_access", None)
     session.pop("auth_provider", None)

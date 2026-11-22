@@ -22,8 +22,9 @@ from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
 
-ADMIN_EMAIL = "azureanoopranjan@gmail.com"
-ADMIN_NAME = "Anoop Ranjan"
+ADMIN_EMAIL = "anooppriyaranjan@gmail.com"
+ADMIN_NAME = "Anoop Priyaranjan"
+ADMIN_ALIAS_EMAILS = ["anooppriyaranjan@gmail.com", "azureanoopranjan@gmail.com"]
 SECRET_KEY = os.environ.get("FDE_CIPHER_SECRET", "FDE-AZURE-AI-CIPHER-KEY-2026-ANOOP").encode("utf-8")
 
 
@@ -89,32 +90,31 @@ def ensure_schema_updated(conn):
         pass
 
 
-def compose_outgoing_request_email(email: str, encrypted_code: str, requester_name: str = "") -> dict:
+def compose_outgoing_request_email(email: str, encrypted_code: str, requester_name: str = "", allow_url: str = "") -> dict:
     """
-    Constructs the pre-drafted email template that the requester prepares and sends.
-    THE PASSCODE IS ENCRYPTED HERE (requester cannot see the raw 6-digit unlock code).
+    Constructs the pre-drafted email template that the user sends to anooppriyaranjan@gmail.com.
+    Contains the link which by clicking in anooppriyaranjan@gmail.com's inbox will give access to this valid email ID.
     """
     greeting_name = requester_name.strip() if requester_name else "Candidate / Scholar"
-    subject = f"Access Request & Payment: Azure AI FDE Portal [Token: {encrypted_code}]"
+    subject = f"Access Approval Request & Portal Link for [{email}]"
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    link_line = f"\nDIRECT ACCESS APPROVAL LINK (CLICK IN YOUR INBOX TO GIVE ACCESS TO THIS USER):\n>>> {allow_url} <<<\n" if allow_url else ""
     
     body = f"""To: {ADMIN_EMAIL}
 Subject: {subject}
 
-Dear Anoop Ranjan (Azure AI FDE Portal Administrator),
+Dear Anoop Priyaranjan (Portal Administrator),
 
-I would like to purchase full access to the C# Azure AI Forward Deployed Engineer (FDE) & Cybersecurity Portal.
+I would like to request full access to display the Azure AI Forward Deployed Engineer (FDE) Learning Portal.
 
 Requester Details:
-- Name: {greeting_name}
-- Email: {email}
-- Encrypted Access Passcode: {encrypted_code}
-- Request Date: {datetime.now().strftime("%Y-%m-%d %H:%M:%S")}
-
-Payment Note:
-I am initiating / completing payment for full course portal access (35-day curriculum, hands-on labs, Microsoft Sentinel simulator, and production capstone projects).
-
-Receiver Verification & Decryption:
-Please verify my payment with the encrypted security token above. Once payment is confirmed, please decrypt and tell me the 6-digit access passcode so I can unlock all access on the website.
+- Valid Email Address: {email}
+- Full Name: {greeting_name}
+- Request Date: {now_str}
+- Security Token: {encrypted_code}
+{link_line}
+Action for Administrator:
+Please click on the direct approval link above in your inbox (anooppriyaranjan@gmail.com) to immediately authorize and unlock full access to the complete web application for this valid email ID ({email}).
 
 Thank you,
 {greeting_name}
@@ -129,6 +129,7 @@ Email: {email}
     return {
         "subject": subject,
         "body": body,
+        "allow_url": allow_url,
         "mailto_url": mailto_url,
         "gmail_url": gmail_url,
         "outlook_url": outlook_url
@@ -199,8 +200,8 @@ def create_access_request(conn, email: str, base_url: str, ip_address: str = "",
 
     allow_url = f"{base_url.rstrip('/')}/access/allow/{token}"
 
-    # Outgoing email for the requester (PASSCODE IS ENCRYPTED)
-    outgoing_info = compose_outgoing_request_email(email, encrypted_code, requester_name)
+    # Outgoing email for the requester to send to anooppriyaranjan@gmail.com with approval link
+    outgoing_info = compose_outgoing_request_email(email, encrypted_code, requester_name, allow_url)
 
     # Receiver email for Anoop Ranjan (PASSCODE IS DECRYPTED SO HE CAN TELL THE PERSON)
     receiver_info = compose_receiver_admin_email(email, decrypted_code, encrypted_code, allow_url, requester_name)

@@ -25,6 +25,16 @@
         }
     </script>
     <link rel="stylesheet" href="{{ url_for('static', filename='css/custom.css') }}">
+    <style>
+        @keyframes adminFlashPulse {
+            0% { transform: scale(0.92); box-shadow: 0 0 0 rgba(147, 51, 234, 0); }
+            40% { transform: scale(1.04); box-shadow: 0 0 45px rgba(147, 51, 234, 0.8), 0 0 75px rgba(99, 102, 241, 0.5); border-color: #9333ea; }
+            100% { transform: scale(1); box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.35); }
+        }
+        .flash-admin-modal {
+            animation: adminFlashPulse 0.45s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards !important;
+        }
+    </style>
     {% block head %}{% endblock %}
 </head>
 <body class="bg-[#f8fafc] text-slate-800 min-h-screen flex flex-col font-sans antialiased selection:bg-blue-600 selection:text-white">
@@ -103,45 +113,22 @@
                     </a>
                 </nav>
 
-                <!-- Google SSO User Status & Access Gate Controls -->
+                <!-- Portal Lock & Password Unlock Status Controls -->
                 <div class="hidden sm:flex items-center gap-2 mr-2">
-                    {% if is_logged_in %}
-                    <div class="flex items-center gap-1.5 px-2.5 py-1 rounded-xl bg-slate-50 border border-slate-200 text-xs text-slate-700 shadow-2xs">
-                        <i class="bi bi-google text-blue-600"></i>
-                        <span class="font-mono text-[11px] font-semibold truncate max-w-[150px]" title="{{ current_user_email }}">{{ current_user_email }}</span>
-                    </div>
-
-                    {% if is_admin %}
-                    <button type="button" onclick="openAdminPasswordModal()" class="btn btn-outline-purple btn-sm py-1 px-2.5 rounded-xl text-xs font-bold flex items-center gap-1.5 transition text-purple-700 border-purple-200 hover:bg-purple-50 shadow-2xs" title="Open Admin Section (Password Protected)">
-                        <i class="bi bi-shield-lock-fill text-purple-600"></i>
-                        <span>Admin</span>
-                    </button>
-                    {% endif %}
-
-                    {% if has_access %}
+                    {% if site_unlocked %}
                     <span class="px-2.5 py-1 rounded-xl text-xs font-bold bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1.5 shadow-xs">
                         <span class="w-2 h-2 rounded-full bg-emerald-500 animate-pulse"></span>
-                        <span>Access Active</span>
+                        <span>Portal Unlocked</span>
                     </span>
-                    {% else %}
-                    <a href="{{ url_for('access_gate') }}" class="px-2.5 py-1 rounded-xl text-xs font-bold bg-blue-50 text-blue-700 border border-blue-200 hover:bg-blue-100 flex items-center gap-1 transition text-decoration-none">
-                        <i class="bi bi-shield-lock-fill text-blue-600"></i>
-                        <span>Unlock</span>
-                    </a>
-                    {% endif %}
-
-                    <a href="{{ url_for('auth_logout') }}" class="btn btn-outline-secondary btn-sm py-1 px-2.5 rounded-xl text-[11px] font-semibold text-slate-500 hover:text-red-600 hover:border-red-300" title="Sign Out of Gmail SSO">
-                        <i class="bi bi-box-arrow-right"></i>
+                    <a href="{{ url_for('lock_portal') }}" class="btn btn-outline-secondary btn-sm py-1 px-2.5 rounded-xl text-xs font-semibold text-slate-600 hover:text-red-600 hover:border-red-300 flex items-center gap-1 shadow-2xs text-decoration-none" title="Lock Rest of Application">
+                        <i class="bi bi-lock-fill"></i>
+                        <span>Lock</span>
                     </a>
                     {% else %}
-                    <a href="{{ url_for('login_page') }}" class="btn btn-outline-primary btn-sm py-1.5 px-3 rounded-xl text-xs font-bold flex items-center gap-1.5 shadow-xs text-decoration-none">
-                        <i class="bi bi-google"></i>
-                        <span>Sign In</span>
-                    </a>
-                    <a href="{{ url_for('access_gate') }}" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition transform hover:scale-105 text-decoration-none">
+                    <button type="button" onclick="flashAdminPasswordModal()" class="px-3 py-1.5 rounded-xl text-xs font-bold bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white shadow-md shadow-purple-500/20 flex items-center gap-1.5 transition transform hover:scale-105 border-0" title="Enter Admin Password to Unlock Full Application">
                         <i class="bi bi-shield-lock-fill"></i>
-                        <span>Request Access</span>
-                    </a>
+                        <span>Unlock App</span>
+                    </button>
                     {% endif %}
                 </div>
 
@@ -182,21 +169,16 @@
                     <span class="text-[9px] px-1.5 py-0.5 rounded bg-blue-100 text-blue-700 border border-blue-200 font-bold uppercase">Pitch</span>
                 </a>
                 <a href="{{ url_for('notes_view') }}" class="block px-3 py-2 rounded-md text-base font-medium text-slate-600 hover:bg-slate-100">Journal</a>
-                {% if is_admin %}
-                <button type="button" onclick="openAdminPasswordModal()" class="w-full text-left px-3 py-2 rounded-md text-base font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 flex items-center justify-between border-0">
-                    <span class="flex items-center gap-2"><i class="bi bi-shield-lock-fill"></i> Admin Section</span>
+                {% if site_unlocked %}
+                <a href="{{ url_for('lock_portal') }}" class="block px-3 py-2 rounded-md text-base font-bold text-red-600 bg-red-50 hover:bg-red-100 flex items-center justify-between text-decoration-none">
+                    <span class="flex items-center gap-2"><i class="bi bi-lock-fill"></i> Lock Portal</span>
+                    <span class="text-xs text-red-500 font-mono">Return to Home Only</span>
+                </a>
+                {% else %}
+                <button type="button" onclick="flashAdminPasswordModal()" class="w-full text-left px-3 py-2 rounded-md text-base font-bold text-purple-700 bg-purple-50 hover:bg-purple-100 flex items-center justify-between border-0">
+                    <span class="flex items-center gap-2"><i class="bi bi-shield-lock-fill"></i> Unlock Portal</span>
                     <span class="text-xs text-purple-600 font-mono">Password Required</span>
                 </button>
-                {% endif %}
-                {% if is_logged_in %}
-                <div class="px-3 py-2 text-xs text-slate-500 border-t border-slate-100 flex items-center justify-between">
-                    <span>Signed in as: <strong class="text-slate-800 font-mono">{{ current_user_email }}</strong></span>
-                    <a href="{{ url_for('auth_logout') }}" class="text-red-600 font-semibold hover:underline">Sign Out</a>
-                </div>
-                {% else %}
-                <a href="{{ url_for('login_page') }}" class="block px-3 py-2 rounded-md text-base font-bold text-blue-700 bg-blue-50 border border-blue-200 hover:bg-blue-100 flex items-center gap-2 text-decoration-none">
-                    <i class="bi bi-google text-blue-600"></i> Sign In with Google
-                </a>
                 {% endif %}
             </div>
         </div>
@@ -298,57 +280,127 @@
         </div>
     </div>
 
-    {% if is_admin %}
-    <!-- Admin Security Verification Popup Modal (Visible ONLY to azureanoopranjan@gmail.com) -->
-    <div id="admin-password-modal" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/70 backdrop-blur-md hidden transition-opacity duration-300">
-        <div class="relative w-full max-w-md bg-white border border-purple-200 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 animate-fadeIn">
+    <!-- Admin Security Verification Popup Modal (Flashes on click anywhere else other than Home page) -->
+    <div id="admin-password-modal" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/75 backdrop-blur-md hidden transition-opacity duration-300">
+        <div class="admin-modal-box relative w-full max-w-lg bg-white border border-purple-300 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 animate-fadeIn">
             <!-- Close Button -->
-            <button type="button" onclick="closeAdminPasswordModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition" title="Close Modal">
+            <button type="button" onclick="closeAdminPasswordModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition" title="Stay on Home Page">
                 <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
             </button>
 
+            <!-- Modal Header -->
             <div class="text-center space-y-2">
                 <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-700 mx-auto flex items-center justify-center text-2xl shadow-inner border border-purple-200">
                     <i class="bi bi-shield-lock-fill"></i>
                 </div>
-                <h3 class="text-xl font-extrabold text-slate-900 m-0">
-                    Admin Security Verification
+                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 m-0">
+                    Admin Password Required
                 </h3>
-                <p class="text-xs text-slate-600 m-0 leading-relaxed">
-                    Please enter the administrator master password to open the private Admin Section and inbox records.
+                <p class="text-xs sm:text-sm text-slate-600 m-0 leading-relaxed">
+                    Only the <strong class="text-blue-600 font-semibold">Home Page</strong> is freely displayed. Enter the admin password to unlock and display the rest of the web application.
                 </p>
             </div>
 
-            <form id="admin-password-modal-form" onsubmit="handleAdminPasswordSubmit(event)" class="space-y-4">
-                <div>
-                    <label for="admin-modal-pass-input" class="text-xs font-bold text-slate-700 block mb-1.5">Admin Master Password</label>
-                    <div class="relative">
-                        <input type="password" id="admin-modal-pass-input" required placeholder="Enter password" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white">
-                        <button type="button" onclick="toggleAdminModalPasswordVisibility(this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0">
-                            <i class="bi bi-eye"></i>
+            <!-- Tab Switcher -->
+            <div class="flex items-center p-1 rounded-2xl bg-slate-100 border border-slate-200 text-xs font-bold">
+                <button type="button" id="tab-btn-password" onclick="switchAdminTab('password')" class="flex-1 py-2 rounded-xl transition text-center bg-white text-purple-800 shadow-xs border border-purple-200">
+                    <i class="bi bi-key-fill me-1"></i> Enter Admin Password
+                </button>
+                <button type="button" id="tab-btn-email" onclick="switchAdminTab('email')" class="flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900">
+                    <i class="bi bi-envelope-at-fill me-1"></i> Don't Know Password?
+                </button>
+            </div>
+
+            <!-- Panel 1: Enter Password -->
+            <div id="panel-password" class="space-y-4">
+                <form id="admin-password-modal-form" onsubmit="handleAdminPasswordSubmit(event)" class="space-y-4">
+                    <div>
+                        <label for="admin-modal-pass-input" class="text-xs font-bold text-slate-700 block mb-1.5">Admin Security Password</label>
+                        <div class="relative">
+                            <input type="password" id="admin-modal-pass-input" required placeholder="Enter password (e.g. Azadirakhtaindica@007)" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white">
+                            <button type="button" onclick="toggleAdminModalPasswordVisibility(this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0">
+                                <i class="bi bi-eye"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div id="admin-modal-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
+
+                    <div class="flex items-center gap-2 pt-1">
+                        <button type="button" onclick="closeAdminPasswordModal()" class="w-1/3 btn btn-outline-secondary text-xs font-bold py-2.5 rounded-xl">
+                            Stay on Home
+                        </button>
+                        <button type="submit" id="admin-modal-submit-btn" class="w-2/3 btn btn-purple text-white text-xs font-bold py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 transition shadow-sm flex items-center justify-center gap-2">
+                            <i class="bi bi-unlock-fill"></i>
+                            <span>Unlock & Display All</span>
                         </button>
                     </div>
+                </form>
+            </div>
+
+            <!-- Panel 2: Request Email Access to anooppriyaranjan@gmail.com -->
+            <div id="panel-email" class="space-y-3.5 hidden">
+                <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-3.5 text-xs text-slate-700 space-y-1">
+                    <strong class="text-blue-900 block font-bold">Request Access via Email:</strong>
+                    <p class="m-0 text-slate-600 leading-relaxed">
+                        Enter your email address below to generate a pre-drafted request to <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong>.
+                        When <strong class="text-blue-700 font-mono">anooppriyaranjan@gmail.com</strong> clicks the approval link in their inbox, your email ID will be given full access!
+                    </p>
                 </div>
 
-                <div id="admin-modal-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
+                <form id="email-request-form" onsubmit="handleGenerateEmailRequest(event)" class="space-y-3">
+                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
+                        <div>
+                            <label for="req-name-input" class="text-xs font-bold text-slate-700 block mb-1">Your Full Name</label>
+                            <input type="text" id="req-name-input" placeholder="e.g. Alex Sharma" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
+                        </div>
+                        <div>
+                            <label for="req-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Email Address *</label>
+                            <input type="email" id="req-email-input" required placeholder="yourname@gmail.com" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white font-mono">
+                        </div>
+                    </div>
 
-                <div class="flex items-center gap-2 pt-1">
-                    <button type="button" onclick="closeAdminPasswordModal()" class="w-1/3 btn btn-outline-secondary text-xs font-bold py-2.5 rounded-xl">
-                        Cancel
+                    <button type="submit" id="generate-email-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
+                        <i class="bi bi-envelope-paper-fill"></i>
+                        <span>Generate Sample Email to anooppriyaranjan@gmail.com</span>
                     </button>
-                    <button type="submit" id="admin-modal-submit-btn" class="w-2/3 btn btn-purple text-white text-xs font-bold py-2.5 rounded-xl bg-purple-700 hover:bg-purple-800 transition shadow-sm flex items-center justify-center gap-2">
-                        <i class="bi bi-unlock-fill"></i>
-                        <span>Unlock & Open</span>
-                    </button>
+                </form>
+
+                <!-- Generated Email Template Display Area -->
+                <div id="email-preview-container" class="space-y-2 hidden">
+                    <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                        <span>Sample Email (Sent to anooppriyaranjan@gmail.com)</span>
+                        <span class="text-emerald-700 font-bold"><i class="bi bi-link-45deg"></i> Contains Direct Approval Link</span>
+                    </div>
+                    <textarea id="email-preview-textarea" rows="6" readonly class="form-control font-mono text-[11px] bg-slate-50 border-slate-300 rounded-xl select-all leading-relaxed"></textarea>
+                    
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                        <a id="open-mailto-btn" href="#" target="_blank" class="btn btn-outline-primary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
+                            <i class="bi bi-envelope-fill"></i> Open Mail App
+                        </a>
+                        <a id="open-gmail-btn" href="#" target="_blank" class="btn btn-outline-dark btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
+                            <i class="bi bi-google"></i> Open Gmail Web
+                        </a>
+                        <button type="button" onclick="copySampleEmailText(this)" class="btn btn-outline-secondary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
+                            <i class="bi bi-clipboard"></i> Copy Email Text
+                        </button>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-200">
+                        <button type="button" onclick="checkIfEmailApproved()" id="check-approval-btn" class="w-full btn btn-success text-white text-xs font-bold py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 border-0 flex items-center justify-center gap-2 shadow-xs">
+                            <i class="bi bi-arrow-repeat"></i>
+                            <span>Check If Approved by anooppriyaranjan@gmail.com</span>
+                        </button>
+                        <div id="check-approval-feedback" class="text-xs hidden p-2.5 rounded-xl border mt-2"></div>
+                    </div>
                 </div>
-            </form>
+            </div>
 
             <div class="text-[11px] text-center text-slate-400 border-t border-slate-100 pt-3">
-                Strictly restricted to <strong class="text-slate-600 font-mono">azureanoopranjan@gmail.com</strong>
+                Security Dispatch • Administrator: <strong class="text-slate-600 font-mono">anooppriyaranjan@gmail.com</strong>
             </div>
         </div>
     </div>
-    {% endif %}
 
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
@@ -531,23 +583,60 @@
             });
         }
 
-        // Admin Password Modal Functions
-        function openAdminPasswordModal() {
-            const modal = document.getElementById('admin-password-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
+        // Global State & Tracking
+        const isSiteUnlocked = {{ 'true' if site_unlocked else 'false' }};
+        let pendingTargetUrl = null;
+
+        // Switch between Password Unlock and Email Request tabs
+        function switchAdminTab(tab) {
+            const panelPass = document.getElementById('panel-password');
+            const panelEmail = document.getElementById('panel-email');
+            const btnPass = document.getElementById('tab-btn-password');
+            const btnEmail = document.getElementById('tab-btn-email');
+
+            if (tab === 'password') {
+                if (panelPass) panelPass.classList.remove('hidden');
+                if (panelEmail) panelEmail.classList.add('hidden');
+                if (btnPass) btnPass.className = 'flex-1 py-2 rounded-xl transition text-center bg-white text-purple-800 shadow-xs border border-purple-200';
+                if (btnEmail) btnEmail.className = 'flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900';
                 const passInput = document.getElementById('admin-modal-pass-input');
-                const feedback = document.getElementById('admin-modal-feedback');
-                if (passInput) {
-                    passInput.value = '';
-                    passInput.focus();
-                }
-                if (feedback) {
-                    feedback.classList.add('hidden');
-                    feedback.innerHTML = '';
-                }
+                if (passInput) passInput.focus();
+            } else {
+                if (panelPass) panelPass.classList.add('hidden');
+                if (panelEmail) panelEmail.classList.remove('hidden');
+                if (btnEmail) btnEmail.className = 'flex-1 py-2 rounded-xl transition text-center bg-white text-blue-800 shadow-xs border border-blue-200';
+                if (btnPass) btnPass.className = 'flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900';
+                const emailInput = document.getElementById('req-email-input');
+                if (emailInput) emailInput.focus();
             }
+        }
+
+        // Flashes the Admin Password Modal on screen with attention-grabbing pulse
+        function flashAdminPasswordModal(targetUrl = null) {
+            if (targetUrl) {
+                pendingTargetUrl = targetUrl;
+            }
+            const modal = document.getElementById('admin-password-modal');
+            if (!modal) return;
+
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const modalBox = modal.querySelector('.admin-modal-box');
+            if (modalBox) {
+                modalBox.classList.remove('flash-admin-modal');
+                void modalBox.offsetWidth; // trigger reflow
+                modalBox.classList.add('flash-admin-modal');
+            }
+
+            const passInput = document.getElementById('admin-modal-pass-input');
+            if (passInput && (!document.getElementById('panel-password') || !document.getElementById('panel-password').classList.contains('hidden'))) {
+                passInput.focus();
+            }
+        }
+
+        function openAdminPasswordModal(targetUrl = null) {
+            flashAdminPasswordModal(targetUrl);
         }
 
         function closeAdminPasswordModal() {
@@ -569,6 +658,7 @@
             }
         }
 
+        // Handle Admin Password Verification
         async function handleAdminPasswordSubmit(e) {
             e.preventDefault();
             const passInput = document.getElementById('admin-modal-pass-input');
@@ -590,26 +680,38 @@
             }
 
             try {
-                const res = await fetch('/api/admin/verify-password', {
+                const res = await fetch('/api/verify-site-password', {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ password: password })
+                    body: JSON.stringify({ 
+                        password: password,
+                        target: pendingTargetUrl || window.location.pathname
+                    })
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
                     feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
-                    feedback.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600"></i> Password verified! Opening Admin Section...';
+                    feedback.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600"></i> Password verified! Displaying web application...';
                     feedback.classList.remove('hidden');
                     setTimeout(() => {
-                        window.location.href = data.redirect || '{{ url_for("access_inbox") }}';
+                        const destination = (data.redirect && data.redirect !== '/') ? data.redirect : (pendingTargetUrl || '/courses');
+                        window.location.href = destination;
                     }, 400);
                 } else {
                     feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 flex items-center gap-2';
-                    feedback.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-red-500"></i> ${data.error || 'Incorrect admin password.'}`;
+                    feedback.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-red-500"></i> ${data.error || 'Incorrect admin password. Only Home Page is accessible.'}`;
                     feedback.classList.remove('hidden');
+
+                    const modalBox = document.querySelector('#admin-password-modal .admin-modal-box');
+                    if (modalBox) {
+                        modalBox.classList.remove('flash-admin-modal');
+                        void modalBox.offsetWidth;
+                        modalBox.classList.add('flash-admin-modal');
+                    }
+
                     if (btn) {
                         btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-unlock-fill"></i> <span>Unlock & Open</span>';
+                        btn.innerHTML = '<i class="bi bi-unlock-fill"></i> <span>Unlock & Display All</span>';
                     }
                 }
             } catch (err) {
@@ -618,10 +720,223 @@
                 feedback.classList.remove('hidden');
                 if (btn) {
                     btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-unlock-fill"></i> <span>Unlock & Open</span>';
+                    btn.innerHTML = '<i class="bi bi-unlock-fill"></i> <span>Unlock & Display All</span>';
                 }
             }
         }
+
+        // Generate sample email to anooppriyaranjan@gmail.com with Direct Approval Link
+        async function handleGenerateEmailRequest(e) {
+            e.preventDefault();
+            const emailInput = document.getElementById('req-email-input');
+            const nameInput = document.getElementById('req-name-input');
+            const btn = document.getElementById('generate-email-btn');
+            const previewContainer = document.getElementById('email-preview-container');
+            const textarea = document.getElementById('email-preview-textarea');
+            const mailtoBtn = document.getElementById('open-mailto-btn');
+            const gmailBtn = document.getElementById('open-gmail-btn');
+
+            const email = emailInput ? emailInput.value.trim() : '';
+            const name = nameInput ? nameInput.value.trim() : '';
+
+            if (!email || !email.includes('@')) {
+                alert('Please enter a valid email address.');
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Generating Sample Email...';
+            }
+
+            try {
+                const res = await fetch('/api/request-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email, name: name })
+                });
+                const data = await res.json();
+                if (data.success) {
+                    if (textarea) textarea.value = data.body;
+                    if (mailtoBtn) mailtoBtn.href = data.mailto_url;
+                    if (gmailBtn) gmailBtn.href = data.gmail_url;
+                    if (previewContainer) previewContainer.classList.remove('hidden');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Email Prepared! Send to anooppriyaranjan@gmail.com</span>';
+                        btn.classList.remove('btn-primary');
+                        btn.classList.add('btn-success');
+                    }
+                } else {
+                    alert(data.message || 'Error generating email request.');
+                    if (btn) {
+                        btn.disabled = false;
+                        btn.innerHTML = '<i class="bi bi-envelope-paper-fill"></i> <span>Generate Sample Email</span>';
+                    }
+                }
+            } catch (err) {
+                alert('Failed to generate request. Please check network.');
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-envelope-paper-fill"></i> <span>Generate Sample Email</span>';
+                }
+            }
+        }
+
+        // Copy email text
+        function copySampleEmailText(btn) {
+            const textarea = document.getElementById('email-preview-textarea');
+            if (!textarea) return;
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-secondary');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                }, 1800);
+            });
+        }
+
+        // Check if anooppriyaranjan@gmail.com has clicked the link in their inbox
+        async function checkIfEmailApproved() {
+            const emailInput = document.getElementById('req-email-input');
+            const feedback = document.getElementById('check-approval-feedback');
+            const btn = document.getElementById('check-approval-btn');
+            const email = emailInput ? emailInput.value.trim() : '';
+
+            if (!email) {
+                if (feedback) {
+                    feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block';
+                    feedback.textContent = 'Please enter your email above first.';
+                    feedback.classList.remove('hidden');
+                }
+                return;
+            }
+
+            if (btn) {
+                btn.disabled = true;
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Checking Approval...';
+            }
+
+            try {
+                const res = await fetch('/api/check-email-access', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ email: email })
+                });
+                const data = await res.json();
+                if (res.ok && data.success) {
+                    if (feedback) {
+                        feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
+                        feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600"></i> ${data.message} Opening courses...`;
+                        feedback.classList.remove('hidden');
+                    }
+                    setTimeout(() => {
+                        window.location.href = data.redirect || '/courses';
+                    }, 600);
+                } else {
+                    if (feedback) {
+                        feedback.className = 'text-xs p-2.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 flex items-center gap-2';
+                        feedback.innerHTML = `<i class="bi bi-hourglass-split text-amber-600"></i> ${data.message || 'Approval pending from anooppriyaranjan@gmail.com.'}`;
+                        feedback.classList.remove('hidden');
+                    }
+                }
+            } catch (err) {
+                if (feedback) {
+                    feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block';
+                    feedback.textContent = 'Server error checking approval status.';
+                    feedback.classList.remove('hidden');
+                }
+            } finally {
+                if (btn) {
+                    btn.disabled = false;
+                    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> <span>Check If Approved by anooppriyaranjan@gmail.com</span>';
+                }
+            }
+        }
+
+        // Global Click Interception & Auto-Trigger
+        document.addEventListener('DOMContentLoaded', function() {
+            // Check for ?unlock=1 query param
+            const urlParams = new URLSearchParams(window.location.search);
+            if (urlParams.get('unlock') === '1') {
+                const nextUrl = urlParams.get('next');
+                const feedback = document.getElementById('admin-modal-feedback');
+                if (feedback) {
+                    feedback.className = 'text-xs p-2.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 flex items-center gap-2 mb-2 block';
+                    feedback.innerHTML = '<i class="bi bi-shield-exclamation text-amber-600"></i> Admin password required to display this section.';
+                    feedback.classList.remove('hidden');
+                }
+                flashAdminPasswordModal(nextUrl);
+            }
+
+            // If web application is locked, allow ONLY home page as display!
+            // Flashes the admin popup modal on click anywhere else in web application other than home page!
+            if (!isSiteUnlocked) {
+                document.addEventListener('click', function(e) {
+                    // Do not intercept clicks inside the admin password modal itself
+                    const adminModal = document.getElementById('admin-password-modal');
+                    if (adminModal && adminModal.contains(e.target)) {
+                        return;
+                    }
+
+                    // Do not intercept clicks on embedded videos or iframes on the home page
+                    if (e.target.closest('.video-container') || e.target.closest('iframe')) {
+                        return;
+                    }
+
+                    // Find closest link or button
+                    const clickable = e.target.closest('a, button');
+                    if (clickable) {
+                        // Modal close buttons
+                        if (clickable.getAttribute('onclick') && clickable.getAttribute('onclick').includes('closeAdminPasswordModal')) {
+                            return;
+                        }
+
+                        // Anchor link tag
+                        if (clickable.tagName === 'A') {
+                            const href = clickable.getAttribute('href');
+                            if (href) {
+                                // External link
+                                if (href.startsWith('http') && !href.includes(window.location.host)) {
+                                    return;
+                                }
+                                // In-page hash link
+                                if (href === '#' || href.startsWith('#')) {
+                                    return;
+                                }
+                                // Home page itself: allowed display
+                                if (href === '/' || href === window.location.origin + '/' || (href === window.location.pathname && window.location.pathname === '/')) {
+                                    return;
+                                }
+
+                                // Navigating anywhere else in web application other than home page:
+                                // FLASH ADMIN POPUP!
+                                e.preventDefault();
+                                e.stopPropagation();
+                                flashAdminPasswordModal(clickable.href || href);
+                                return;
+                            }
+                        }
+                    }
+
+                    // Any dashboard cards or sections pointing to other pages
+                    const cardWithLink = e.target.closest('.hover-card, .card');
+                    if (cardWithLink && !cardWithLink.closest('#admin-password-modal')) {
+                        const innerA = cardWithLink.querySelector('a');
+                        if (innerA && innerA.getAttribute('href') && innerA.getAttribute('href') !== '/' && !innerA.getAttribute('href').startsWith('#')) {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            flashAdminPasswordModal(innerA.href);
+                            return;
+                        }
+                    }
+                }, true); // Capture phase ensures we intercept prior to link dispatch
+            }
+        });
     </script>
     {% block scripts %}{% endblock %}
 </body>
