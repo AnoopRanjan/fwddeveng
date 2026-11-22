@@ -150,6 +150,54 @@ Email: {email}
     }
 
 
+def compose_verified_admin_request_email(candidate_email: str = "", candidate_name: str = "", base_url: str = "") -> dict:
+    """
+    Constructs a sample email text created when the user enters the correct Admin Security Password,
+    where the user will be requesting full access from administrator anooppriyaranjan@gmail.com.
+    """
+    greeting_name = candidate_name.strip() if candidate_name else "Candidate / Scholar"
+    user_email_str = candidate_email.strip() if candidate_email else "requester@verified-portal"
+    subject = f"Verified Full Portal Access Request for [{greeting_name}]"
+    now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
+    portal_url = base_url.rstrip("/") if base_url else "https://fwddeveng.vercel.app"
+    courses_url = f"{portal_url}/courses"
+
+    body = f"""To: {ADMIN_EMAIL}
+Subject: {subject}
+
+Dear Anoop Priyaranjan (Portal Administrator),
+
+I have successfully verified the Admin Security Password for the Azure AI Forward Deployed Engineer (FDE) Learning Portal.
+
+I am requesting full member access authorization and enrollment:
+- Full Name: {greeting_name}
+- Email Address: {user_email_str}
+- Verification Status: Admin Password Verified Successfully
+- Request Timestamp: {now_str}
+- Portal Access Destination: {courses_url}
+
+Please confirm and grant my full access to all 35-day interactive courses, hands-on lab sandbox guides, Microsoft Sentinel KQL attack simulator, and capstone blueprints.
+
+Thank you,
+{greeting_name}
+Email: {user_email_str}
+"""
+
+    encoded_sub = urllib.parse.quote(subject)
+    encoded_body = urllib.parse.quote(body)
+    mailto_url = f"mailto:{ADMIN_EMAIL}?subject={encoded_sub}&body={encoded_body}"
+    gmail_url = f"https://mail.google.com/mail/?view=cm&fs=1&to={ADMIN_EMAIL}&su={encoded_sub}&body={encoded_body}"
+    outlook_url = f"https://outlook.live.com/mail/0/deeplink/compose?to={ADMIN_EMAIL}&subject={encoded_sub}&body={encoded_body}"
+
+    return {
+        "subject": subject,
+        "body": body,
+        "mailto_url": mailto_url,
+        "gmail_url": gmail_url,
+        "outlook_url": outlook_url
+    }
+
+
 def compose_receiver_admin_email(email: str, decrypted_code: str, encrypted_code: str, allow_url: str, requester_name: str = "") -> dict:
     """
     Constructs the email notification that administrator (Anoop Ranjan) receives.

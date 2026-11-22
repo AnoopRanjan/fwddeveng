@@ -101,10 +101,18 @@ def test_routes_and_access():
     reset_admin_rate_limit("unknown")
 
     # 4. Correct admin password "Azadirakhtaindica@007" unlocks the entire web application
-    unlock_res = client.post('/api/verify-site-password', json={'password': 'Azadirakhtaindica@007', 'target': '/courses'})
+    # AND when password is correct, creates sample email text for the user to send to anooppriyaranjan@gmail.com requesting full access
+    unlock_res = client.post('/api/verify-site-password', json={'password': 'Azadirakhtaindica@007', 'target': '/courses', 'email': 'student@example.com', 'name': 'Verified Candidate'})
     assert unlock_res.status_code == 200
-    assert unlock_res.get_json()['success'] is True
-    print("PASS: Admin popup password 'Azadirakhtaindica@007' successfully unlocks the web application.")
+    unlock_data = unlock_res.get_json()
+    assert unlock_data['success'] is True
+    assert 'sample_email' in unlock_data, "Expected sample_email created on correct password"
+    sample_email = unlock_data['sample_email']
+    assert "anooppriyaranjan@gmail.com" in sample_email['body']
+    assert "anooppriyaranjan@gmail.com" in sample_email['mailto_url']
+    assert "anooppriyaranjan@gmail.com" in sample_email['gmail_url']
+    assert "full" in sample_email['body'].lower() and "access" in sample_email['body'].lower()
+    print("PASS: Correct admin password unlocks portal AND creates sample email text for anooppriyaranjan@gmail.com requesting full access.")
 
     # 5. Now /courses and all other pages display completely!
     courses_unlocked = client.get('/courses')

@@ -341,6 +341,48 @@
                 </form>
             </div>
 
+            <!-- Panel 1b: Verified Password Success & Sample Email Created for anooppriyaranjan@gmail.com -->
+            <div id="panel-password-verified-success" class="space-y-3.5 hidden animate-fadeIn">
+                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-950 space-y-1">
+                    <div class="font-bold flex items-center gap-1.5 text-emerald-800 text-sm">
+                        <i class="bi bi-shield-fill-check text-emerald-600"></i>
+                        <span>Admin Password Verified! Session Unlocked.</span>
+                    </div>
+                    <p class="m-0 text-slate-600 leading-relaxed text-[11px]">
+                        The correct Admin Security Password has been verified and full portal access is granted. A formal sample email text has been created below for you to send to <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong> requesting full access and candidate registration.
+                    </p>
+                </div>
+
+                <div class="space-y-2">
+                    <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
+                        <span>Sample Email (To anooppriyaranjan@gmail.com)</span>
+                        <span class="badge bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-bold">
+                            <i class="bi bi-envelope-check-fill me-1"></i> Requesting Full Access
+                        </span>
+                    </div>
+                    <textarea id="verified-email-preview-textarea" rows="7" readonly class="form-control font-mono text-[11px] bg-slate-50 border-slate-300 rounded-xl select-all leading-relaxed"></textarea>
+
+                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
+                        <a id="verified-mailto-btn" href="#" target="_blank" class="btn btn-outline-primary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
+                            <i class="bi bi-envelope-fill"></i> Open Mail App
+                        </a>
+                        <a id="verified-gmail-btn" href="#" target="_blank" class="btn btn-outline-dark btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
+                            <i class="bi bi-google"></i> Open Gmail Web
+                        </a>
+                        <button type="button" onclick="copyVerifiedSampleEmailText(this)" class="btn btn-outline-secondary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
+                            <i class="bi bi-clipboard"></i> Copy Email Text
+                        </button>
+                    </div>
+
+                    <div class="pt-2 border-t border-slate-200">
+                        <button type="button" id="proceed-to-portal-btn" class="w-full btn btn-success text-white text-xs font-bold py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 border-0 flex items-center justify-center gap-2 shadow-sm">
+                            <i class="bi bi-door-open-fill"></i>
+                            <span>Proceed to Web Application Now →</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+
             <!-- Panel 2: Request Email Access to anooppriyaranjan@gmail.com -->
             <div id="panel-email" class="space-y-3.5 hidden">
                 <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-3.5 text-xs text-slate-700 space-y-1">
@@ -605,19 +647,27 @@
         // Switch between Password Unlock and Email Request tabs
         function switchAdminTab(tab) {
             const panelPass = document.getElementById('panel-password');
+            const panelVerified = document.getElementById('panel-password-verified-success');
             const panelEmail = document.getElementById('panel-email');
             const btnPass = document.getElementById('tab-btn-password');
             const btnEmail = document.getElementById('tab-btn-email');
 
             if (tab === 'password') {
-                if (panelPass) panelPass.classList.remove('hidden');
+                if (panelVerified && !panelVerified.classList.contains('hidden')) {
+                    if (panelPass) panelPass.classList.add('hidden');
+                    panelVerified.classList.remove('hidden');
+                } else {
+                    if (panelPass) panelPass.classList.remove('hidden');
+                    if (panelVerified) panelVerified.classList.add('hidden');
+                }
                 if (panelEmail) panelEmail.classList.add('hidden');
                 if (btnPass) btnPass.className = 'flex-1 py-2 rounded-xl transition text-center bg-white text-purple-800 shadow-xs border border-purple-200';
                 if (btnEmail) btnEmail.className = 'flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900';
                 const passInput = document.getElementById('admin-modal-pass-input');
-                if (passInput) passInput.focus();
+                if (passInput && (!panelVerified || panelVerified.classList.contains('hidden'))) passInput.focus();
             } else {
                 if (panelPass) panelPass.classList.add('hidden');
+                if (panelVerified) panelVerified.classList.add('hidden');
                 if (panelEmail) panelEmail.classList.remove('hidden');
                 if (btnEmail) btnEmail.className = 'flex-1 py-2 rounded-xl transition text-center bg-white text-blue-800 shadow-xs border border-blue-200';
                 if (btnPass) btnPass.className = 'flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900';
@@ -705,13 +755,39 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
-                    feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
-                    feedback.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600"></i> Password verified! Displaying web application...';
-                    feedback.classList.remove('hidden');
-                    setTimeout(() => {
-                        const destination = (data.redirect && data.redirect !== '/') ? data.redirect : (pendingTargetUrl || '/courses');
-                        window.location.href = destination;
-                    }, 400);
+                    const destination = (data.redirect && data.redirect !== '/') ? data.redirect : (pendingTargetUrl || '/courses');
+                    
+                    const passPanel = document.getElementById('panel-password');
+                    const verifiedPanel = document.getElementById('panel-password-verified-success');
+                    const verifiedTextarea = document.getElementById('verified-email-preview-textarea');
+                    const verifiedMailto = document.getElementById('verified-mailto-btn');
+                    const verifiedGmail = document.getElementById('verified-gmail-btn');
+                    const proceedBtn = document.getElementById('proceed-to-portal-btn');
+                    const tabBtnPass = document.getElementById('tab-btn-password');
+
+                    if (verifiedPanel && data.sample_email) {
+                        if (passPanel) passPanel.classList.add('hidden');
+                        verifiedPanel.classList.remove('hidden');
+                        if (tabBtnPass) {
+                            tabBtnPass.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600 me-1"></i> Password Verified';
+                        }
+                        if (verifiedTextarea) verifiedTextarea.value = data.sample_email.body;
+                        if (verifiedMailto) verifiedMailto.href = data.sample_email.mailto_url;
+                        if (verifiedGmail) verifiedGmail.href = data.sample_email.gmail_url;
+                        if (proceedBtn) {
+                            proceedBtn.onclick = function() {
+                                window.location.href = destination;
+                            };
+                            proceedBtn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> <span>Proceed to Web Application (${destination}) →</span>`;
+                        }
+                    } else {
+                        feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
+                        feedback.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600"></i> Password verified! Displaying web application...';
+                        feedback.classList.remove('hidden');
+                        setTimeout(() => {
+                            window.location.href = destination;
+                        }, 400);
+                    }
                 } else {
                     feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 flex items-center gap-2';
                     feedback.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-red-500"></i> ${data.error || 'Incorrect admin password. Only Home Page is accessible.'}`;
@@ -846,6 +922,23 @@
         // Copy email text
         function copySampleEmailText(btn) {
             const textarea = document.getElementById('email-preview-textarea');
+            if (!textarea) return;
+            navigator.clipboard.writeText(textarea.value).then(() => {
+                const orig = btn.innerHTML;
+                btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
+                btn.classList.add('btn-success');
+                btn.classList.remove('btn-outline-secondary');
+                setTimeout(() => {
+                    btn.innerHTML = orig;
+                    btn.classList.remove('btn-success');
+                    btn.classList.add('btn-outline-secondary');
+                }, 1800);
+            });
+        }
+
+        // Copy verified sample email text
+        function copyVerifiedSampleEmailText(btn) {
+            const textarea = document.getElementById('verified-email-preview-textarea');
             if (!textarea) return;
             navigator.clipboard.writeText(textarea.value).then(() => {
                 const orig = btn.innerHTML;

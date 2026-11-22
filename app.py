@@ -24,6 +24,7 @@ from data.access_control import (
     get_request_by_token,
     approve_access_by_token,
     get_all_inbox_messages,
+    compose_verified_admin_request_email,
     ADMIN_EMAIL,
     ADMIN_NAME
 )
@@ -977,7 +978,24 @@ def verify_admin_password_api():
         else:
             redirect_url = url_for("courses_hub")
 
-        return jsonify({"success": True, "redirect": redirect_url})
+        # Requirement: when that password is correct then create a sample email text
+        # for the user to send to anooppriyaranjan@gmail.com where he will be requesting for the full access
+        candidate_email = (data.get("email") or session.get("user_email") or "").strip()
+        candidate_name = (data.get("name") or "").strip()
+        verified_email_info = compose_verified_admin_request_email(candidate_email, candidate_name, request.host_url)
+
+        return jsonify({
+            "success": True,
+            "message": "Admin password verified! Full access granted and sample email request created for anooppriyaranjan@gmail.com.",
+            "redirect": redirect_url,
+            "sample_email": {
+                "subject": verified_email_info["subject"],
+                "body": verified_email_info["body"],
+                "mailto_url": verified_email_info["mailto_url"],
+                "gmail_url": verified_email_info["gmail_url"],
+                "outlook_url": verified_email_info["outlook_url"]
+            }
+        })
 
     record_failed_admin_attempt(client_ip)
     return jsonify({"success": False, "error": "Incorrect admin password. Only Home Page is accessible."}), 401
