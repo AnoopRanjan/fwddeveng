@@ -315,10 +315,13 @@
             <div id="panel-password" class="space-y-4">
                 <form id="admin-password-modal-form" onsubmit="handleAdminPasswordSubmit(event)" class="space-y-4">
                     <div>
-                        <label for="admin-modal-pass-input" class="text-xs font-bold text-slate-700 block mb-1.5">Admin Security Password</label>
+                        <label for="admin-modal-pass-input" class="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
+                            <span>Admin Security Password</span>
+                            <span class="text-[10px] text-slate-400 font-normal">Encrypted Verification</span>
+                        </label>
                         <div class="relative">
-                            <input type="password" id="admin-modal-pass-input" required placeholder="Enter password (e.g. Azadirakhtaindica@007)" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white">
-                            <button type="button" onclick="toggleAdminModalPasswordVisibility(this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0">
+                            <input type="password" id="admin-modal-pass-input" required autocomplete="current-password" placeholder="••••••••••••" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white tracking-widest font-mono">
+                            <button type="button" onclick="toggleAdminModalPasswordVisibility(this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0" title="Toggle password visibility">
                                 <i class="bi bi-eye"></i>
                             </button>
                         </div>
@@ -343,8 +346,8 @@
                 <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-3.5 text-xs text-slate-700 space-y-1">
                     <strong class="text-blue-900 block font-bold">Request Access via Email:</strong>
                     <p class="m-0 text-slate-600 leading-relaxed">
-                        Enter your email address below to generate a pre-drafted request to <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong>.
-                        When <strong class="text-blue-700 font-mono">anooppriyaranjan@gmail.com</strong> clicks the approval link in their inbox, your email ID will be given full access!
+                        Enter your valid email address below to generate a sample email to <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong>.
+                        The authorization link is <strong class="text-purple-700 font-semibold">invisible for the sender</strong> to prevent unauthorized bypass. When <strong class="text-blue-700 font-mono">anooppriyaranjan@gmail.com</strong> clicks the link in their inbox, your email ID will be given full access!
                     </p>
                 </div>
 
@@ -355,7 +358,7 @@
                             <input type="text" id="req-name-input" placeholder="e.g. Alex Sharma" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
                         </div>
                         <div>
-                            <label for="req-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Email Address *</label>
+                            <label for="req-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Valid Email Address *</label>
                             <input type="email" id="req-email-input" required placeholder="yourname@gmail.com" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white font-mono">
                         </div>
                     </div>
@@ -369,11 +372,23 @@
                 <!-- Generated Email Template Display Area -->
                 <div id="email-preview-container" class="space-y-2 hidden">
                     <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
-                        <span>Sample Email (Sent to anooppriyaranjan@gmail.com)</span>
-                        <span class="text-emerald-700 font-bold"><i class="bi bi-link-45deg"></i> Contains Direct Approval Link</span>
+                        <span>Sample Email (To anooppriyaranjan@gmail.com)</span>
+                        <span class="badge bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-bold flex items-center gap-1">
+                            <i class="bi bi-eye-slash-fill text-purple-600"></i> Link Invisible for Sender
+                        </span>
                     </div>
-                    <textarea id="email-preview-textarea" rows="6" readonly class="form-control font-mono text-[11px] bg-slate-50 border-slate-300 rounded-xl select-all leading-relaxed"></textarea>
+                    <textarea id="email-preview-textarea" rows="7" readonly class="form-control font-mono text-[11px] bg-slate-50 border-slate-300 rounded-xl select-all leading-relaxed"></textarea>
                     
+                    <div class="p-2.5 bg-purple-50/70 border border-purple-200 rounded-xl text-[11px] text-purple-900 space-y-1">
+                        <div class="font-bold flex items-center gap-1.5 text-purple-800">
+                            <i class="bi bi-shield-lock-fill text-purple-600"></i>
+                            <span>Invisible Link Encoded for Sender</span>
+                        </div>
+                        <p class="m-0 text-slate-600">
+                            The direct authorization link is invisibly embedded for the sender so it cannot be bypassed. When <strong class="text-slate-800 font-mono">anooppriyaranjan@gmail.com</strong> clicks the link in their inbox, full portal access will be granted to your email ID!
+                        </p>
+                    </div>
+
                     <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
                         <a id="open-mailto-btn" href="#" target="_blank" class="btn btn-outline-primary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
                             <i class="bi bi-envelope-fill"></i> Open Mail App
@@ -725,7 +740,50 @@
             }
         }
 
-        // Generate sample email to anooppriyaranjan@gmail.com with Direct Approval Link
+        // Generate sample email to anooppriyaranjan@gmail.com with Invisible Link for Sender
+        let approvalPollInterval = null;
+
+        function startApprovalPolling(email) {
+            if (approvalPollInterval) clearInterval(approvalPollInterval);
+            const feedback = document.getElementById('check-approval-feedback');
+            if (feedback) {
+                feedback.className = 'text-xs p-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-900 flex items-center justify-between mt-2 block';
+                feedback.innerHTML = `
+                    <span class="flex items-center gap-2">
+                        <span class="spinner-grow spinner-grow-sm text-blue-600" role="status"></span>
+                        <span>Waiting for approval from <strong>anooppriyaranjan@gmail.com</strong>...</span>
+                    </span>
+                    <span class="text-[10px] text-blue-700 font-mono font-bold bg-blue-100 px-2 py-0.5 rounded">Auto-Checking</span>
+                `;
+                feedback.classList.remove('hidden');
+            }
+
+            approvalPollInterval = setInterval(async () => {
+                try {
+                    const res = await fetch('/api/check-email-access', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify({ email: email })
+                    });
+                    const data = await res.json();
+                    if (res.ok && data.success) {
+                        clearInterval(approvalPollInterval);
+                        approvalPollInterval = null;
+                        if (feedback) {
+                            feedback.className = 'text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 block font-bold';
+                            feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600 me-1"></i> ${data.message || 'Access Approved by anooppriyaranjan@gmail.com!'} Opening full portal...`;
+                            feedback.classList.remove('hidden');
+                        }
+                        setTimeout(() => {
+                            window.location.href = data.redirect || '/courses';
+                        }, 700);
+                    }
+                } catch (e) {
+                    // silently retry on transient poll error
+                }
+            }, 3000);
+        }
+
         async function handleGenerateEmailRequest(e) {
             e.preventDefault();
             const emailInput = document.getElementById('req-email-input');
@@ -757,7 +815,7 @@
                 });
                 const data = await res.json();
                 if (data.success) {
-                    if (textarea) textarea.value = data.body;
+                    if (textarea) textarea.value = data.display_body || data.body;
                     if (mailtoBtn) mailtoBtn.href = data.mailto_url;
                     if (gmailBtn) gmailBtn.href = data.gmail_url;
                     if (previewContainer) previewContainer.classList.remove('hidden');
@@ -767,6 +825,8 @@
                         btn.classList.remove('btn-primary');
                         btn.classList.add('btn-success');
                     }
+                    // Start automatic approval check every 3s
+                    startApprovalPolling(email);
                 } else {
                     alert(data.message || 'Error generating email request.');
                     if (btn) {
@@ -829,6 +889,7 @@
                 });
                 const data = await res.json();
                 if (res.ok && data.success) {
+                    if (approvalPollInterval) clearInterval(approvalPollInterval);
                     if (feedback) {
                         feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
                         feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600"></i> ${data.message} Opening courses...`;

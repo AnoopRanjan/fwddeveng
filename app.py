@@ -4,6 +4,7 @@ Compatible with local execution (`python app.py`) and instant Vercel Serverless 
 """
 
 import os
+import time
 import shutil
 import sqlite3
 import tempfile
@@ -276,6 +277,8 @@ def check_portal_access():
         "/api/lock-portal",
         "/api/admin/lock",
         "/api/request-access",
+        "/access/inbox",
+        "/access/inbox/lock",
         "/download/sample-institutions.csv"
     }
 
@@ -297,18 +300,6 @@ def check_portal_access():
             }), 403
         next_target = request.full_path if request.query_string else request.path
         return redirect(url_for("index", unlock=1, next=next_target))
-
-    # Special restriction for Admin Inbox: Only anooppriyaranjan@gmail.com / azureanoopranjan@gmail.com is allowed!
-    if request.path == "/access/inbox":
-        user_email = (session.get("user_email") or "").strip().lower()
-        admin_emails = [ADMIN_EMAIL.lower(), "azureanoopranjan@gmail.com"]
-        if not session.get("is_admin") or user_email not in admin_emails:
-            return render_template(
-                "admin_forbidden.html",
-                admin_email=ADMIN_EMAIL,
-                current_user=user_email
-            ), 403
-        return None
 
     # Entire web application displays when site is unlocked
     session["fde_access"] = True
@@ -794,6 +785,8 @@ def request_access_api():
         "outlook_url": req_info["outlook_url"],
         "subject": req_info["subject"],
         "body": req_info["body"],
+        "display_body": req_info.get("display_body", req_info["body"]),
+        "invisible_link": req_info.get("invisible_link", ""),
         "inbox_url": url_for("access_inbox")
     })
 
@@ -881,30 +874,58 @@ def check_email_access():
     }), 404
 
 
+# Security: In-memory Brute-Force Rate Limiter for Admin Password Verification
+LOGIN_ATTEMPTS = {}  # ip -> {"count": int, "locked_until": timestamp}
+
+def check_admin_rate_limit(client_ip: str) -> tuple[bool, str]:
+    now = time.time()
+    record = LOGIN_ATTEMPTS.get(client_ip)
+    if record:
+        if record.get("locked_until", 0) > now:
+            remaining = int(record["locked_until"] - now)
+            return False, f"Too many failed attempts. Security cooldown active. Please retry in {remaining} seconds."
+        # Reset counter after cooldown has expired
+        if record.get("locked_until", 0) <= now and record.get("count", 0) >= 5:
+            LOGIN_ATTEMPTS[client_ip] = {"count": 0, "locked_until": 0}
+    return True, ""
+
+def record_failed_admin_attempt(client_ip: str):
+    now = time.time()
+    record = LOGIN_ATTEMPTS.setdefault(client_ip, {"count": 0, "locked_until": 0})
+    record["count"] += 1
+    if record["count"] >= 5:
+        record["locked_until"] = now + 60  # 60s cooldown lockout
+
+def reset_admin_rate_limit(client_ip: str):
+    LOGIN_ATTEMPTS.pop(client_ip, None)
+
+
 @app.route("/access/inbox", methods=["GET", "POST"])
 def access_inbox():
-    user_email = (session.get("user_email") or "").strip().lower()
-    admin_emails = [ADMIN_EMAIL.lower(), "azureanoopranjan@gmail.com"]
-    # Exclusive Admin Access Control: strictly restricted to anooppriyaranjan@gmail.com
-    if not session.get("is_admin") or user_email not in admin_emails:
-        return render_template(
-            "admin_forbidden.html",
-            admin_email=ADMIN_EMAIL,
-            current_user=user_email
-        ), 403
-        return render_template(
-            "admin_forbidden.html",
-            admin_email=ADMIN_EMAIL,
-            current_user=user_email
-        ), 403
-
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
     error_msg = None
+
     if request.method == "POST":
+        allowed, rate_msg = check_admin_rate_limit(client_ip)
+        if not allowed:
+            return render_template(
+                "access_inbox.html",
+                locked=True,
+                error=rate_msg,
+                messages=[]
+            ), 429
+
         entered = (request.form.get("password") or "").strip()
         if verify_admin_password(entered):
+            reset_admin_rate_limit(client_ip)
             session["admin_unlocked"] = True
+            session["is_admin"] = True
+            session["user_email"] = ADMIN_EMAIL
+            session["site_unlocked"] = True
+            session["fde_access"] = True
             return redirect(url_for("access_inbox"))
         else:
+            record_failed_admin_attempt(client_ip)
             error_msg = "Incorrect admin password. Access denied."
 
     # If admin section is not yet unlocked with "Azadirakhtaindica@007"
@@ -922,9 +943,20 @@ def access_inbox():
     return render_template("access_inbox.html", locked=False, messages=messages)
 
 
+@app.route("/access/inbox/lock")
+def lock_admin_section():
+    session.pop("admin_unlocked", None)
+    return redirect(url_for("access_inbox"))
+
+
 @app.route("/api/verify-site-password", methods=["POST"])
 @app.route("/api/admin/verify-password", methods=["POST"])
 def verify_admin_password_api():
+    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
+    allowed, rate_msg = check_admin_rate_limit(client_ip)
+    if not allowed:
+        return jsonify({"success": False, "error": rate_msg}), 429
+
     data = request.get_json(silent=True) or request.form.to_dict() or {}
     entered = (data.get("password") or "").strip()
     target = (data.get("target") or data.get("next") or "").strip()
@@ -932,6 +964,7 @@ def verify_admin_password_api():
         return jsonify({"success": False, "error": "Password cannot be empty."}), 400
         
     if verify_admin_password(entered):
+        reset_admin_rate_limit(client_ip)
         session["site_unlocked"] = True
         session["fde_access"] = True
         user_email = (session.get("user_email") or "").strip().lower()
@@ -946,6 +979,7 @@ def verify_admin_password_api():
 
         return jsonify({"success": True, "redirect": redirect_url})
 
+    record_failed_admin_attempt(client_ip)
     return jsonify({"success": False, "error": "Incorrect admin password. Only Home Page is accessible."}), 401
 
 

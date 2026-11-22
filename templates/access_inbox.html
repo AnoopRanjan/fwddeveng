@@ -35,10 +35,13 @@
 
         <form method="POST" action="{{ url_for('access_inbox') }}" class="space-y-4">
             <div>
-                <label for="admin-inbox-password" class="text-xs font-bold text-slate-700 block mb-1.5 text-left">Admin Master Password</label>
+                <label for="admin-inbox-password" class="text-xs font-bold text-slate-700 block mb-1.5 text-left flex items-center justify-between">
+                    <span>Admin Master Password</span>
+                    <span class="text-[10px] text-slate-400 font-normal">Encrypted Verification</span>
+                </label>
                 <div class="relative">
-                    <input type="password" id="admin-inbox-password" name="password" required autofocus placeholder="Enter password to unlock" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white">
-                    <button type="button" onclick="togglePasswordVisibility('admin-inbox-password', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0">
+                    <input type="password" id="admin-inbox-password" name="password" required autofocus autocomplete="current-password" placeholder="••••••••••••" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white tracking-widest font-mono">
+                    <button type="button" onclick="togglePasswordVisibility('admin-inbox-password', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0" title="Toggle password visibility">
                         <i class="bi bi-eye"></i>
                     </button>
                 </div>

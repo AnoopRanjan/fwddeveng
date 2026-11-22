@@ -35,7 +35,7 @@
                         <h2 class="text-base font-bold text-slate-900 m-0">Send Email Request to Administrator</h2>
                     </div>
                     <p class="text-xs text-slate-600 leading-relaxed m-0">
-                        Enter your details and click below. Your email provider will open with a pre-filled request template to receiver <strong class="text-slate-800">azureanoopranjan@gmail.com</strong> containing your <strong class="text-indigo-700">encrypted passcode</strong>. When the receiver gets the email and verifies payment, they will tell you your <strong class="text-emerald-700">decrypted 6-digit passcode</strong>.
+                        Enter your details and click below. Your email provider will open with a pre-filled request template to receiver <strong class="text-slate-800">anooppriyaranjan@gmail.com</strong> containing your <strong class="text-indigo-700">encrypted passcode</strong>. When the receiver gets the email and verifies payment, they will tell you your <strong class="text-emerald-700">decrypted 6-digit passcode</strong>.
                     </p>
 
                     <form id="gate-request-form" onsubmit="handleGateRequest(event)" class="space-y-3">
@@ -57,7 +57,7 @@
                 </div>
 
                 <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500">
-                    <span>Admin: <strong class="text-slate-700 font-mono">azureanoopranjan@gmail.com</strong></span>
+                    <span>Admin: <strong class="text-slate-700 font-mono">anooppriyaranjan@gmail.com</strong></span>
                 </div>
             </div>
 
@@ -104,7 +104,7 @@
                 </span>
                 <div>
                     <strong class="text-slate-900 block font-semibold">Payment & Code Verification</strong>
-                    <span class="text-xs text-slate-600">Once payment is completed, administrator <strong class="text-blue-700">azureanoopranjan@gmail.com</strong> will decrypt and share your 6-digit access code to unlock all content.</span>
+                    <span class="text-xs text-slate-600">Once payment is completed, administrator <strong class="text-blue-700">anooppriyaranjan@gmail.com</strong> will decrypt and share your 6-digit access code to unlock all content.</span>
                 </div>
             </div>
             <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-semibold text-xs">
@@ -174,7 +174,7 @@ async function handleGateRequest(e) {
                     <span>Email Provider Opened with Pre-Filled Request!</span>
                 </div>
                 <p class="text-[11px] text-slate-700 m-0">
-                    Email draft opened for receiver <strong class="text-slate-900 font-mono">azureanoopranjan@gmail.com</strong> with your <strong class="text-indigo-700">encrypted passcode</strong>: <code class="text-indigo-800 font-mono text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">${data.encrypted_passcode || ''}</code>.
+                    Email draft opened for receiver <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong> with your <strong class="text-indigo-700">encrypted passcode</strong>: <code class="text-indigo-800 font-mono text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">${data.encrypted_passcode || ''}</code>.
                 </p>
                 <div class="flex flex-wrap gap-1.5 pt-1">
                     <a href="${data.mailto_url}" class="btn btn-sm btn-outline-primary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">

@@ -93,14 +93,15 @@ def ensure_schema_updated(conn):
 def compose_outgoing_request_email(email: str, encrypted_code: str, requester_name: str = "", allow_url: str = "") -> dict:
     """
     Constructs the pre-drafted email template that the user sends to anooppriyaranjan@gmail.com.
-    Contains the link which by clicking in anooppriyaranjan@gmail.com's inbox will give access to this valid email ID.
+    Contains an invisible link for the sender which, when received and clicked in the inbox of anooppriyaranjan@gmail.com,
+    gives the user of this valid email ID full access.
     """
     greeting_name = requester_name.strip() if requester_name else "Candidate / Scholar"
-    subject = f"Access Approval Request & Portal Link for [{email}]"
+    subject = f"Access Approval Request & Portal Authorization for [{email}]"
     now_str = datetime.now().strftime("%Y-%m-%d %H:%M:%S")
-    link_line = f"\nDIRECT ACCESS APPROVAL LINK (CLICK IN YOUR INBOX TO GIVE ACCESS TO THIS USER):\n>>> {allow_url} <<<\n" if allow_url else ""
-    
-    body = f"""To: {ADMIN_EMAIL}
+
+    # Clean visible body presented to the sender (NO exposed raw URL string for the sender to bypass the lock)
+    display_body = f"""To: {ADMIN_EMAIL}
 Subject: {subject}
 
 Dear Anoop Priyaranjan (Portal Administrator),
@@ -111,15 +112,26 @@ Requester Details:
 - Valid Email Address: {email}
 - Full Name: {greeting_name}
 - Request Date: {now_str}
-- Security Token: {encrypted_code}
-{link_line}
+- Security Dispatch Token: {encrypted_code}
+- Portal Authorization Link: [Invisibly Encoded for Recipient Inbox Verification]
+
 Action for Administrator:
-Please click on the direct approval link above in your inbox (anooppriyaranjan@gmail.com) to immediately authorize and unlock full access to the complete web application for this valid email ID ({email}).
+Please authorize full portal access for this valid email address ({email}) by clicking the direct approval link in your inbox ({ADMIN_EMAIL}).
 
 Thank you,
 {greeting_name}
 Email: {email}
 """
+
+    # Invisible link representation for the sender:
+    # 1. Zero-width character space and markdown link [​](allow_url) (brackets contain zero-width space \u200B)
+    # 2. Invisible HTML anchor tag with zero-font, transparent color, and zero opacity.
+    invisible_md = f"[​]({allow_url})" if allow_url else ""
+    invisible_html = f'<a href="{allow_url}" style="font-size:0px;color:transparent;line-height:0;opacity:0;text-decoration:none;display:inline-block;width:0;height:0;overflow:hidden;" aria-hidden="true">&#8203;</a>' if allow_url else ""
+
+    # The full body embeds the invisible link for the sender
+    body = f"{display_body.rstrip()}\n\n{invisible_md}\n{invisible_html}\n"
+
     encoded_sub = urllib.parse.quote(subject)
     encoded_body = urllib.parse.quote(body)
     mailto_url = f"mailto:{ADMIN_EMAIL}?subject={encoded_sub}&body={encoded_body}"
@@ -129,7 +141,9 @@ Email: {email}
     return {
         "subject": subject,
         "body": body,
+        "display_body": display_body,
         "allow_url": allow_url,
+        "invisible_link": invisible_html,
         "mailto_url": mailto_url,
         "gmail_url": gmail_url,
         "outlook_url": outlook_url
@@ -160,12 +174,10 @@ Request Timestamp: {now_str}
 ============================================================
 
 ACTION FOR ADMINISTRATOR:
-1. Verify payment received from {email}.
-2. Tell the candidate their decrypted 6-digit access passcode: {decrypted_code}
-3. The candidate will enter this decrypted code on the website to unlock all access!
-
-Alternatively, you can grant instant 1-click access here:
-{allow_url}
+1. Verify payment / identity received from valid email: {email}
+2. Share the decrypted 6-digit access passcode with the candidate: [{decrypted_code}]
+3. Or click the direct approval link below in your inbox (anooppriyaranjan@gmail.com) to immediately unlock and give full access to this valid email ID ({email}):
+>>> {allow_url} <<<
 
 Thanks & Regards,
 Azure AI FDE Automated Security Dispatch
@@ -261,6 +273,8 @@ Thanks & Regards,
         "created_at": now_str,
         "subject": outgoing_info["subject"],
         "body": outgoing_info["body"],
+        "display_body": outgoing_info.get("display_body", outgoing_info["body"]),
+        "invisible_link": outgoing_info.get("invisible_link", ""),
         "mailto_url": outgoing_info["mailto_url"],
         "gmail_url": outgoing_info["gmail_url"],
         "outlook_url": outgoing_info["outlook_url"]
