@@ -25,6 +25,15 @@ from datetime import datetime
 
 ADMIN_EMAIL = "azureanoopranjan@gmail.com"
 ADMIN_NAME = "Anoop Ranjan"
+ADMIN_PASSWORD = "Azadirakhtaindica@007"
+
+
+def verify_admin_password(candidate_password: str) -> bool:
+    """Verifies the master admin password using constant-time comparison."""
+    if not candidate_password:
+        return False
+    return hmac.compare_digest(candidate_password.strip(), ADMIN_PASSWORD)
+
 
 # Google OAuth2 Endpoints
 GOOGLE_AUTH_URL = "https://accounts.google.com/o/oauth2/v2/auth"
@@ -296,6 +305,7 @@ def logout_user_session(session):
     session.pop("user_name", None)
     session.pop("user_picture", None)
     session.pop("is_admin", None)
+    session.pop("admin_unlocked", None)
     session.pop("role", None)
     session.pop("fde_access", None)
     session.pop("auth_provider", None)

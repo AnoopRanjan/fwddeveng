@@ -1,17 +1,71 @@
 {% extends "base.html" %}
 
-{% block title %}Email Inbox Simulator | Azure AI FDE Portal{% endblock %}
+{% block title %}Admin Inbox | Azure AI FDE Portal{% endblock %}
 
 {% block content %}
 <div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
 
-    <!-- Header Card -->
+    {% if locked %}
+    <!-- Locked State: Modal / Password Challenge Screen -->
+    <div class="bg-white border border-purple-200 rounded-3xl p-8 sm:p-12 shadow-2xl max-w-lg mx-auto text-center space-y-6">
+        
+        <div class="w-16 h-16 rounded-2xl bg-purple-100 text-purple-700 mx-auto flex items-center justify-center text-3xl shadow-inner border border-purple-200">
+            <i class="bi bi-shield-lock-fill"></i>
+        </div>
+
+        <div class="space-y-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-800 text-xs font-bold uppercase tracking-wider">
+                <i class="bi bi-key-fill text-purple-600"></i>
+                <span>Password Protected Admin Section</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
+                Enter Admin Password
+            </h1>
+            <p class="text-xs sm:text-sm text-slate-600 m-0 leading-relaxed">
+                The Admin Section is password protected. Please enter the master password to open received customer email requests and decrypted passcodes.
+            </p>
+        </div>
+
+        {% if error %}
+        <div class="p-3.5 rounded-2xl bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2.5 text-left">
+            <i class="bi bi-exclamation-octagon-fill text-red-500 text-base flex-shrink-0"></i>
+            <div>{{ error }}</div>
+        </div>
+        {% endif %}
+
+        <form method="POST" action="{{ url_for('access_inbox') }}" class="space-y-4">
+            <div>
+                <label for="admin-inbox-password" class="text-xs font-bold text-slate-700 block mb-1.5 text-left">Admin Master Password</label>
+                <div class="relative">
+                    <input type="password" id="admin-inbox-password" name="password" required autofocus placeholder="Enter password to unlock" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white">
+                    <button type="button" onclick="togglePasswordVisibility('admin-inbox-password', this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <button type="submit" class="w-full btn btn-purple text-white text-sm font-bold py-3 rounded-xl bg-purple-700 hover:bg-purple-800 transition shadow-sm flex items-center justify-center gap-2">
+                <i class="bi bi-unlock-fill"></i>
+                <span>Unlock & Open Admin Section</span>
+            </button>
+        </form>
+
+        <div class="pt-3 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span>Admin: <strong class="text-slate-700 font-mono">azureanoopranjan@gmail.com</strong></span>
+            <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline">
+                Home Dashboard →
+            </a>
+        </div>
+    </div>
+
+    {% else %}
+    <!-- Unlocked State: Full Admin Inbox Viewer -->
     <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-xl mb-8">
         <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-5 mb-5">
             <div>
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-blue-50 border border-blue-200 text-blue-800 text-xs font-bold uppercase tracking-wider mb-2">
-                    <i class="bi bi-inbox-fill text-blue-600"></i>
-                    <span>Email Delivery & Inbox Viewer</span>
+                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-800 text-xs font-bold uppercase tracking-wider mb-2">
+                    <i class="bi bi-inbox-fill text-purple-600"></i>
+                    <span>Admin Section • Unlocked</span>
                 </div>
                 <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
                     Received Access Emails & Passcodes
@@ -21,8 +75,12 @@
                 </p>
             </div>
             <div class="flex items-center gap-2 flex-shrink-0">
+                <a href="{{ url_for('lock_admin_section') }}" class="btn btn-outline-danger btn-sm rounded-xl px-3.5 py-2 text-xs font-semibold flex items-center gap-1.5" title="Lock the Admin Section">
+                    <i class="bi bi-lock-fill"></i>
+                    <span>Lock Admin Section</span>
+                </a>
                 <a href="{{ url_for('access_gate') }}" class="btn btn-outline-primary btn-sm rounded-xl px-3.5 py-2 text-xs font-semibold">
-                    ← Back to Access Gate
+                    Access Gate
                 </a>
                 <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm rounded-xl px-3.5 py-2 text-xs font-semibold">
                     Home Dashboard
@@ -118,6 +176,7 @@
         {% endif %}
 
     </div>
+    {% endif %}
 
 </div>
 
@@ -134,6 +193,17 @@ function copyToClipboard(text, btn) {
             btn.classList.add("btn-outline-secondary");
         }, 1500);
     });
+}
+
+function togglePasswordVisibility(inputId, btn) {
+    const input = document.getElementById(inputId);
+    if (!input) return;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    const icon = btn.querySelector('i');
+    if (icon) {
+        icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
+    }
 }
 </script>
 {% endblock %}

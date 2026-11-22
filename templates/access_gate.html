@@ -56,13 +56,8 @@
                     <div id="gate-request-feedback" class="text-xs hidden p-3.5 rounded-xl border"></div>
                 </div>
 
-                <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 flex items-center justify-between">
+                <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500">
                     <span>Admin: <strong class="text-slate-700 font-mono">azureanoopranjan@gmail.com</strong></span>
-                    {% if is_admin %}
-                    <a href="{{ url_for('access_inbox') }}" class="text-purple-700 hover:underline font-semibold flex items-center gap-1">
-                        <i class="bi bi-inbox-fill"></i> View Inbox (Admin)
-                    </a>
-                    {% endif %}
                 </div>
             </div>
 
@@ -101,23 +96,6 @@
 
         </div>
 
-        {% if is_admin %}
-        <!-- Admin Inbox Management Banner (Visible ONLY to azureanoopranjan@gmail.com) -->
-        <div class="mt-8 bg-purple-50 border border-purple-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 text-sm text-slate-700">
-                <span class="p-2.5 rounded-xl bg-purple-600 text-white flex-shrink-0 shadow-sm">
-                    <i class="bi bi-shield-shaded text-lg"></i>
-                </span>
-                <div>
-                    <strong class="text-purple-950 block font-bold">Administrator Access Controls</strong>
-                    <span class="text-xs text-purple-800">You are logged in as admin (<strong class="font-mono">azureanoopranjan@gmail.com</strong>). Manage customer requests and view decrypted passcodes.</span>
-                </div>
-            </div>
-            <a href="{{ url_for('access_inbox') }}" class="btn btn-purple btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-bold text-xs bg-purple-700 text-white hover:bg-purple-800 shadow-sm">
-                Open Admin Inbox →
-            </a>
-        </div>
-        {% else %}
         <!-- Candidate Instructions -->
         <div class="mt-8 bg-blue-50/60 border border-blue-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
             <div class="flex items-center gap-3 text-sm text-slate-700">
@@ -133,7 +111,6 @@
                 Back to Home Dashboard
             </a>
         </div>
-        {% endif %}
 
     </div>
 

@@ -82,6 +82,14 @@ def test_routes_and_access():
     assert "/access-gate" in gate_res.headers["Location"]
     print("PASS: Candidate without payment passcode redirects to /access-gate.")
 
+    # 6b. Verify Admin portion is disabled from candidate / other pages (e.g. /access-gate)
+    gate_page = client.get('/access-gate')
+    assert gate_page.status_code == 200
+    gate_html = gate_page.data.decode('utf-8')
+    assert "Administrator Access Controls" not in gate_html, "Admin portion banner must be disabled on other pages"
+    assert "View Inbox (Admin)" not in gate_html, "Admin inbox link must be disabled on other pages"
+    print("PASS: Admin portion controls successfully disabled from other pages.")
+
     # 7. Candidate submits access request -> passcode is ENCRYPTED in outgoing request draft
     req_res = client.post('/api/request-access', json={'email': cand_email, 'name': 'Candidate Student'})
     assert req_res.status_code == 200
@@ -100,14 +108,48 @@ def test_routes_and_access():
     admin_login = client.post('/auth/google/dev-login', data={'email': 'azureanoopranjan@gmail.com', 'name': 'Anoop Ranjan (Admin)'})
     assert admin_login.status_code == 302
 
-    # 9. Admin accessing /access/inbox MUST return 200 OK and show DECRYPTED code to tell candidate
+    # 9a. Verify on Home page for admin that old inbox admin banner is disabled
+    home_res = client.get('/')
+    assert home_res.status_code == 200
+    home_html = home_res.data.decode('utf-8')
+    assert "View Inbox (Admin)" not in home_html
+    assert "Administrator Access Controls" not in home_html
+
+    # 9b. Accessing /access/inbox before entering password MUST be locked
+    locked_inbox = client.get('/access/inbox')
+    assert locked_inbox.status_code == 200
+    locked_html = locked_inbox.data.decode('utf-8')
+    assert "Enter Admin Password" in locked_html
+    assert "Password Protected Admin Section" in locked_html
+    assert decrypted_passcode not in locked_html, "Decrypted code must NOT be visible while admin section is locked"
+    print("PASS: Admin section is strictly locked until password prompt is completed.")
+
+    # 9c. Wrong password rejected
+    wrong_pw_res = client.post('/api/admin/verify-password', json={'password': 'WrongPassword123!'})
+    assert wrong_pw_res.status_code == 401
+    assert wrong_pw_res.get_json()['success'] is False
+
+    # 9d. Correct password "Azadirakhtaindica@007" opens admin section
+    correct_pw_res = client.post('/api/admin/verify-password', json={'password': 'Azadirakhtaindica@007'})
+    assert correct_pw_res.status_code == 200
+    assert correct_pw_res.get_json()['success'] is True
+
+    # 9e. Now Admin accessing /access/inbox MUST show DECRYPTED code to tell candidate
     admin_inbox = client.get('/access/inbox')
     assert admin_inbox.status_code == 200
     inbox_html = admin_inbox.data.decode('utf-8')
     assert decrypted_passcode in inbox_html, "Decrypted 6-digit code must be visible to admin in inbox"
     assert "Decrypted Code (To Tell Candidate)" in inbox_html
     assert cand_email in inbox_html
-    print(f"PASS: Admin (azureanoopranjan@gmail.com) successfully accesses /access/inbox with decrypted code: {decrypted_passcode}")
+    print(f"PASS: Admin successfully opened Admin Section with password 'Azadirakhtaindica@007' and decrypted code: {decrypted_passcode}")
+
+    # 9f. Lock admin section and verify it re-locks
+    client.get('/api/admin/lock')
+    relocked_res = client.get('/access/inbox')
+    assert "Enter Admin Password" in relocked_res.data.decode('utf-8')
+    assert decrypted_passcode not in relocked_res.data.decode('utf-8')
+    # Re-unlock
+    client.post('/api/admin/verify-password', json={'password': 'Azadirakhtaindica@007'})
 
     # 10. Admin has automatic full VIP access to all portal routes without entering a passcode
     routes_to_test = [
