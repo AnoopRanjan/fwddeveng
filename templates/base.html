@@ -205,81 +205,6 @@
         </div>
     </footer>
 
-    <!-- Access Request Modal Popup -->
-    <div id="access-modal" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm hidden transition-opacity duration-300">
-        <div class="relative w-full max-w-xl bg-white border border-slate-200 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 animate-fadeIn">
-            
-            <!-- Close Button -->
-            <button onclick="closeAccessModal()" class="absolute top-5 right-5 text-slate-400 hover:text-slate-700 p-2 rounded-xl hover:bg-slate-100 transition" title="Close Modal">
-                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path></svg>
-            </button>
-
-            <!-- Modal Header -->
-            <div class="space-y-1.5">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-wider">
-                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span>Member Access Required</span>
-                </div>
-                <h3 class="text-xl sm:text-2xl font-extrabold text-slate-900 m-0">
-                    Unlock Full C# Azure AI FDE Portal
-                </h3>
-                <p class="text-xs text-slate-600 leading-relaxed m-0">
-                    The <strong class="text-blue-600">Home Dashboard</strong> is freely accessible. To unlock complete day-by-day courses, hands-on labs, Sentinel simulator, and blueprints, request access below.
-                </p>
-            </div>
-
-            <!-- Step 1: Request Email & Open Provider -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-lg bg-blue-600 text-white flex items-center justify-center font-bold text-xs">1</span>
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Send Email Request to Administrator</h4>
-                </div>
-                <p class="text-xs text-slate-600 m-0 leading-relaxed">
-                    Clicking below opens your email provider with a pre-drafted purchase template sent to <strong class="text-slate-800">azureanoopranjan@gmail.com</strong>. The access passcode is <strong class="text-indigo-700">encrypted</strong> in your request. When the receiver gets the email and verifies payment, they will tell you your <strong class="text-emerald-700">decrypted 6-digit passcode</strong>.
-                </p>
-                <div class="space-y-2">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <input type="text" id="modal-name-input" placeholder="Your Full Name" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
-                        <input type="email" id="modal-email-input" required placeholder="Your Email Address" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
-                    </div>
-                    <button onclick="submitModalEmailRequest()" id="modal-email-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
-                        <i class="bi bi-envelope-arrow-up-fill"></i>
-                        <span>Send Email (With Encrypted Passcode)</span>
-                    </button>
-                </div>
-                <div id="modal-request-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
-            </div>
-
-            <!-- Step 2: Lock by Passcode Section -->
-            <div class="bg-slate-50 border border-slate-200 rounded-2xl p-4 sm:p-5 space-y-3">
-                <div class="flex items-center gap-2">
-                    <span class="w-6 h-6 rounded-lg bg-emerald-600 text-white flex items-center justify-center font-bold text-xs">2</span>
-                    <h4 class="text-xs font-bold text-slate-900 uppercase tracking-wider m-0">Unlock with Decrypted Passcode</h4>
-                </div>
-                <p class="text-xs text-slate-600 m-0 leading-relaxed">
-                    When you complete payment, enter the decrypted 6-digit code told to you by the administrator to unlock all website access:
-                </p>
-                <div class="flex items-center gap-2">
-                    <input type="text" id="access-passcode-input" maxlength="24" placeholder="Enter decrypted 6-digit passcode" class="form-control text-xs font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white flex-grow">
-                    <button onclick="submitUnlockPasscode()" id="modal-passcode-btn" class="btn btn-success text-white text-xs font-bold px-4 py-2.5 rounded-xl flex-shrink-0 bg-emerald-600 hover:bg-emerald-700 border-0 shadow-sm flex items-center gap-1.5">
-                        <i class="bi bi-shield-check"></i>
-                        <span>Unlock All Access</span>
-                    </button>
-                </div>
-                <div id="unlock-feedback" class="text-xs hidden p-2.5 rounded-xl border"></div>
-            </div>
-
-            <!-- Footer options -->
-            <div class="flex items-center justify-between text-xs text-slate-500 pt-2 border-t border-slate-100">
-                <span class="text-slate-500">Official Portal Access</span>
-                <button onclick="closeAccessModal()" class="text-slate-500 hover:text-slate-800">
-                    Close
-                </button>
-            </div>
-
-        </div>
-    </div>
-
     <!-- Admin Security Verification Popup Modal (Flashes on click anywhere else other than Home page) -->
     <div id="admin-password-modal" class="fixed inset-0 z-50 items-center justify-center p-4 bg-slate-900/75 backdrop-blur-md hidden transition-opacity duration-300">
         <div class="admin-modal-box relative w-full max-w-lg bg-white border border-purple-300 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-5 animate-fadeIn">
@@ -301,23 +226,16 @@
                 </p>
             </div>
 
-            <!-- Tab Switcher -->
-            <div class="flex items-center p-1 rounded-2xl bg-slate-100 border border-slate-200 text-xs font-bold">
-                <button type="button" id="tab-btn-password" onclick="switchAdminTab('password')" class="flex-1 py-2 rounded-xl transition text-center bg-white text-purple-800 shadow-xs border border-purple-200">
-                    <i class="bi bi-key-fill me-1"></i> Enter Admin Password
-                </button>
-                <button type="button" id="tab-btn-email" onclick="switchAdminTab('email')" class="flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900">
-                    <i class="bi bi-envelope-at-fill me-1"></i> Don't Know Password?
-                </button>
-            </div>
-
-            <!-- Panel 1: Enter Password -->
+            <!-- Encrypted Password Verification Panel -->
             <div id="panel-password" class="space-y-4">
                 <form id="admin-password-modal-form" onsubmit="handleAdminPasswordSubmit(event)" class="space-y-4">
                     <div>
                         <label for="admin-modal-pass-input" class="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
                             <span>Admin Security Password</span>
-                            <span class="text-[10px] text-slate-400 font-normal">Encrypted Verification</span>
+                            <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                                <i class="bi bi-lock-fill"></i>
+                                <span>Client-Side Encrypted (PBKDF2 + HMAC)</span>
+                            </span>
                         </label>
                         <div class="relative">
                             <input type="password" id="admin-modal-pass-input" required autocomplete="current-password" placeholder="••••••••••••" class="form-control text-sm rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 focus:ring-purple-200 bg-white tracking-widest font-mono">
@@ -341,120 +259,9 @@
                 </form>
             </div>
 
-            <!-- Panel 1b: Verified Password Success & Sample Email Created for anooppriyaranjan@gmail.com -->
-            <div id="panel-password-verified-success" class="space-y-3.5 hidden animate-fadeIn">
-                <div class="bg-emerald-50 border border-emerald-200 rounded-2xl p-3.5 text-xs text-emerald-950 space-y-1">
-                    <div class="font-bold flex items-center gap-1.5 text-emerald-800 text-sm">
-                        <i class="bi bi-shield-fill-check text-emerald-600"></i>
-                        <span>Admin Password Verified! Session Unlocked.</span>
-                    </div>
-                    <p class="m-0 text-slate-600 leading-relaxed text-[11px]">
-                        The correct Admin Security Password has been verified and full portal access is granted. A formal sample email text has been created below for you to send to <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong> requesting full access and candidate registration.
-                    </p>
-                </div>
-
-                <div class="space-y-2">
-                    <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
-                        <span>Sample Email (To anooppriyaranjan@gmail.com)</span>
-                        <span class="badge bg-emerald-100 text-emerald-800 border border-emerald-300 text-[10px] font-bold">
-                            <i class="bi bi-envelope-check-fill me-1"></i> Requesting Full Access
-                        </span>
-                    </div>
-                    <textarea id="verified-email-preview-textarea" rows="7" readonly class="form-control font-mono text-[11px] bg-slate-50 border-slate-300 rounded-xl select-all leading-relaxed"></textarea>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-                        <a id="verified-mailto-btn" href="#" target="_blank" class="btn btn-outline-primary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
-                            <i class="bi bi-envelope-fill"></i> Open Mail App
-                        </a>
-                        <a id="verified-gmail-btn" href="#" target="_blank" class="btn btn-outline-dark btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
-                            <i class="bi bi-google"></i> Open Gmail Web
-                        </a>
-                        <button type="button" onclick="copyVerifiedSampleEmailText(this)" class="btn btn-outline-secondary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
-                            <i class="bi bi-clipboard"></i> Copy Email Text
-                        </button>
-                    </div>
-
-                    <div class="pt-2 border-t border-slate-200">
-                        <button type="button" id="proceed-to-portal-btn" class="w-full btn btn-success text-white text-xs font-bold py-2.5 rounded-xl bg-emerald-600 hover:bg-emerald-700 border-0 flex items-center justify-center gap-2 shadow-sm">
-                            <i class="bi bi-door-open-fill"></i>
-                            <span>Proceed to Web Application Now →</span>
-                        </button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- Panel 2: Request Email Access to anooppriyaranjan@gmail.com -->
-            <div id="panel-email" class="space-y-3.5 hidden">
-                <div class="bg-blue-50/70 border border-blue-200 rounded-2xl p-3.5 text-xs text-slate-700 space-y-1">
-                    <strong class="text-blue-900 block font-bold">Request Access via Email:</strong>
-                    <p class="m-0 text-slate-600 leading-relaxed">
-                        Enter your valid email address below to generate a sample email to <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong>.
-                        The authorization link is <strong class="text-purple-700 font-semibold">invisible for the sender</strong> to prevent unauthorized bypass. When <strong class="text-blue-700 font-mono">anooppriyaranjan@gmail.com</strong> clicks the link in their inbox, your email ID will be given full access!
-                    </p>
-                </div>
-
-                <form id="email-request-form" onsubmit="handleGenerateEmailRequest(event)" class="space-y-3">
-                    <div class="grid grid-cols-1 sm:grid-cols-2 gap-2">
-                        <div>
-                            <label for="req-name-input" class="text-xs font-bold text-slate-700 block mb-1">Your Full Name</label>
-                            <input type="text" id="req-name-input" placeholder="e.g. Alex Sharma" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white">
-                        </div>
-                        <div>
-                            <label for="req-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Valid Email Address *</label>
-                            <input type="email" id="req-email-input" required placeholder="yourname@gmail.com" class="form-control text-xs rounded-xl px-3 py-2 border-slate-300 focus:border-blue-500 bg-white font-mono">
-                        </div>
-                    </div>
-
-                    <button type="submit" id="generate-email-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
-                        <i class="bi bi-envelope-paper-fill"></i>
-                        <span>Generate Sample Email to anooppriyaranjan@gmail.com</span>
-                    </button>
-                </form>
-
-                <!-- Generated Email Template Display Area -->
-                <div id="email-preview-container" class="space-y-2 hidden">
-                    <div class="text-[11px] font-bold text-slate-700 uppercase tracking-wider flex items-center justify-between">
-                        <span>Sample Email (To anooppriyaranjan@gmail.com)</span>
-                        <span class="badge bg-purple-100 text-purple-800 border border-purple-200 text-[10px] font-bold flex items-center gap-1">
-                            <i class="bi bi-eye-slash-fill text-purple-600"></i> Link Invisible for Sender
-                        </span>
-                    </div>
-                    <textarea id="email-preview-textarea" rows="7" readonly class="form-control font-mono text-[11px] bg-slate-50 border-slate-300 rounded-xl select-all leading-relaxed"></textarea>
-                    
-                    <div class="p-2.5 bg-purple-50/70 border border-purple-200 rounded-xl text-[11px] text-purple-900 space-y-1">
-                        <div class="font-bold flex items-center gap-1.5 text-purple-800">
-                            <i class="bi bi-shield-lock-fill text-purple-600"></i>
-                            <span>Invisible Link Encoded for Sender</span>
-                        </div>
-                        <p class="m-0 text-slate-600">
-                            The direct authorization link is invisibly embedded for the sender so it cannot be bypassed. When <strong class="text-slate-800 font-mono">anooppriyaranjan@gmail.com</strong> clicks the link in their inbox, full portal access will be granted to your email ID!
-                        </p>
-                    </div>
-
-                    <div class="grid grid-cols-1 sm:grid-cols-3 gap-2 pt-1">
-                        <a id="open-mailto-btn" href="#" target="_blank" class="btn btn-outline-primary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
-                            <i class="bi bi-envelope-fill"></i> Open Mail App
-                        </a>
-                        <a id="open-gmail-btn" href="#" target="_blank" class="btn btn-outline-dark btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
-                            <i class="bi bi-google"></i> Open Gmail Web
-                        </a>
-                        <button type="button" onclick="copySampleEmailText(this)" class="btn btn-outline-secondary btn-sm text-xs font-bold rounded-xl flex items-center justify-center gap-1">
-                            <i class="bi bi-clipboard"></i> Copy Email Text
-                        </button>
-                    </div>
-
-                    <div class="pt-2 border-t border-slate-200">
-                        <button type="button" onclick="checkIfEmailApproved()" id="check-approval-btn" class="w-full btn btn-success text-white text-xs font-bold py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 border-0 flex items-center justify-center gap-2 shadow-xs">
-                            <i class="bi bi-arrow-repeat"></i>
-                            <span>Check If Approved by anooppriyaranjan@gmail.com</span>
-                        </button>
-                        <div id="check-approval-feedback" class="text-xs hidden p-2.5 rounded-xl border mt-2"></div>
-                    </div>
-                </div>
-            </div>
-
-            <div class="text-[11px] text-center text-slate-400 border-t border-slate-100 pt-3">
-                Security Dispatch • Administrator: <strong class="text-slate-600 font-mono">anooppriyaranjan@gmail.com</strong>
+            <div class="text-[11px] text-center text-slate-400 border-t border-slate-100 pt-3 flex items-center justify-center gap-1.5">
+                <i class="bi bi-shield-check text-emerald-600"></i>
+                <span>Zero-Plaintext Encrypted Client Verification • FDE Portal</span>
             </div>
         </div>
     </div>
@@ -462,6 +269,7 @@
     <!-- Bootstrap 5 Bundle JS -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
     <!-- Scripts -->
+    <script src="{{ url_for('static', filename='js/auth_crypto.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
     <script>
         const mobileBtn = document.getElementById('mobile-menu-btn');
@@ -472,209 +280,9 @@
             });
         }
 
-        // Access Modal Functions
-        function openAccessModal() {
-            const modal = document.getElementById('access-modal');
-            if (modal) {
-                modal.classList.remove('hidden');
-                modal.classList.add('flex');
-            }
-        }
-
-        function closeAccessModal() {
-            const modal = document.getElementById('access-modal');
-            if (modal) {
-                modal.classList.add('hidden');
-                modal.classList.remove('flex');
-            }
-        }
-
-        function copyEmailTemplate(encodedText, btn) {
-            const decoded = decodeURIComponent(encodedText);
-            navigator.clipboard.writeText(decoded).then(() => {
-                const orig = btn.innerHTML;
-                btn.innerHTML = `<i class="bi bi-check-lg"></i> Copied!`;
-                btn.classList.add("btn-success");
-                btn.classList.remove("btn-outline-secondary");
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.remove("btn-success");
-                    btn.classList.add("btn-outline-secondary");
-                }, 1800);
-            });
-        }
-
-        async function submitModalEmailRequest() {
-            const emailInput = document.getElementById('modal-email-input');
-            const nameInput = document.getElementById('modal-name-input');
-            const feedback = document.getElementById('modal-request-feedback');
-            const btn = document.getElementById('modal-email-btn');
-            const email = emailInput ? emailInput.value.trim() : '';
-            const name = nameInput ? nameInput.value.trim() : '';
-
-            if (!email) {
-                if (feedback) {
-                    feedback.className = "text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
-                    feedback.textContent = "Please enter an email address.";
-                }
-                return;
-            }
-
-            btn.disabled = true;
-            btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Preparing email...`;
-
-            try {
-                const res = await fetch("/api/request-access", {
-                    method: "POST",
-                    headers: { "Content-Type": "application/json" },
-                    body: JSON.stringify({ email: email, name: name })
-                });
-                const data = await res.json();
-
-                if (res.ok && data.success) {
-                    // Automatically trigger opening default email client
-                    if (data.mailto_url) {
-                        try {
-                            window.location.href = data.mailto_url;
-                        } catch (e) {
-                            console.warn("Mailto launch notice:", e);
-                        }
-                    }
-
-                    feedback.className = "text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 block space-y-2";
-                    feedback.innerHTML = `
-                        <div class="font-bold flex items-center gap-1.5 text-emerald-800">
-                            <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                            <span>Email Provider Opened with Pre-filled Template!</span>
-                        </div>
-                        <p class="text-[11px] text-slate-700 m-0">
-                            Email draft opened for receiver <strong class="text-slate-900 font-mono">azureanoopranjan@gmail.com</strong> with your <strong class="text-indigo-700">encrypted passcode</strong>: <code class="text-indigo-800 font-mono text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">${data.encrypted_passcode || ''}</code>.
-                        </p>
-                        <div class="flex flex-wrap gap-1.5 pt-1">
-                            <a href="${data.mailto_url}" class="btn btn-sm btn-outline-primary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                                <i class="bi bi-envelope-fill"></i> Default Mail Client
-                            </a>
-                            <a href="${data.gmail_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                                <i class="bi bi-google"></i> Open in Gmail (Web)
-                            </a>
-                            <a href="${data.outlook_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                                <i class="bi bi-microsoft"></i> Open in Outlook (Web)
-                            </a>
-                            <button onclick="copyEmailTemplate('${encodeURIComponent(data.body)}', this)" class="btn btn-sm btn-outline-secondary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                                <i class="bi bi-clipboard"></i> Copy Email Template
-                            </button>
-                        </div>
-                        <div class="text-[11px] text-amber-900 bg-amber-50/90 border border-amber-200 p-2 rounded-lg mt-1 font-medium">
-                            <i class="bi bi-info-circle-fill text-amber-600 me-1"></i>
-                            <strong>When payment is done:</strong> The administrator will tell you your decrypted 6-digit passcode to unlock the website in Step 2.
-                        </div>
-                    `;
-                } else {
-                    feedback.className = "text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
-                    feedback.textContent = data.message || "Failed to submit request.";
-                }
-            } catch (err) {
-                feedback.className = "text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
-                feedback.textContent = "Network error. Please try again.";
-            } finally {
-                btn.disabled = false;
-                btn.innerHTML = `<i class="bi bi-envelope-arrow-up-fill"></i> <span>Send Email & Open Email Provider</span>`;
-            }
-        }
-
-        async function submitUnlockPasscode() {
-            const input = document.getElementById('access-passcode-input');
-            const feedback = document.getElementById('unlock-feedback');
-            const btn = document.getElementById('modal-passcode-btn');
-            if (!input) return;
-            const passcode = input.value.trim();
-
-            if (!passcode) {
-                if (feedback) {
-                    feedback.className = "text-xs p-2 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
-                    feedback.textContent = "Please enter the 6-digit access passcode.";
-                }
-                return;
-            }
-
-            if (btn) btn.disabled = true;
-
-            try {
-                const res = await fetch('{{ url_for("unlock_portal") }}', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ passcode: passcode })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    if (feedback) {
-                        feedback.className = "text-xs p-2 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 block font-semibold";
-                        feedback.textContent = "Access Granted! Unlocking portal...";
-                    }
-                    if (typeof showToast === 'function') {
-                        showToast(data.message || 'Access Unlocked!', 'success');
-                    }
-                    setTimeout(() => {
-                        window.location.reload();
-                    }, 800);
-                } else {
-                    if (feedback) {
-                        feedback.className = "text-xs p-2 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
-                        feedback.textContent = data.message || "Invalid passcode.";
-                    }
-                }
-            } catch (err) {
-                if (feedback) {
-                    feedback.className = "text-xs p-2 rounded-xl border border-red-300 bg-red-50 text-red-700 block";
-                    feedback.textContent = "Error verifying passcode.";
-                }
-            } finally {
-                if (btn) btn.disabled = false;
-            }
-        }
-
-        // Check for query param ?request_access=1
-        if (new URLSearchParams(window.location.search).get('request_access') === '1') {
-            document.addEventListener('DOMContentLoaded', function() {
-                openAccessModal();
-            });
-        }
-
         // Global State & Tracking
         const isSiteUnlocked = {{ 'true' if site_unlocked else 'false' }};
         let pendingTargetUrl = null;
-
-        // Switch between Password Unlock and Email Request tabs
-        function switchAdminTab(tab) {
-            const panelPass = document.getElementById('panel-password');
-            const panelVerified = document.getElementById('panel-password-verified-success');
-            const panelEmail = document.getElementById('panel-email');
-            const btnPass = document.getElementById('tab-btn-password');
-            const btnEmail = document.getElementById('tab-btn-email');
-
-            if (tab === 'password') {
-                if (panelVerified && !panelVerified.classList.contains('hidden')) {
-                    if (panelPass) panelPass.classList.add('hidden');
-                    panelVerified.classList.remove('hidden');
-                } else {
-                    if (panelPass) panelPass.classList.remove('hidden');
-                    if (panelVerified) panelVerified.classList.add('hidden');
-                }
-                if (panelEmail) panelEmail.classList.add('hidden');
-                if (btnPass) btnPass.className = 'flex-1 py-2 rounded-xl transition text-center bg-white text-purple-800 shadow-xs border border-purple-200';
-                if (btnEmail) btnEmail.className = 'flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900';
-                const passInput = document.getElementById('admin-modal-pass-input');
-                if (passInput && (!panelVerified || panelVerified.classList.contains('hidden'))) passInput.focus();
-            } else {
-                if (panelPass) panelPass.classList.add('hidden');
-                if (panelVerified) panelVerified.classList.add('hidden');
-                if (panelEmail) panelEmail.classList.remove('hidden');
-                if (btnEmail) btnEmail.className = 'flex-1 py-2 rounded-xl transition text-center bg-white text-blue-800 shadow-xs border border-blue-200';
-                if (btnPass) btnPass.className = 'flex-1 py-2 rounded-xl transition text-center text-slate-600 hover:text-slate-900';
-                const emailInput = document.getElementById('req-email-input');
-                if (emailInput) emailInput.focus();
-            }
-        }
 
         // Flashes the Admin Password Modal on screen with attention-grabbing pulse
         function flashAdminPasswordModal(targetUrl = null) {
@@ -695,7 +303,7 @@
             }
 
             const passInput = document.getElementById('admin-modal-pass-input');
-            if (passInput && (!document.getElementById('panel-password') || !document.getElementById('panel-password').classList.contains('hidden'))) {
+            if (passInput) {
                 passInput.focus();
             }
         }
@@ -723,7 +331,7 @@
             }
         }
 
-        // Handle Admin Password Verification
+        // Handle Encrypted Admin Password Verification
         async function handleAdminPasswordSubmit(e) {
             e.preventDefault();
             const passInput = document.getElementById('admin-modal-pass-input');
@@ -741,53 +349,23 @@
 
             if (btn) {
                 btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Verifying...';
+                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Encrypting & Verifying...';
             }
 
             try {
-                const res = await fetch('/api/verify-site-password', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ 
-                        password: password,
-                        target: pendingTargetUrl || window.location.pathname
-                    })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
+                const { ok, data } = await window.FDEAuthCrypto.verifyAdminPasswordEncrypted(
+                    password,
+                    pendingTargetUrl || window.location.pathname
+                );
+                if (ok && data.success) {
+                    passInput.value = '';
                     const destination = (data.redirect && data.redirect !== '/') ? data.redirect : (pendingTargetUrl || '/courses');
-                    
-                    const passPanel = document.getElementById('panel-password');
-                    const verifiedPanel = document.getElementById('panel-password-verified-success');
-                    const verifiedTextarea = document.getElementById('verified-email-preview-textarea');
-                    const verifiedMailto = document.getElementById('verified-mailto-btn');
-                    const verifiedGmail = document.getElementById('verified-gmail-btn');
-                    const proceedBtn = document.getElementById('proceed-to-portal-btn');
-                    const tabBtnPass = document.getElementById('tab-btn-password');
-
-                    if (verifiedPanel && data.sample_email) {
-                        if (passPanel) passPanel.classList.add('hidden');
-                        verifiedPanel.classList.remove('hidden');
-                        if (tabBtnPass) {
-                            tabBtnPass.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600 me-1"></i> Password Verified';
-                        }
-                        if (verifiedTextarea) verifiedTextarea.value = data.sample_email.body;
-                        if (verifiedMailto) verifiedMailto.href = data.sample_email.mailto_url;
-                        if (verifiedGmail) verifiedGmail.href = data.sample_email.gmail_url;
-                        if (proceedBtn) {
-                            proceedBtn.onclick = function() {
-                                window.location.href = destination;
-                            };
-                            proceedBtn.innerHTML = `<i class="bi bi-box-arrow-in-right"></i> <span>Proceed to Web Application (${destination}) →</span>`;
-                        }
-                    } else {
-                        feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
-                        feedback.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600"></i> Password verified! Displaying web application...';
-                        feedback.classList.remove('hidden');
-                        setTimeout(() => {
-                            window.location.href = destination;
-                        }, 400);
-                    }
+                    feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
+                    feedback.innerHTML = '<i class="bi bi-check-circle-fill text-emerald-600"></i> Encrypted verification succeeded! Displaying web application...';
+                    feedback.classList.remove('hidden');
+                    setTimeout(() => {
+                        window.location.href = destination;
+                    }, 350);
                 } else {
                     feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 flex items-center gap-2';
                     feedback.innerHTML = `<i class="bi bi-exclamation-triangle-fill text-red-500"></i> ${data.error || 'Incorrect admin password. Only Home Page is accessible.'}`;
@@ -807,207 +385,11 @@
                 }
             } catch (err) {
                 feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 flex items-center gap-2';
-                feedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-red-500"></i> Server error verifying password.';
+                feedback.innerHTML = '<i class="bi bi-exclamation-triangle-fill text-red-500"></i> Server error verifying encrypted password.';
                 feedback.classList.remove('hidden');
                 if (btn) {
                     btn.disabled = false;
                     btn.innerHTML = '<i class="bi bi-unlock-fill"></i> <span>Unlock & Display All</span>';
-                }
-            }
-        }
-
-        // Generate sample email to anooppriyaranjan@gmail.com with Invisible Link for Sender
-        let approvalPollInterval = null;
-
-        function startApprovalPolling(email) {
-            if (approvalPollInterval) clearInterval(approvalPollInterval);
-            const feedback = document.getElementById('check-approval-feedback');
-            if (feedback) {
-                feedback.className = 'text-xs p-2.5 rounded-xl border border-blue-200 bg-blue-50 text-blue-900 flex items-center justify-between mt-2 block';
-                feedback.innerHTML = `
-                    <span class="flex items-center gap-2">
-                        <span class="spinner-grow spinner-grow-sm text-blue-600" role="status"></span>
-                        <span>Waiting for approval from <strong>anooppriyaranjan@gmail.com</strong>...</span>
-                    </span>
-                    <span class="text-[10px] text-blue-700 font-mono font-bold bg-blue-100 px-2 py-0.5 rounded">Auto-Checking</span>
-                `;
-                feedback.classList.remove('hidden');
-            }
-
-            approvalPollInterval = setInterval(async () => {
-                try {
-                    const res = await fetch('/api/check-email-access', {
-                        method: 'POST',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify({ email: email })
-                    });
-                    const data = await res.json();
-                    if (res.ok && data.success) {
-                        clearInterval(approvalPollInterval);
-                        approvalPollInterval = null;
-                        if (feedback) {
-                            feedback.className = 'text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 block font-bold';
-                            feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600 me-1"></i> ${data.message || 'Access Approved by anooppriyaranjan@gmail.com!'} Opening full portal...`;
-                            feedback.classList.remove('hidden');
-                        }
-                        setTimeout(() => {
-                            window.location.href = data.redirect || '/courses';
-                        }, 700);
-                    }
-                } catch (e) {
-                    // silently retry on transient poll error
-                }
-            }, 3000);
-        }
-
-        async function handleGenerateEmailRequest(e) {
-            e.preventDefault();
-            const emailInput = document.getElementById('req-email-input');
-            const nameInput = document.getElementById('req-name-input');
-            const btn = document.getElementById('generate-email-btn');
-            const previewContainer = document.getElementById('email-preview-container');
-            const textarea = document.getElementById('email-preview-textarea');
-            const mailtoBtn = document.getElementById('open-mailto-btn');
-            const gmailBtn = document.getElementById('open-gmail-btn');
-
-            const email = emailInput ? emailInput.value.trim() : '';
-            const name = nameInput ? nameInput.value.trim() : '';
-
-            if (!email || !email.includes('@')) {
-                alert('Please enter a valid email address.');
-                return;
-            }
-
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Generating Sample Email...';
-            }
-
-            try {
-                const res = await fetch('/api/request-access', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email, name: name })
-                });
-                const data = await res.json();
-                if (data.success) {
-                    if (textarea) textarea.value = data.display_body || data.body;
-                    if (mailtoBtn) mailtoBtn.href = data.mailto_url;
-                    if (gmailBtn) gmailBtn.href = data.gmail_url;
-                    if (previewContainer) previewContainer.classList.remove('hidden');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-check2-circle"></i> <span>Email Prepared! Send to anooppriyaranjan@gmail.com</span>';
-                        btn.classList.remove('btn-primary');
-                        btn.classList.add('btn-success');
-                    }
-                    // Start automatic approval check every 3s
-                    startApprovalPolling(email);
-                } else {
-                    alert(data.message || 'Error generating email request.');
-                    if (btn) {
-                        btn.disabled = false;
-                        btn.innerHTML = '<i class="bi bi-envelope-paper-fill"></i> <span>Generate Sample Email</span>';
-                    }
-                }
-            } catch (err) {
-                alert('Failed to generate request. Please check network.');
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-envelope-paper-fill"></i> <span>Generate Sample Email</span>';
-                }
-            }
-        }
-
-        // Copy email text
-        function copySampleEmailText(btn) {
-            const textarea = document.getElementById('email-preview-textarea');
-            if (!textarea) return;
-            navigator.clipboard.writeText(textarea.value).then(() => {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
-                btn.classList.add('btn-success');
-                btn.classList.remove('btn-outline-secondary');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline-secondary');
-                }, 1800);
-            });
-        }
-
-        // Copy verified sample email text
-        function copyVerifiedSampleEmailText(btn) {
-            const textarea = document.getElementById('verified-email-preview-textarea');
-            if (!textarea) return;
-            navigator.clipboard.writeText(textarea.value).then(() => {
-                const orig = btn.innerHTML;
-                btn.innerHTML = '<i class="bi bi-check-lg"></i> Copied!';
-                btn.classList.add('btn-success');
-                btn.classList.remove('btn-outline-secondary');
-                setTimeout(() => {
-                    btn.innerHTML = orig;
-                    btn.classList.remove('btn-success');
-                    btn.classList.add('btn-outline-secondary');
-                }, 1800);
-            });
-        }
-
-        // Check if anooppriyaranjan@gmail.com has clicked the link in their inbox
-        async function checkIfEmailApproved() {
-            const emailInput = document.getElementById('req-email-input');
-            const feedback = document.getElementById('check-approval-feedback');
-            const btn = document.getElementById('check-approval-btn');
-            const email = emailInput ? emailInput.value.trim() : '';
-
-            if (!email) {
-                if (feedback) {
-                    feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block';
-                    feedback.textContent = 'Please enter your email above first.';
-                    feedback.classList.remove('hidden');
-                }
-                return;
-            }
-
-            if (btn) {
-                btn.disabled = true;
-                btn.innerHTML = '<span class="spinner-border spinner-border-sm" role="status"></span> Checking Approval...';
-            }
-
-            try {
-                const res = await fetch('/api/check-email-access', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ email: email })
-                });
-                const data = await res.json();
-                if (res.ok && data.success) {
-                    if (approvalPollInterval) clearInterval(approvalPollInterval);
-                    if (feedback) {
-                        feedback.className = 'text-xs p-2.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 flex items-center gap-2';
-                        feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600"></i> ${data.message} Opening courses...`;
-                        feedback.classList.remove('hidden');
-                    }
-                    setTimeout(() => {
-                        window.location.href = data.redirect || '/courses';
-                    }, 600);
-                } else {
-                    if (feedback) {
-                        feedback.className = 'text-xs p-2.5 rounded-xl border border-amber-300 bg-amber-50 text-amber-800 flex items-center gap-2';
-                        feedback.innerHTML = `<i class="bi bi-hourglass-split text-amber-600"></i> ${data.message || 'Approval pending from anooppriyaranjan@gmail.com.'}`;
-                        feedback.classList.remove('hidden');
-                    }
-                }
-            } catch (err) {
-                if (feedback) {
-                    feedback.className = 'text-xs p-2.5 rounded-xl border border-red-300 bg-red-50 text-red-700 block';
-                    feedback.textContent = 'Server error checking approval status.';
-                    feedback.classList.remove('hidden');
-                }
-            } finally {
-                if (btn) {
-                    btn.disabled = false;
-                    btn.innerHTML = '<i class="bi bi-arrow-repeat"></i> <span>Check If Approved by anooppriyaranjan@gmail.com</span>';
                 }
             }
         }

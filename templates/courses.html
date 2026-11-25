@@ -21,15 +21,15 @@
                     Viewing Preview of Day {{ active_day.day }}
                 </h2>
                 <p class="text-xs text-slate-600 mt-0.5">
-                    To unlock the complete 35-day interactive video course library, hands-on labs, and architecture capstones, please send an email to <strong class="text-blue-700 font-mono">azureanoopranjan@gmail.com</strong>.
+                    To unlock the complete 35-day interactive video course library, hands-on labs, and architecture capstones, verify the Admin Security Password.
                 </p>
             </div>
         </div>
 
         <div class="flex items-center gap-2 self-start sm:self-center flex-shrink-0">
-            <button onclick="openAccessModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-blue-500/20 flex items-center gap-1.5 transition">
-                <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z"></path></svg>
-                <span>Request Access via Email</span>
+            <button onclick="flashAdminPasswordModal()" class="px-4 py-2 rounded-xl bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-700 hover:to-indigo-700 text-white font-bold text-xs shadow-md shadow-purple-500/20 flex items-center gap-1.5 transition border-0">
+                <i class="bi bi-shield-lock-fill"></i>
+                <span>Unlock with Admin Password</span>
             </button>
             <a href="{{ url_for('index') }}" class="px-3 py-2 rounded-xl bg-white hover:bg-slate-100 text-slate-700 text-xs font-semibold border border-slate-300 transition text-decoration-none shadow-xs">
                 Home Dashboard

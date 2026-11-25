@@ -18,26 +18,13 @@ from data.kql_queries import KQL_QUERIES, MOCK_LOGS, get_kql_by_id
 from data.interview_prep import POSITIONING_STRATEGY, ELEVATOR_PITCH, INTERVIEW_QUESTIONS, get_questions_by_category
 from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS, FDE_BRIEFING_10MIN
 from data.outreach import parse_institutes_from_upload, generate_sales_email, get_sample_csv_template, SAMPLE_INSTITUTIONS, DEFAULT_SENDER, SIGN_OFF_NAME
-from data.access_control import (
-    create_access_request,
-    verify_and_consume_passcode,
-    get_request_by_token,
-    approve_access_by_token,
-    get_all_inbox_messages,
-    compose_verified_admin_request_email,
-    ADMIN_EMAIL,
-    ADMIN_NAME
-)
 from data.google_auth import (
-    generate_pkce_pair,
-    create_signed_oauth_state,
-    verify_signed_oauth_state,
-    get_google_authorization_url,
-    parse_and_validate_jwt,
-    exchange_oauth_code_for_user,
-    login_user_session,
-    logout_user_session,
-    ADMIN_PASSWORD,
+    ADMIN_EMAIL,
+    ADMIN_NAME,
+    ADMIN_PBKDF2_SALT,
+    ADMIN_PBKDF2_ITERATIONS,
+    create_auth_challenge,
+    verify_encrypted_admin_payload,
     verify_admin_password
 )
 
@@ -265,34 +252,22 @@ def check_portal_access():
     # Completely public routes (accessible without password/unlock)
     public_paths = {
         "/",
-        "/login",
-        "/auth/google",
-        "/auth/google/callback",
-        "/api/auth/google/credential",
-        "/auth/google/dev-login",
-        "/auth/logout",
+        "/access-gate",
+        "/api/auth/challenge",
         "/api/verify-site-password",
         "/api/admin/verify-password",
-        "/api/check-email-access",
-        "/api/unlock-portal",
         "/api/lock-portal",
         "/api/admin/lock",
-        "/api/request-access",
-        "/access/inbox",
-        "/access/inbox/lock",
-        "/download/sample-institutions.csv"
     }
 
     if (
         request.path in public_paths
         or request.path.startswith("/static")
-        or request.path.startswith("/access/allow")
     ):
         return None
 
-    # Requirement: Allow ONLY Home page as display; rest of web application displays
-    # only when admin password ("Azadirakhtaindica@007") is verified in popup,
-    # OR when access is approved via link by anooppriyaranjan@gmail.com.
+    # Allow ONLY Home page as display; rest of web application displays
+    # only when Admin password is verified via encrypted challenge-response.
     if not session.get("site_unlocked"):
         if request.path.startswith("/api/"):
             return jsonify({
@@ -605,274 +580,14 @@ def download_sample_csv():
     )
 
 
-# ================= GOOGLE SSO & AUTHENTICATION ENDPOINTS =================
-
-GOOGLE_CLIENT_ID = os.environ.get("GOOGLE_CLIENT_ID", "")
-GOOGLE_CLIENT_SECRET = os.environ.get("GOOGLE_CLIENT_SECRET", "")
-
-
-@app.route("/login")
-def login_page():
-    next_url = request.args.get("next") or url_for("index")
-    if session.get("user_email"):
-        return redirect(next_url)
-    return render_template("login.html", next_url=next_url, google_client_id=GOOGLE_CLIENT_ID)
-
-
-@app.route("/auth/google")
-def auth_google_start():
-    next_url = request.args.get("next") or "/"
-    state = create_signed_oauth_state(app.secret_key, next_url)
-    session["oauth_state"] = state
-
-    code_verifier, code_challenge = generate_pkce_pair()
-    session["oauth_code_verifier"] = code_verifier
-
-    redirect_uri = url_for("auth_google_callback", _external=True)
-
-    if GOOGLE_CLIENT_ID:
-        google_url = get_google_authorization_url(
-            client_id=GOOGLE_CLIENT_ID,
-            redirect_uri=redirect_uri,
-            state=state,
-            code_challenge=code_challenge
-        )
-        return redirect(google_url)
-    else:
-        return render_template(
-            "login.html",
-            next_url=next_url,
-            google_client_id="",
-            message="Google OAuth credentials are not set in environment. Use the Instant Google SSO Authenticator below to log in as azureanoopranjan@gmail.com or any member."
-        )
-
-
-@app.route("/auth/google/callback")
-def auth_google_callback():
-    state = request.args.get("state", "")
-    code = request.args.get("code", "")
-    error = request.args.get("error", "")
-
-    if error:
-        return render_template("login.html", error=f"Google authentication failed: {error}", next_url="/"), 400
-
-    valid_state, next_url = verify_signed_oauth_state(state, app.secret_key)
-    if not valid_state:
-        return render_template("login.html", error="Invalid or expired authentication state parameter. Please try signing in again.", next_url="/"), 400
-
-    redirect_uri = url_for("auth_google_callback", _external=True)
-    code_verifier = session.pop("oauth_code_verifier", "")
-
-    if GOOGLE_CLIENT_ID and GOOGLE_CLIENT_SECRET:
-        success, user_info, err = exchange_oauth_code_for_user(
-            code=code,
-            client_id=GOOGLE_CLIENT_ID,
-            client_secret=GOOGLE_CLIENT_SECRET,
-            redirect_uri=redirect_uri,
-            code_verifier=code_verifier
-        )
-        if not success:
-            return render_template("login.html", error=f"Google token verification error: {err}", next_url=next_url), 400
-
-        conn = get_db()
-        login_user_session(
-            conn=conn,
-            session=session,
-            email=user_info["email"],
-            name=user_info.get("name", ""),
-            picture=user_info.get("picture", ""),
-            google_id=user_info.get("google_id", ""),
-            auth_method="google_sso"
-        )
-        conn.close()
-        return redirect(next_url or url_for("index"))
-
-    return redirect(url_for("login_page", next=next_url))
-
-
-@app.route("/api/auth/google/credential", methods=["POST"])
-def auth_google_credential_api():
-    """Google Identity Services (GSI) One Tap callback endpoint."""
-    data = request.get_json() or request.form or {}
-    id_token = data.get("credential") or data.get("id_token") or ""
-    next_url = data.get("next") or "/"
-
-    if not id_token:
-        return jsonify({"success": False, "message": "Missing Google credential token"}), 400
-
-    valid, user_info, err = parse_and_validate_jwt(id_token, GOOGLE_CLIENT_ID)
-    if not valid:
-        return jsonify({"success": False, "message": err or "Invalid Google token"}), 400
-
-    conn = get_db()
-    login_info = login_user_session(
-        conn=conn,
-        session=session,
-        email=user_info["email"],
-        name=user_info.get("name", ""),
-        picture=user_info.get("picture", ""),
-        google_id=user_info.get("google_id", ""),
-        auth_method="google_one_tap"
-    )
-    conn.close()
-
-    return jsonify({"success": True, "user": login_info, "redirect_url": next_url})
-
-
-@app.route("/auth/google/dev-login", methods=["POST"])
-def auth_google_dev_login():
-    """
-    Verified Google SSO identity authenticator:
-    Allows instant verified login as azureanoopranjan@gmail.com (Admin) or any candidate Gmail.
-    """
-    email = str(request.form.get("email") or "").strip().lower()
-    name = str(request.form.get("name") or "").strip()
-    next_url = request.form.get("next") or url_for("index")
-
-    if not email or "@" not in email:
-        return render_template("login.html", error="Please provide a valid Gmail address.", next_url=next_url), 400
-
-    conn = get_db()
-    login_user_session(
-        conn=conn,
-        session=session,
-        email=email,
-        name=name,
-        auth_method="google_sso_verified"
-    )
-    conn.close()
-
-    return redirect(next_url or url_for("index"))
-
-
-@app.route("/auth/logout")
-def auth_logout():
-    logout_user_session(session)
-    return redirect(url_for("index"))
-
-
-# ================= PORTAL ACCESS CONTROL, PASSCODES & ALLOW WORKFLOW =================
+# ================= ENCRYPTED ADMIN PASSWORD AUTHENTICATION =================
 
 @app.route("/access-gate")
 def access_gate():
     next_url = request.args.get("next") or url_for("courses_hub")
-    if session.get("fde_access"):
+    if session.get("site_unlocked"):
         return redirect(next_url)
     return render_template("access_gate.html", next_url=next_url)
-
-
-@app.route("/api/request-access", methods=["POST"])
-def request_access_api():
-    data = request.get_json() or request.form or {}
-    email = str(data.get("email") or "").strip().lower()
-    name = str(data.get("name") or "").strip()
-    if not email or "@" not in email or "." not in email:
-        return jsonify({"success": False, "message": "Please enter a valid email address."}), 400
-
-    conn = get_db()
-    req_info = create_access_request(conn, email, request.host_url, request.remote_addr or "", requester_name=name)
-    conn.close()
-
-    return jsonify({
-        "success": True,
-        "message": f"Pre-filled request generated with direct approval link for receiver anooppriyaranjan@gmail.com!",
-        "email": email,
-        "passcode": req_info["passcode"],
-        "encrypted_passcode": req_info["encrypted_passcode"],
-        "token": req_info["token"],
-        "allow_url": req_info["allow_url"],
-        "mailto_url": req_info["mailto_url"],
-        "gmail_url": req_info["gmail_url"],
-        "outlook_url": req_info["outlook_url"],
-        "subject": req_info["subject"],
-        "body": req_info["body"],
-        "display_body": req_info.get("display_body", req_info["body"]),
-        "invisible_link": req_info.get("invisible_link", ""),
-        "inbox_url": url_for("access_inbox")
-    })
-
-
-@app.route("/api/unlock-portal", methods=["POST"])
-def unlock_portal():
-    data = request.get_json() or request.form or {}
-    passcode = str(data.get("passcode") or data.get("key") or "").strip()
-    
-    conn = get_db()
-    success, email_or_msg, error_detail = verify_and_consume_passcode(conn, passcode)
-    conn.close()
-
-    if success:
-        session["fde_access"] = True
-        session["access_email"] = email_or_msg
-        return jsonify({
-            "success": True,
-            "message": "Access granted successfully! Welcome to the Azure AI FDE Portal."
-        })
-    
-    return jsonify({
-        "success": False,
-        "message": error_detail or "Invalid passcode. Please enter the unique 6-digit code received in your email."
-    }), 400
-
-
-@app.route("/access/allow/<token>", methods=["GET", "POST"])
-def access_allow_page(token):
-    conn = get_db()
-    req_item = get_request_by_token(conn, token)
-    if not req_item:
-        conn.close()
-        return render_template("access_allow.html", error="Invalid or expired access link.", token=token)
-
-    # Clicking the link in anooppriyaranjan@gmail.com's inbox immediately approves access
-    success, req_dict = approve_access_by_token(conn, token)
-    conn.close()
-
-    user_email = req_dict.get("email") if req_dict else req_item["email"]
-    session["site_unlocked"] = True
-    session["fde_access"] = True
-    session["access_email"] = user_email
-    session["user_email"] = user_email
-
-    return render_template(
-        "access_allow.html",
-        request_item=req_dict or dict(req_item),
-        token=token,
-        already_approved=True
-    )
-
-
-@app.route("/access/allow/<token>/submit", methods=["POST"], endpoint="access_allow_submit")
-def access_allow_submit(token):
-    return access_allow_page(token)
-
-
-@app.route("/api/check-email-access", methods=["POST"])
-def check_email_access():
-    data = request.get_json(silent=True) or request.form.to_dict() or {}
-    email = (data.get("email") or "").strip().lower()
-    if not email:
-        return jsonify({"success": False, "message": "Email address is required."}), 400
-
-    conn = get_db()
-    cursor = conn.cursor()
-    cursor.execute("SELECT email, status FROM access_requests WHERE email = ? AND status = 'approved' ORDER BY id DESC LIMIT 1", (email,))
-    row = cursor.fetchone()
-    conn.close()
-
-    if row:
-        session["site_unlocked"] = True
-        session["fde_access"] = True
-        session["user_email"] = email
-        return jsonify({
-            "success": True,
-            "message": f"Access has been approved by anooppriyaranjan@gmail.com for {email}!",
-            "redirect": url_for("courses_hub")
-        })
-
-    return jsonify({
-        "success": False,
-        "message": f"Approval pending. Please verify that anooppriyaranjan@gmail.com has clicked the approval link in their inbox."
-    }), 404
 
 
 # Security: In-memory Brute-Force Rate Limiter for Admin Password Verification
@@ -901,53 +616,18 @@ def reset_admin_rate_limit(client_ip: str):
     LOGIN_ATTEMPTS.pop(client_ip, None)
 
 
-@app.route("/access/inbox", methods=["GET", "POST"])
-def access_inbox():
-    client_ip = request.headers.get("X-Forwarded-For", request.remote_addr or "unknown").split(",")[0].strip()
-    error_msg = None
-
-    if request.method == "POST":
-        allowed, rate_msg = check_admin_rate_limit(client_ip)
-        if not allowed:
-            return render_template(
-                "access_inbox.html",
-                locked=True,
-                error=rate_msg,
-                messages=[]
-            ), 429
-
-        entered = (request.form.get("password") or "").strip()
-        if verify_admin_password(entered):
-            reset_admin_rate_limit(client_ip)
-            session["admin_unlocked"] = True
-            session["is_admin"] = True
-            session["user_email"] = ADMIN_EMAIL
-            session["site_unlocked"] = True
-            session["fde_access"] = True
-            return redirect(url_for("access_inbox"))
-        else:
-            record_failed_admin_attempt(client_ip)
-            error_msg = "Incorrect admin password. Access denied."
-
-    # If admin section is not yet unlocked with "Azadirakhtaindica@007"
-    if not session.get("admin_unlocked"):
-        return render_template(
-            "access_inbox.html",
-            locked=True,
-            error=error_msg,
-            messages=[]
-        )
-
-    conn = get_db()
-    messages = get_all_inbox_messages(conn)
-    conn.close()
-    return render_template("access_inbox.html", locked=False, messages=messages)
-
-
-@app.route("/access/inbox/lock")
-def lock_admin_section():
-    session.pop("admin_unlocked", None)
-    return redirect(url_for("access_inbox"))
+@app.route("/api/auth/challenge", methods=["GET"])
+def get_auth_challenge():
+    """Issues a single-use cryptographic challenge for encrypted client-side password verification."""
+    challenge = create_auth_challenge()
+    session["auth_challenge"] = challenge
+    return jsonify({
+        "nonce": challenge["nonce"],
+        "salt": ADMIN_PBKDF2_SALT,
+        "iterations": ADMIN_PBKDF2_ITERATIONS,
+        "transport_key": challenge["transport_key"],
+        "algorithm": "PBKDF2-HMAC-SHA256+HMAC-SHA256-CTR"
+    })
 
 
 @app.route("/api/verify-site-password", methods=["POST"])
@@ -959,46 +639,41 @@ def verify_admin_password_api():
         return jsonify({"success": False, "error": rate_msg}), 429
 
     data = request.get_json(silent=True) or request.form.to_dict() or {}
-    entered = (data.get("password") or "").strip()
+    encrypted_token = (data.get("encrypted_token") or "").strip()
     target = (data.get("target") or data.get("next") or "").strip()
-    if not entered:
-        return jsonify({"success": False, "error": "Password cannot be empty."}), 400
-        
-    if verify_admin_password(entered):
+
+    if not encrypted_token:
+        return jsonify({
+            "success": False,
+            "error": "Encrypted verification payload is required. Plaintext password transmission is disabled."
+        }), 400
+
+    # Consume challenge immediately to enforce single-use replay protection
+    challenge = session.pop("auth_challenge", None)
+    valid, error_msg = verify_encrypted_admin_payload(encrypted_token, challenge)
+
+    if valid:
         reset_admin_rate_limit(client_ip)
         session["site_unlocked"] = True
         session["fde_access"] = True
-        user_email = (session.get("user_email") or "").strip().lower()
-        if session.get("is_admin") or user_email == ADMIN_EMAIL.lower():
-            session["admin_unlocked"] = True
-            
-        # Determine redirect destination
-        if target and target.startswith("/") and target != "/":
+        session["admin_unlocked"] = True
+        session["is_admin"] = True
+        session["user_email"] = ADMIN_EMAIL
+
+        # Determine redirect destination (only allow safe relative paths)
+        if target and target.startswith("/") and not target.startswith("//") and target != "/":
             redirect_url = target
         else:
             redirect_url = url_for("courses_hub")
 
-        # Requirement: when that password is correct then create a sample email text
-        # for the user to send to anooppriyaranjan@gmail.com where he will be requesting for the full access
-        candidate_email = (data.get("email") or session.get("user_email") or "").strip()
-        candidate_name = (data.get("name") or "").strip()
-        verified_email_info = compose_verified_admin_request_email(candidate_email, candidate_name, request.host_url)
-
         return jsonify({
             "success": True,
-            "message": "Admin password verified! Full access granted and sample email request created for anooppriyaranjan@gmail.com.",
-            "redirect": redirect_url,
-            "sample_email": {
-                "subject": verified_email_info["subject"],
-                "body": verified_email_info["body"],
-                "mailto_url": verified_email_info["mailto_url"],
-                "gmail_url": verified_email_info["gmail_url"],
-                "outlook_url": verified_email_info["outlook_url"]
-            }
+            "message": "Admin password verified via encrypted challenge! Full access granted.",
+            "redirect": redirect_url
         })
 
     record_failed_admin_attempt(client_ip)
-    return jsonify({"success": False, "error": "Incorrect admin password. Only Home Page is accessible."}), 401
+    return jsonify({"success": False, "error": error_msg or "Incorrect admin password. Only Home Page is accessible."}), 401
 
 
 @app.route("/api/admin/lock", methods=["GET", "POST"])
@@ -1007,7 +682,10 @@ def lock_portal():
     session.pop("site_unlocked", None)
     session.pop("admin_unlocked", None)
     session.pop("fde_access", None)
+    session.pop("is_admin", None)
+    session.pop("user_email", None)
     session.pop("access_email", None)
+    session.pop("auth_challenge", None)
     if request.is_json:
         return jsonify({"success": True, "message": "Application locked successfully. Only Home Page is accessible."})
     return redirect(url_for("index"))

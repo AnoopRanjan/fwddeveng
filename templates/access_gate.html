@@ -1,256 +1,118 @@
 {% extends "base.html" %}
 
-{% block title %}Restricted Access Gate | Azure AI FDE Portal{% endblock %}
+{% block title %}Admin Access Gate | Azure AI FDE Portal{% endblock %}
 
 {% block content %}
-<div class="max-w-4xl mx-auto px-4 sm:px-6 py-10 sm:py-16">
+<div class="max-w-lg mx-auto px-4 sm:px-6 py-12 sm:py-20">
 
-    <!-- Hero Card -->
-    <div class="bg-white border border-slate-200 rounded-3xl p-6 sm:p-10 shadow-xl mb-8">
-        <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100 pb-6 mb-6">
-            <div class="space-y-1">
-                <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-amber-50 border border-amber-200 text-amber-800 text-xs font-bold uppercase tracking-wider">
-                    <svg class="w-3.5 h-3.5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z"></path></svg>
-                    <span>Member Access Required</span>
-                </div>
-                <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-                    Azure AI Forward Deployed Engineer Access Gate
-                </h1>
-                <p class="text-slate-600 text-sm leading-relaxed max-w-2xl">
-                    The <strong class="text-blue-600 font-semibold">Home Dashboard</strong> is freely accessible to everyone. The full 35-day curriculum, hands-on lab sandbox guides, sentinel KQL attack simulator, and capstone architectures are reserved for verified members.
-                </p>
+    <div class="bg-white border border-purple-200 rounded-3xl p-6 sm:p-10 shadow-2xl space-y-6">
+        <div class="text-center space-y-2 border-b border-slate-100 pb-6">
+            <div class="w-14 h-14 rounded-2xl bg-purple-100 text-purple-700 mx-auto flex items-center justify-center text-2xl shadow-inner border border-purple-200">
+                <i class="bi bi-shield-lock-fill"></i>
             </div>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-secondary btn-sm self-start sm:self-auto rounded-xl text-xs font-semibold px-4 py-2">
+            <div class="inline-flex items-center gap-2 px-3 py-1 rounded-full bg-purple-50 border border-purple-200 text-purple-800 text-xs font-bold uppercase tracking-wider">
+                <span>Admin Password Required</span>
+            </div>
+            <h1 class="text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight m-0">
+                Azure AI FDE Access Gate
+            </h1>
+            <p class="text-slate-600 text-xs sm:text-sm leading-relaxed m-0">
+                Only the <strong class="text-blue-600 font-semibold">Home Dashboard</strong> is freely displayed. Enter the Admin Security Password to unlock the full 35-day curriculum, hands-on labs, Sentinel KQL simulator, and capstone blueprints.
+            </p>
+        </div>
+
+        <form id="gate-admin-password-form" onsubmit="handleGateAdminPassword(event)" class="space-y-4">
+            <div>
+                <label for="gate-admin-pass-input" class="text-xs font-bold text-slate-700 block mb-1.5 flex items-center justify-between">
+                    <span>Admin Security Password</span>
+                    <span class="text-[10px] text-emerald-700 font-semibold flex items-center gap-1">
+                        <i class="bi bi-lock-fill"></i>
+                        <span>Client-Side Encrypted (PBKDF2 + HMAC)</span>
+                    </span>
+                </label>
+                <div class="relative">
+                    <input type="password" id="gate-admin-pass-input" required autocomplete="current-password" placeholder="••••••••••••" class="form-control text-sm font-mono tracking-widest rounded-xl px-3.5 py-2.5 pr-10 border-slate-300 focus:border-purple-600 bg-white">
+                    <button type="button" onclick="toggleGatePasswordVisibility(this)" class="absolute right-3 top-2.5 text-slate-400 hover:text-slate-600 border-0 bg-transparent p-0" title="Toggle password visibility">
+                        <i class="bi bi-eye"></i>
+                    </button>
+                </div>
+            </div>
+
+            <div id="gate-password-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
+
+            <button type="submit" id="gate-password-submit-btn" class="w-full btn btn-purple text-white text-xs sm:text-sm font-bold py-3 rounded-xl bg-purple-700 hover:bg-purple-800 transition shadow-sm flex items-center justify-center gap-2">
+                <i class="bi bi-unlock-fill"></i>
+                <span>Unlock Full Portal Access</span>
+            </button>
+        </form>
+
+        <div class="pt-4 border-t border-slate-100 flex items-center justify-between text-xs text-slate-500">
+            <span class="flex items-center gap-1.5">
+                <i class="bi bi-shield-check text-emerald-600"></i>
+                <span>Zero-Plaintext Encrypted Verification</span>
+            </span>
+            <a href="{{ url_for('index') }}" class="text-blue-600 hover:underline font-semibold">
                 ← Back to Home
             </a>
         </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            
-            <!-- Column 1: Request Access via Email -->
-            <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-xl bg-blue-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">1</span>
-                        <h2 class="text-base font-bold text-slate-900 m-0">Send Email Request to Administrator</h2>
-                    </div>
-                    <p class="text-xs text-slate-600 leading-relaxed m-0">
-                        Enter your details and click below. Your email provider will open with a pre-filled request template to receiver <strong class="text-slate-800">anooppriyaranjan@gmail.com</strong> containing your <strong class="text-indigo-700">encrypted passcode</strong>. When the receiver gets the email and verifies payment, they will tell you your <strong class="text-emerald-700">decrypted 6-digit passcode</strong>.
-                    </p>
-
-                    <form id="gate-request-form" onsubmit="handleGateRequest(event)" class="space-y-3">
-                        <div>
-                            <label for="gate-name-input" class="text-xs font-bold text-slate-700 block mb-1">Your Full Name</label>
-                            <input type="text" id="gate-name-input" value="{{ current_user_name }}" placeholder="e.g. Alex Sharma" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
-                        </div>
-                        <div>
-                            <label for="gate-email-input" class="text-xs font-bold text-slate-700 block mb-1">Your Gmail Address</label>
-                            <input type="email" id="gate-email-input" required value="{{ current_user_email }}" placeholder="colleague@gmail.com" class="form-control text-sm rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-blue-500 bg-white">
-                        </div>
-                        <button type="submit" id="gate-request-submit-btn" class="w-full btn btn-primary text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2">
-                            <i class="bi bi-envelope-arrow-up-fill"></i>
-                            <span>Send Email (With Encrypted Passcode)</span>
-                        </button>
-                    </form>
-
-                    <div id="gate-request-feedback" class="text-xs hidden p-3.5 rounded-xl border"></div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500">
-                    <span>Admin: <strong class="text-slate-700 font-mono">anooppriyaranjan@gmail.com</strong></span>
-                </div>
-            </div>
-
-            <!-- Column 2: Lock by Passcode Section -->
-            <div class="bg-slate-50/80 border border-slate-200 rounded-2xl p-6 flex flex-col justify-between">
-                <div class="space-y-4">
-                    <div class="flex items-center gap-3">
-                        <span class="w-8 h-8 rounded-xl bg-emerald-600 text-white flex items-center justify-center font-bold text-sm shadow-sm">2</span>
-                        <h2 class="text-base font-bold text-slate-900 m-0">Unlock with Decrypted Passcode</h2>
-                    </div>
-                    <p class="text-xs text-slate-600 leading-relaxed m-0">
-                        When you complete payment, enter the decrypted 6-digit code told to you by the administrator to unlock full website access:
-                    </p>
-
-                    <form id="gate-passcode-form" onsubmit="handleGatePasscode(event)" class="space-y-3">
-                        <div>
-                            <label for="gate-passcode-input" class="text-xs font-bold text-slate-700 block mb-1">Decrypted 6-Digit Access Code</label>
-                            <input type="text" id="gate-passcode-input" maxlength="24" required placeholder="Enter decrypted 6-digit passcode" class="form-control text-sm font-mono text-center tracking-widest font-bold rounded-xl px-3.5 py-2.5 border-slate-300 focus:border-emerald-500 bg-white">
-                        </div>
-                        <button type="submit" id="gate-passcode-submit-btn" class="w-full btn btn-success text-white text-xs font-bold py-2.5 rounded-xl shadow-sm flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 border-0">
-                            <i class="bi bi-shield-check"></i>
-                            <span>Unlock All Website Access</span>
-                        </button>
-                    </form>
-
-                    <div id="gate-passcode-feedback" class="text-xs hidden p-3 rounded-xl border"></div>
-                </div>
-
-                <div class="pt-4 border-t border-slate-200 mt-6 text-xs text-slate-500 space-y-1">
-                    <div class="flex items-center gap-1.5 text-slate-700">
-                        <i class="bi bi-check2-circle text-emerald-600"></i>
-                        <span>No hints provided. Unlocks via unique request code or admin allow button.</span>
-                    </div>
-                </div>
-            </div>
-
-        </div>
-
-        <!-- Candidate Instructions -->
-        <div class="mt-8 bg-blue-50/60 border border-blue-200 rounded-2xl p-5 flex flex-col sm:flex-row items-center justify-between gap-4">
-            <div class="flex items-center gap-3 text-sm text-slate-700">
-                <span class="p-2.5 rounded-xl bg-blue-600 text-white flex-shrink-0 shadow-sm">
-                    <i class="bi bi-shield-check text-lg"></i>
-                </span>
-                <div>
-                    <strong class="text-slate-900 block font-semibold">Payment & Code Verification</strong>
-                    <span class="text-xs text-slate-600">Once payment is completed, administrator <strong class="text-blue-700">anooppriyaranjan@gmail.com</strong> will decrypt and share your 6-digit access code to unlock all content.</span>
-                </div>
-            </div>
-            <a href="{{ url_for('index') }}" class="btn btn-outline-primary btn-sm flex-shrink-0 rounded-xl px-4 py-2 font-semibold text-xs">
-                Back to Home Dashboard
-            </a>
-        </div>
-
     </div>
 
 </div>
 
 <script>
-const NEXT_URL = {{ next_url | tojson }};
+const GATE_NEXT_URL = {{ next_url | tojson }};
 
-function copyEmailTemplate(encodedText, btn) {
-    const decoded = decodeURIComponent(encodedText);
-    navigator.clipboard.writeText(decoded).then(() => {
-        const orig = btn.innerHTML;
-        btn.innerHTML = `<i class="bi bi-check-lg"></i> Copied!`;
-        btn.classList.add("btn-success");
-        btn.classList.remove("btn-outline-secondary");
-        setTimeout(() => {
-            btn.innerHTML = orig;
-            btn.classList.remove("btn-success");
-            btn.classList.add("btn-outline-secondary");
-        }, 1800);
-    });
-}
-
-async function handleGateRequest(e) {
-    e.preventDefault();
-    const emailInput = document.getElementById('gate-email-input');
-    const nameInput = document.getElementById('gate-name-input');
-    const feedback = document.getElementById('gate-request-feedback');
-    const btn = document.getElementById('gate-request-submit-btn');
-    const email = emailInput.value.trim();
-    const name = nameInput ? nameInput.value.trim() : '';
-
-    if (!email) return;
-
-    btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Preparing email...`;
-    feedback.className = "text-xs hidden p-3 rounded-xl border";
-
-    try {
-        const res = await fetch("/api/request-access", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ email: email, name: name })
-        });
-        const data = await res.json();
-
-        if (res.ok && data.success) {
-            // Trigger default mail client
-            if (data.mailto_url) {
-                try {
-                    window.location.href = data.mailto_url;
-                } catch (err) {
-                    console.warn("Mailto notice:", err);
-                }
-            }
-
-            feedback.className = "text-xs p-3.5 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-900 block space-y-2";
-            feedback.innerHTML = `
-                <div class="font-bold flex items-center gap-1.5 text-emerald-800">
-                    <i class="bi bi-check-circle-fill text-emerald-600"></i>
-                    <span>Email Provider Opened with Pre-Filled Request!</span>
-                </div>
-                <p class="text-[11px] text-slate-700 m-0">
-                    Email draft opened for receiver <strong class="text-slate-900 font-mono">anooppriyaranjan@gmail.com</strong> with your <strong class="text-indigo-700">encrypted passcode</strong>: <code class="text-indigo-800 font-mono text-[10px] bg-indigo-50 px-1.5 py-0.5 rounded border border-indigo-200">${data.encrypted_passcode || ''}</code>.
-                </p>
-                <div class="flex flex-wrap gap-1.5 pt-1">
-                    <a href="${data.mailto_url}" class="btn btn-sm btn-outline-primary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                        <i class="bi bi-envelope-fill"></i> Default Mail Client
-                    </a>
-                    <a href="${data.gmail_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-danger text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                        <i class="bi bi-google"></i> Open in Gmail (Web)
-                    </a>
-                    <a href="${data.outlook_url}" target="_blank" rel="noopener noreferrer" class="btn btn-sm btn-outline-info text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                        <i class="bi bi-microsoft"></i> Open in Outlook (Web)
-                    </a>
-                    <button type="button" onclick="copyEmailTemplate('${encodeURIComponent(data.body)}', this)" class="btn btn-sm btn-outline-secondary text-[11px] py-1 px-2.5 rounded-lg flex items-center gap-1 font-semibold">
-                        <i class="bi bi-clipboard"></i> Copy Email Template
-                    </button>
-                </div>
-                <div class="text-[11px] text-amber-900 bg-amber-50/90 border border-amber-200 p-2 rounded-lg mt-1 font-medium">
-                    <i class="bi bi-info-circle-fill text-amber-600 me-1"></i>
-                    <strong>When payment is done:</strong> The administrator will tell you your decrypted 6-digit passcode to unlock the website in Step 2.
-                </div>
-            `;
-            feedback.classList.remove('hidden');
-        } else {
-            feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
-            feedback.textContent = data.message || "Failed to submit request. Please try again.";
-            feedback.classList.remove('hidden');
-        }
-    } catch (err) {
-        feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
-        feedback.textContent = "Network error. Please try again.";
-        feedback.classList.remove('hidden');
-    } finally {
-        btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-envelope-arrow-up-fill"></i> <span>Send Email & Open Provider</span>`;
+function toggleGatePasswordVisibility(btn) {
+    const input = document.getElementById('gate-admin-pass-input');
+    if (!input) return;
+    const isPassword = input.type === 'password';
+    input.type = isPassword ? 'text' : 'password';
+    const icon = btn.querySelector('i');
+    if (icon) {
+        icon.className = isPassword ? 'bi bi-eye-slash' : 'bi bi-eye';
     }
 }
 
-async function handleGatePasscode(e) {
+async function handleGateAdminPassword(e) {
     e.preventDefault();
-    const input = document.getElementById('gate-passcode-input');
-    const feedback = document.getElementById('gate-passcode-feedback');
-    const btn = document.getElementById('gate-passcode-submit-btn');
-    const passcode = input.value.trim();
+    const input = document.getElementById('gate-admin-pass-input');
+    const feedback = document.getElementById('gate-password-feedback');
+    const btn = document.getElementById('gate-password-submit-btn');
+    const password = input ? input.value.trim() : '';
 
-    if (!passcode) return;
+    if (!password) return;
 
     btn.disabled = true;
-    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Verifying...`;
+    btn.innerHTML = `<span class="spinner-border spinner-border-sm me-1"></span> Encrypting & Verifying...`;
     feedback.className = "text-xs hidden p-3 rounded-xl border";
 
     try {
-        const res = await fetch("/api/unlock-portal", {
-            method: "POST",
-            headers: { "Content-Type": "application/json" },
-            body: JSON.stringify({ passcode: passcode })
-        });
-        const data = await res.json();
+        const { ok, data } = await window.FDEAuthCrypto.verifyAdminPasswordEncrypted(
+            password,
+            GATE_NEXT_URL || "/courses"
+        );
 
-        if (res.ok && data.success) {
+        if (ok && data.success) {
+            input.value = '';
             feedback.className = "text-xs p-3 rounded-xl border border-emerald-300 bg-emerald-50 text-emerald-800 font-semibold";
             feedback.innerHTML = `<i class="bi bi-check-circle-fill text-emerald-600 me-1"></i> ${data.message} Redirecting...`;
             feedback.classList.remove('hidden');
             setTimeout(() => {
-                window.location.href = NEXT_URL || "/courses";
-            }, 800);
+                window.location.href = data.redirect || GATE_NEXT_URL || "/courses";
+            }, 400);
         } else {
             feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
-            feedback.textContent = data.message || "Invalid passcode.";
+            feedback.textContent = data.error || "Incorrect admin password.";
             feedback.classList.remove('hidden');
+            btn.disabled = false;
+            btn.innerHTML = `<i class="bi bi-unlock-fill"></i> <span>Unlock Full Portal Access</span>`;
         }
     } catch (err) {
         feedback.className = "text-xs p-3 rounded-xl border border-red-300 bg-red-50 text-red-700";
-        feedback.textContent = "Error verifying passcode.";
+        feedback.textContent = "Error verifying encrypted password.";
         feedback.classList.remove('hidden');
-    } finally {
         btn.disabled = false;
-        btn.innerHTML = `<i class="bi bi-shield-check"></i> <span>Unlock All Website Access</span>`;
+        btn.innerHTML = `<i class="bi bi-unlock-fill"></i> <span>Unlock Full Portal Access</span>`;
     }
 }
 </script>

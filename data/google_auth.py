@@ -14,6 +14,7 @@ Features:
 import os
 import time
 import json
+import struct
 import base64
 import hmac
 import hashlib
@@ -25,15 +26,118 @@ from datetime import datetime
 
 ADMIN_EMAIL = "anooppriyaranjan@gmail.com"
 ADMIN_NAME = "Anoop Priyaranjan"
-ADMIN_PASSWORD = "Azadirakhtaindica@007"
 ADMIN_ALIAS_EMAILS = ["anooppriyaranjan@gmail.com", "azureanoopranjan@gmail.com"]
+
+# PBKDF2-HMAC-SHA256 verifier for the Admin Password (no plaintext password stored in source)
+ADMIN_PBKDF2_SALT = os.environ.get("PORTAL_ADMIN_SALT", "FDE-PORTAL-ADMIN-SALT-2026")
+ADMIN_PBKDF2_ITERATIONS = 100000
+_DEFAULT_ADMIN_PBKDF2_HEX = "5b77edbd03a50b151d9a9f600d92d6adb9952a5a8fbd6d2ad25e9776d0f3e1d5"
+
+
+def get_admin_pbkdf2_bytes() -> bytes:
+    """Returns the 32-byte PBKDF2-HMAC-SHA256 derived admin key."""
+    env_override = os.environ.get("PORTAL_ADMIN_PASSWORD")
+    if env_override:
+        return hashlib.pbkdf2_hmac(
+            "sha256",
+            env_override.strip().encode("utf-8"),
+            ADMIN_PBKDF2_SALT.encode("utf-8"),
+            ADMIN_PBKDF2_ITERATIONS,
+        )
+    return bytes.fromhex(_DEFAULT_ADMIN_PBKDF2_HEX)
 
 
 def verify_admin_password(candidate_password: str) -> bool:
-    """Verifies the master admin password using constant-time comparison."""
+    """Verifies a candidate admin password using PBKDF2-HMAC-SHA256 and constant-time comparison."""
     if not candidate_password:
         return False
-    return hmac.compare_digest(candidate_password.strip(), ADMIN_PASSWORD)
+    derived = hashlib.pbkdf2_hmac(
+        "sha256",
+        candidate_password.strip().encode("utf-8"),
+        ADMIN_PBKDF2_SALT.encode("utf-8"),
+        ADMIN_PBKDF2_ITERATIONS,
+    )
+    return hmac.compare_digest(derived, get_admin_pbkdf2_bytes())
+
+
+def create_auth_challenge() -> dict:
+    """Creates a single-use cryptographic challenge and ephemeral transport key for client-side encrypted verification."""
+    return {
+        "nonce": secrets.token_hex(24),
+        "transport_key": secrets.token_hex(32),
+        "ts": int(time.time()),
+    }
+
+
+def verify_encrypted_admin_payload(encrypted_token: str, challenge: dict, max_age_seconds: int = 120) -> tuple[bool, str]:
+    """
+    Decrypts and verifies an encrypted client-side password verification token.
+    Expected format: ENC-V1.<iv_b64>.<ciphertext_b64>.<mac_b64>
+    Inside plaintext JSON: {"proof": <HMAC-SHA256(pw_pbkdf2, nonce)>, "nonce": <nonce>, ...}
+    """
+    if not challenge or not isinstance(challenge, dict):
+        return False, "Missing or expired security challenge. Please retry."
+
+    nonce = str(challenge.get("nonce") or "")
+    transport_key_hex = str(challenge.get("transport_key") or "")
+    ts = int(challenge.get("ts") or 0)
+    if not nonce or not transport_key_hex or (time.time() - ts > max_age_seconds):
+        return False, "Security challenge expired. Please retry."
+
+    if not encrypted_token or not isinstance(encrypted_token, str):
+        return False, "Encrypted verification payload is required."
+
+    parts = encrypted_token.strip().split(".")
+    if len(parts) != 4 or parts[0] != "ENC-V1":
+        return False, "Invalid encrypted verification format."
+
+    try:
+        transport_key = bytes.fromhex(transport_key_hex)
+        iv = base64url_decode(parts[1])
+        ciphertext = base64url_decode(parts[2])
+        mac_tag = base64url_decode(parts[3])
+    except Exception:
+        return False, "Malformed encrypted verification payload."
+
+    if len(iv) != 16 or len(mac_tag) != 32 or not ciphertext:
+        return False, "Invalid cryptographic envelope."
+
+    expected_mac = hmac.new(transport_key, iv + ciphertext, hashlib.sha256).digest()
+    if not hmac.compare_digest(mac_tag, expected_mac):
+        return False, "Encrypted payload integrity check failed."
+
+    # Decrypt keystream using HMAC-SHA256 counter blocks
+    plain_bytes = bytearray(len(ciphertext))
+    offset = 0
+    counter = 0
+    while offset < len(ciphertext):
+        block = hmac.new(transport_key, iv + struct.pack(">I", counter), hashlib.sha256).digest()
+        take = min(len(block), len(ciphertext) - offset)
+        for i in range(take):
+            plain_bytes[offset + i] = ciphertext[offset + i] ^ block[i]
+        offset += take
+        counter += 1
+
+    try:
+        payload = json.loads(bytes(plain_bytes).decode("utf-8"))
+    except Exception:
+        return False, "Failed to decode encrypted verification payload."
+
+    payload_nonce = str(payload.get("nonce") or "")
+    payload_proof = str(payload.get("proof") or "").lower()
+    if not hmac.compare_digest(payload_nonce, nonce):
+        return False, "Security challenge nonce mismatch."
+
+    expected_proof = hmac.new(
+        get_admin_pbkdf2_bytes(),
+        nonce.encode("utf-8"),
+        hashlib.sha256,
+    ).hexdigest()
+
+    if not hmac.compare_digest(payload_proof, expected_proof):
+        return False, "Incorrect admin password. Only Home Page is accessible."
+
+    return True, ""
 
 
 # Google OAuth2 Endpoints
