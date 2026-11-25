@@ -18,7 +18,7 @@ from data.kql_queries import KQL_QUERIES, MOCK_LOGS, get_kql_by_id
 from data.interview_prep import POSITIONING_STRATEGY, ELEVATOR_PITCH, INTERVIEW_QUESTIONS, get_questions_by_category
 from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS, FDE_BRIEFING_10MIN
 from data.outreach import parse_institutes_from_upload, generate_sales_email, get_sample_csv_template, SAMPLE_INSTITUTIONS, DEFAULT_SENDER, SIGN_OFF_NAME
-from data.advisor_rag import answer_advisor_question, is_gemini_configured
+from data.advisor_rag import answer_advisor_question, is_gemini_configured, is_google_search_configured
 from data.google_auth import (
     ADMIN_EMAIL,
     ADMIN_NAME,
@@ -238,7 +238,8 @@ def inject_global_metrics():
         access_email=ADMIN_EMAIL,
         outreach_sender=DEFAULT_SENDER,
         outreach_sign_off=SIGN_OFF_NAME,
-        advisor_gemini_enabled=is_gemini_configured()
+        advisor_gemini_enabled=is_gemini_configured(),
+        advisor_google_enabled=is_google_search_configured()
     )
 
 
@@ -878,7 +879,7 @@ def delete_note(note_id):
 
 @app.route("/api/advisor-chat", methods=["POST"])
 def advisor_chat_api():
-    """Answers concise FDE + AI + Cybersecurity Advisor questions via Gemini LLM + RAG."""
+    """Answers concise FDE + AI + Cybersecurity Advisor questions via Google Search + Gemini LLM + RAG."""
     data = request.get_json(silent=True) or {}
     message = (data.get("message") or data.get("question") or "").strip()
     history = data.get("history") if isinstance(data.get("history"), list) else []
@@ -893,6 +894,8 @@ def advisor_chat_api():
         "in_scope": result["in_scope"],
         "mode": result["mode"],
         "model": result.get("model"),
+        "google_used": bool(result.get("google_used")),
+        "google_queries": result.get("google_queries", []),
         "sources": result.get("sources", []),
     })
 

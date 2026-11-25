@@ -269,13 +269,19 @@ def test_advisor_chatbot_rag_and_gemini():
         assert "out of scope" in d["answer"].lower()
     print("PASS: Out-of-scope questions cleanly rejected as out of scope.")
 
-    # 5. Gemini LLM + RAG path when GEMINI_API_KEY is configured
+    # 5. Gemini LLM + Google Search Grounding + RAG path when GEMINI_API_KEY is configured
     fake_gemini_resp = json.dumps({
         "candidates": [{
             "content": {
                 "parts": [{
                     "text": "An FDE embeds with clients to build rapid 48-hour PoCs and ship secure cloud & AI systems."
                 }]
+            },
+            "groundingMetadata": {
+                "webSearchQueries": ["Forward Deployed Engineer role"],
+                "groundingChunks": [
+                    {"web": {"title": "Forward Deployed Engineer Overview", "uri": "https://example.com/fde-google"}}
+                ]
             }
         }]
     }).encode("utf-8")
@@ -291,13 +297,46 @@ def test_advisor_chatbot_rag_and_gemini():
         assert r_gem.status_code == 200
         d_gem = r_gem.get_json()
         assert d_gem["in_scope"] is True
-        assert d_gem["mode"] == "gemini_rag"
+        assert d_gem["mode"] == "google_gemini_rag"
+        assert d_gem["google_used"] is True
         assert "48-hour" in d_gem["answer"]
+        assert d_gem["google_queries"] == ["Forward Deployed Engineer role"]
+        assert d_gem["sources"][0]["url"] == "https://example.com/fde-google"
         assert mock_urlopen.called
         req_sent = mock_urlopen.call_args[0][0]
         sent_payload = json.loads(req_sent.data.decode("utf-8"))
+        assert sent_payload.get("tools") == [{"google_search": {}}]
         assert "RAG Context:" in sent_payload["contents"][-1]["parts"][0]["text"]
-    print("PASS: Gemini LLM + RAG integration sends retrieved context and returns concise reply.")
+    print("PASS: Gemini LLM + Google Search Grounding + RAG fetches Google sources and puts answer in bot response.")
+
+    # 6. Direct Google Custom Search API fetch path (when GOOGLE_CSE_API_KEY + GOOGLE_CSE_CX set without GEMINI_API_KEY)
+    fake_cse_resp = json.dumps({
+        "items": [
+            {
+                "title": "Zero Trust Architecture - Microsoft Learn",
+                "link": "https://learn.microsoft.com/security/zero-trust/",
+                "snippet": "Zero Trust assumes breach and verifies each request explicitly using least privilege access."
+            }
+        ]
+    }).encode("utf-8")
+
+    mock_cse_resp = MagicMock()
+    mock_cse_resp.read.return_value = fake_cse_resp
+    mock_cse_resp.__enter__.return_value = mock_cse_resp
+    mock_cse_resp.__exit__.return_value = False
+
+    env_cse = {"GOOGLE_CSE_API_KEY": "fake-cse-key", "GOOGLE_CSE_CX": "fake-cx", "GEMINI_API_KEY": "", "GOOGLE_API_KEY": ""}
+    with patch.dict(os.environ, env_cse), \
+         patch.object(advisor_rag.urllib.request, "urlopen", return_value=mock_cse_resp):
+        r_cse = client.post("/api/advisor-chat", json={"message": "What is Zero Trust?"})
+        assert r_cse.status_code == 200
+        d_cse = r_cse.get_json()
+        assert d_cse["in_scope"] is True
+        assert d_cse["mode"] == "google_search_rag"
+        assert d_cse["google_used"] is True
+        assert "Zero Trust assumes breach" in d_cse["answer"]
+        assert d_cse["sources"][0]["url"] == "https://learn.microsoft.com/security/zero-trust/"
+    print("PASS: Google Custom Search API fetches answer from Google and puts it in bot response.")
     print("\nALL VERIFICATION TESTS PASSED SUCCESSFULLY!")
 
 

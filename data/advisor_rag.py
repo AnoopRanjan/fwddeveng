@@ -12,8 +12,32 @@ import math
 import os
 import re
 import urllib.error
+import urllib.parse
 import urllib.request
 from collections import Counter
+
+
+def _load_local_env():
+    """Lightweight .env loader (no extra dependency) for local GEMINI_API_KEY / GOOGLE_CSE_* config."""
+    env_path = os.path.join(os.path.dirname(os.path.dirname(os.path.abspath(__file__))), ".env")
+    if not os.path.isfile(env_path):
+        return
+    try:
+        with open(env_path, "r", encoding="utf-8") as fh:
+            for raw_line in fh:
+                line = raw_line.strip()
+                if not line or line.startswith("#") or "=" not in line:
+                    continue
+                key, val = line.split("=", 1)
+                key = key.strip()
+                val = val.strip().strip('"').strip("'")
+                if key and key not in os.environ:
+                    os.environ[key] = val
+    except Exception:
+        pass
+
+
+_load_local_env()
 
 from data.fde_masterclass import FDE_BRIEFING_10MIN, FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS
 from data.interview_prep import ELEVATOR_PITCH, INTERVIEW_QUESTIONS, POSITIONING_STRATEGY
@@ -482,23 +506,80 @@ class AdvisorRAGEngine:
 
         return False
 
-    def _call_gemini(self, query: str, retrieved: list[dict], history: list[dict]) -> tuple[str | None, str | None]:
+    def _fetch_google_cse(self, query: str, num_results: int = 4) -> list[dict]:
+        """Fetches live Google Search snippets & links via Google Custom Search JSON API when configured."""
+        cse_key = (os.environ.get("GOOGLE_CSE_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
+        cse_cx = (os.environ.get("GOOGLE_CSE_CX") or os.environ.get("GOOGLE_SEARCH_ENGINE_ID") or "").strip()
+        if not cse_key or not cse_cx:
+            return []
+
+        params = urllib.parse.urlencode({
+            "key": cse_key,
+            "cx": cse_cx,
+            "q": query,
+            "num": max(1, min(num_results, 5)),
+        })
+        url = f"https://www.googleapis.com/customsearch/v1?{params}"
+        req = urllib.request.Request(url, method="GET")
+        try:
+            with urllib.request.urlopen(req, timeout=8) as resp:
+                data = json.loads(resp.read().decode("utf-8"))
+                results = []
+                for item in data.get("items") or []:
+                    title = (item.get("title") or "").strip()
+                    snippet = re.sub(r"\s+", " ", (item.get("snippet") or "").strip())
+                    link = (item.get("link") or "").strip()
+                    if snippet or title:
+                        results.append({"title": title, "snippet": snippet, "url": link})
+                return results
+        except Exception:
+            return []
+
+    def _extract_grounding_sources(self, candidate: dict) -> tuple[list[dict], list[str]]:
+        """Extracts Google Search grounding URLs and search queries from Gemini groundingMetadata."""
+        grounding = candidate.get("groundingMetadata") or {}
+        web_queries = [q for q in (grounding.get("webSearchQueries") or []) if isinstance(q, str) and q.strip()]
+        sources = []
+        seen_urls = set()
+        for chunk in grounding.get("groundingChunks") or []:
+            web = chunk.get("web") or {}
+            uri = (web.get("uri") or "").strip()
+            title = (web.get("title") or uri or "Google Search Result").strip()
+            if uri and uri not in seen_urls:
+                seen_urls.add(uri)
+                sources.append({"title": title, "url": uri})
+        return sources, web_queries
+
+    def _call_gemini(
+        self,
+        query: str,
+        retrieved: list[dict],
+        google_cse_results: list[dict],
+        history: list[dict],
+    ) -> dict | None:
         api_key = (os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
         if not api_key:
-            return None, None
+            return None
 
-        context_block = "\n".join(
+        rag_block = "\n".join(
             f"- [{chunk['category']}] {chunk['title']}: {chunk['text']}"
             for chunk in retrieved
-        ) or "No specific portal snippet matched; rely on core FDE + AI + Cybersecurity Advisor expertise."
+        ) or "No specific portal snippet matched."
+
+        google_block = ""
+        if google_cse_results:
+            google_block = "\n\nGoogle Search Fetched Context:\n" + "\n".join(
+                f"- {g['title']} ({g['url']}): {g['snippet']}"
+                for g in google_cse_results
+            )
 
         system_instruction = (
             "You are a friendly virtual advisor sitting at a company helpdesk specializing ONLY in "
             "Forward Deployed Engineer (FDE), Artificial Intelligence (AI/LLM/RAG), and Cybersecurity Advisory "
             "(including closely related cloud architecture, DevSecOps, IAM, SIEM/KQL, and enterprise engineering).\n"
             "STRICT RULES:\n"
-            "1. Give the SMALLEST clear description possible: 2 to 3 crisp sentences maximum (under 70 words). No filler.\n"
-            "2. Ground your answer in the provided RAG Context whenever relevant.\n"
+            "1. Use Google Search grounding to fetch the live answer from Google for the user's question and combine it with the RAG Context.\n"
+            "2. Give the SMALLEST clear description possible: 2 to 3 crisp sentences maximum (under 70 words). No filler.\n"
             "3. Speak naturally like a knowledgeable company advisor helping a colleague or client.\n"
             "4. If the user's question is NOT about Forward Deployed Engineering, AI, or Cybersecurity Advisory "
             "(or closely related technical/cloud/security concepts), reply ONLY with:\n"
@@ -513,9 +594,10 @@ class AdvisorRAGEngine:
                 contents.append({"role": role, "parts": [{"text": msg[:400]}]})
 
         user_prompt = (
-            f"RAG Context:\n{context_block}\n\n"
+            f"RAG Context:\n{rag_block}"
+            f"{google_block}\n\n"
             f"Question: {query}\n\n"
-            "Respond in 2-3 concise sentences (smallest useful description), or state it is out of scope."
+            "Fetch/ground the answer from Google and the context above, then put the answer into a concise 2-3 sentence response (or state it is out of scope)."
         )
         contents.append({"role": "user", "parts": [{"text": user_prompt}]})
 
@@ -525,44 +607,59 @@ class AdvisorRAGEngine:
             if fallback_model not in candidate_models:
                 candidate_models.append(fallback_model)
 
-        payload = {
+        base_payload = {
             "system_instruction": {"parts": [{"text": system_instruction}]},
             "contents": contents,
             "generationConfig": {
                 "temperature": 0.2,
-                "maxOutputTokens": 180,
+                "maxOutputTokens": 200,
             },
         }
-        body_bytes = json.dumps(payload).encode("utf-8")
 
         for model_name in candidate_models:
             url = (
                 f"https://generativelanguage.googleapis.com/v1beta/models/"
                 f"{model_name}:generateContent?key={api_key}"
             )
-            req = urllib.request.Request(
-                url,
-                data=body_bytes,
-                headers={"Content-Type": "application/json"},
-                method="POST",
-            )
-            try:
-                with urllib.request.urlopen(req, timeout=12) as resp:
-                    data = json.loads(resp.read().decode("utf-8"))
-                    candidates = data.get("candidates") or []
-                    if candidates:
-                        parts = (candidates[0].get("content") or {}).get("parts") or []
-                        text = "".join(p.get("text", "") for p in parts).strip()
-                        if text:
-                            return text, model_name
-            except urllib.error.HTTPError as e:
-                if e.code == 404:
-                    continue
-                break
-            except Exception:
-                break
+            # First attempt with Google Search Grounding enabled; if endpoint rejects tool schema (400), retry without tools
+            for use_google_tool in (True, False):
+                payload = dict(base_payload)
+                if use_google_tool:
+                    payload["tools"] = [{"google_search": {}}]
+                body_bytes = json.dumps(payload).encode("utf-8")
+                req = urllib.request.Request(
+                    url,
+                    data=body_bytes,
+                    headers={"Content-Type": "application/json"},
+                    method="POST",
+                )
+                try:
+                    with urllib.request.urlopen(req, timeout=14) as resp:
+                        data = json.loads(resp.read().decode("utf-8"))
+                        candidates = data.get("candidates") or []
+                        if candidates:
+                            cand = candidates[0]
+                            parts = (cand.get("content") or {}).get("parts") or []
+                            text = "".join(p.get("text", "") for p in parts).strip()
+                            if text:
+                                grounding_sources, web_queries = self._extract_grounding_sources(cand)
+                                return {
+                                    "text": text,
+                                    "model": model_name,
+                                    "grounding_sources": grounding_sources,
+                                    "web_queries": web_queries,
+                                    "grounding_requested": use_google_tool,
+                                }
+                except urllib.error.HTTPError as e:
+                    if e.code == 400 and use_google_tool:
+                        continue
+                    if e.code == 404:
+                        break
+                    return None
+                except Exception:
+                    return None
 
-        return None, None
+        return None
 
     def answer(self, query: str, history: list[dict] | None = None) -> dict:
         clean_query = (query or "").strip()
@@ -571,6 +668,8 @@ class AdvisorRAGEngine:
                 "answer": GREETING_MESSAGE,
                 "in_scope": True,
                 "mode": "greeting",
+                "google_used": False,
+                "google_queries": [],
                 "sources": [],
             }
 
@@ -579,6 +678,8 @@ class AdvisorRAGEngine:
                 "answer": GREETING_MESSAGE,
                 "in_scope": True,
                 "mode": "greeting",
+                "google_used": False,
+                "google_queries": [],
                 "sources": [],
             }
 
@@ -589,22 +690,60 @@ class AdvisorRAGEngine:
                 "answer": OUT_OF_SCOPE_MESSAGE,
                 "in_scope": False,
                 "mode": "out_of_scope",
+                "google_used": False,
+                "google_queries": [],
                 "sources": [],
             }
 
-        # 1. Try Gemini LLM + RAG altogether if API key is configured
-        gemini_text, model_used = self._call_gemini(clean_query, retrieved, history or [])
-        if gemini_text:
+        # 1. Fetch live Google Search snippets (if Google CSE is configured)
+        google_cse_results = self._fetch_google_cse(clean_query, num_results=3)
+
+        # 2. Try Gemini LLM + Google Search Grounding + RAG altogether
+        gemini_res = self._call_gemini(clean_query, retrieved, google_cse_results, history or [])
+        if gemini_res:
+            gemini_text = gemini_res["text"]
             is_oos = "out of scope" in gemini_text.lower()
+            google_sources = list(gemini_res.get("grounding_sources") or [])
+            for cse in google_cse_results:
+                if cse.get("url") and all(s.get("url") != cse["url"] for s in google_sources):
+                    google_sources.append({"title": cse["title"], "url": cse["url"]})
+
+            google_used = bool(
+                google_sources
+                or gemini_res.get("web_queries")
+                or gemini_res.get("grounding_requested")
+            )
+            rag_sources = [{"title": c["title"], "url": None} for c in retrieved[:2]]
+            combined_sources = ([] if is_oos else (google_sources[:3] if google_sources else rag_sources))
+
             return {
                 "answer": gemini_text,
                 "in_scope": not is_oos,
-                "mode": "gemini_rag",
-                "model": model_used,
-                "sources": [] if is_oos else [c["title"] for c in retrieved[:2]],
+                "mode": "google_gemini_rag" if google_used else "gemini_rag",
+                "model": gemini_res["model"],
+                "google_used": google_used and not is_oos,
+                "google_queries": [] if is_oos else (gemini_res.get("web_queries") or ([clean_query] if google_cse_results else [])),
+                "sources": combined_sources,
             }
 
-        # 2. RAG Concise Extractive Synthesizer (works offline / without external key)
+        # 3. Direct Google CSE fetched answer (when Google CSE is configured without Gemini)
+        if google_cse_results:
+            top_google = google_cse_results[0]
+            concise_google = _truncate_concise(top_google.get("snippet") or top_google.get("title", ""), max_sentences=3, max_chars=300)
+            return {
+                "answer": concise_google,
+                "in_scope": True,
+                "mode": "google_search_rag",
+                "google_used": True,
+                "google_queries": [clean_query],
+                "sources": [
+                    {"title": g["title"], "url": g["url"]}
+                    for g in google_cse_results[:3]
+                    if g.get("title")
+                ],
+            }
+
+        # 4. RAG Concise Extractive Synthesizer (works offline / without external key)
         if retrieved:
             best = retrieved[0]
             concise = _truncate_concise(best["text"], max_sentences=3, max_chars=300)
@@ -612,10 +751,12 @@ class AdvisorRAGEngine:
                 "answer": concise,
                 "in_scope": True,
                 "mode": "rag",
-                "sources": [c["title"] for c in retrieved[:2]],
+                "google_used": False,
+                "google_queries": [],
+                "sources": [{"title": c["title"], "url": None} for c in retrieved[:2]],
             }
 
-        # 3. Domain term was present, provide brief baseline FDE+AI+Security advisor guidance
+        # 5. Domain term was present, provide brief baseline FDE+AI+Security advisor guidance
         return {
             "answer": (
                 "In FDE + AI + Cybersecurity Advisory, we align cloud architecture, Zero Trust controls, "
@@ -624,7 +765,9 @@ class AdvisorRAGEngine:
             ),
             "in_scope": True,
             "mode": "rag",
-            "sources": ["FDE + AI + Cybersecurity Advisor Value"],
+            "google_used": False,
+            "google_queries": [],
+            "sources": [{"title": "FDE + AI + Cybersecurity Advisor Value", "url": None}],
         }
 
 
@@ -645,3 +788,11 @@ def answer_advisor_question(query: str, history: list[dict] | None = None) -> di
 
 def is_gemini_configured() -> bool:
     return bool((os.environ.get("GEMINI_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip())
+
+
+def is_google_search_configured() -> bool:
+    cse_ready = bool(
+        (os.environ.get("GOOGLE_CSE_API_KEY") or os.environ.get("GOOGLE_API_KEY") or "").strip()
+        and (os.environ.get("GOOGLE_CSE_CX") or os.environ.get("GOOGLE_SEARCH_ENGINE_ID") or "").strip()
+    )
+    return is_gemini_configured() or cse_ready

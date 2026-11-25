@@ -653,10 +653,23 @@ code:not(pre code) {
 .fde-chat-source {
     font-size: 9.5px;
     color: #64748b;
-    max-width: 155px;
+    max-width: 170px;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
+}
+
+.fde-chat-source-link {
+    color: #1d4ed8;
+    text-decoration: none;
+    display: inline-flex;
+    align-items: center;
+    gap: 3px;
+}
+
+.fde-chat-source-link:hover {
+    text-decoration: underline;
+    color: #1e40af;
 }
 
 .fde-chat-quick-prompts {

@@ -55,6 +55,10 @@
             let badgeHtml = "";
             if (meta.mode === "out_of_scope") {
                 badgeHtml = `<span class="fde-chat-tag fde-chat-tag-oos">Out of Scope</span>`;
+            } else if (meta.mode === "google_gemini_rag") {
+                badgeHtml = `<span class="fde-chat-tag fde-chat-tag-gemini">Google + Gemini + RAG</span>`;
+            } else if (meta.mode === "google_search_rag") {
+                badgeHtml = `<span class="fde-chat-tag fde-chat-tag-gemini">Google Search + RAG</span>`;
             } else if (meta.mode === "gemini_rag") {
                 badgeHtml = `<span class="fde-chat-tag fde-chat-tag-gemini">Gemini + RAG</span>`;
             } else if (meta.mode === "rag") {
@@ -63,8 +67,16 @@
 
             let sourcesHtml = "";
             if (Array.isArray(meta.sources) && meta.sources.length > 0 && meta.in_scope !== false) {
-                const topSource = escapeHtml(meta.sources[0]);
-                sourcesHtml = `<span class="fde-chat-source" title="Grounded reference">${topSource}</span>`;
+                const sourceLinks = meta.sources.slice(0, 2).map((src) => {
+                    if (src && typeof src === "object" && src.url && /^https?:\/\//i.test(src.url)) {
+                        const label = escapeHtml(src.title || src.url);
+                        const safeUrl = escapeHtml(src.url);
+                        return `<a class="fde-chat-source fde-chat-source-link" href="${safeUrl}" target="_blank" rel="noopener noreferrer" title="${label}"><i class="bi bi-box-arrow-up-right"></i> ${label}</a>`;
+                    }
+                    const label = escapeHtml(typeof src === "string" ? src : (src && src.title) || "");
+                    return label ? `<span class="fde-chat-source" title="Grounded reference">${label}</span>` : "";
+                }).filter(Boolean).join("");
+                sourcesHtml = sourceLinks;
             }
 
             const metaBlock = (badgeHtml || sourcesHtml)
