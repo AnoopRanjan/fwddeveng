@@ -190,7 +190,82 @@
     </main>
 
     <!-- Global Toast Container -->
-    <div id="toast-container" class="fixed bottom-5 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+    <div id="toast-container" class="fixed bottom-24 right-5 z-50 flex flex-col gap-2 max-w-sm pointer-events-none"></div>
+
+    <!-- Virtual FDE + AI + Cybersecurity Advisor Chatbot (Minimized in Bottom-Right Corner) -->
+    <div id="fde-advisor-chatbot" aria-live="polite">
+        <!-- Minimized Launcher Pill -->
+        <button
+            type="button"
+            id="fde-chat-launcher"
+            class="fde-chat-launcher"
+            aria-expanded="false"
+            aria-controls="fde-chat-panel"
+            title="Hover or click to ask our FDE + AI + Cybersecurity Advisor"
+        >
+            <span class="fde-chat-launcher-avatar">
+                <i class="bi bi-headset"></i>
+                <span class="fde-chat-status-dot"></span>
+            </span>
+            <span class="fde-chat-launcher-text">
+                <span class="fde-chat-launcher-title">FDE • AI • Security Advisor</span>
+                <span class="fde-chat-launcher-sub">Online • How can I help you?</span>
+            </span>
+        </button>
+
+        <!-- Popup Chat Window -->
+        <section
+            id="fde-chat-panel"
+            class="fde-chat-panel fde-chat-hidden"
+            role="dialog"
+            aria-label="FDE + AI + Cybersecurity Advisor Chatbot"
+        >
+            <header class="fde-chat-header">
+                <div class="fde-chat-header-info">
+                    <span class="fde-chat-launcher-avatar">
+                        <i class="bi bi-headset"></i>
+                        <span class="fde-chat-status-dot"></span>
+                    </span>
+                    <div style="min-width: 0;">
+                        <h4 class="fde-chat-header-title">FDE + AI + Cybersecurity Advisor</h4>
+                        <div class="fde-chat-header-sub">
+                            <span>Company Desk • {{ 'Gemini + RAG' if advisor_gemini_enabled else 'RAG Engine' }}</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="fde-chat-header-actions">
+                    <button type="button" id="fde-chat-reset-btn" class="fde-chat-icon-btn" title="New conversation" aria-label="New conversation">
+                        <i class="bi bi-arrow-counterclockwise"></i>
+                    </button>
+                    <button type="button" id="fde-chat-minimize-btn" class="fde-chat-icon-btn" title="Minimize chatbot" aria-label="Minimize chatbot">
+                        <i class="bi bi-dash-lg"></i>
+                    </button>
+                </div>
+            </header>
+
+            <div id="fde-chat-messages" class="fde-chat-messages"></div>
+
+            <div id="fde-chat-quick-prompts" class="fde-chat-quick-prompts">
+                <button type="button" class="fde-chat-chip" data-question="What does a Forward Deployed Engineer do?">What is an FDE?</button>
+                <button type="button" class="fde-chat-chip" data-question="How does RAG reduce AI hallucinations?">How does RAG work?</button>
+                <button type="button" class="fde-chat-chip" data-question="Explain Zero Trust in Azure">Zero Trust in Azure</button>
+            </div>
+
+            <form id="fde-chat-form" class="fde-chat-form" autocomplete="off">
+                <input
+                    type="text"
+                    id="fde-chat-input"
+                    class="fde-chat-input"
+                    placeholder="Ask about FDE, AI, or Cybersecurity..."
+                    maxlength="800"
+                    required
+                >
+                <button type="submit" id="fde-chat-send-btn" class="fde-chat-send-btn" title="Send question" aria-label="Send question">
+                    <i class="bi bi-send-fill"></i>
+                </button>
+            </form>
+        </section>
+    </div>
 
     <!-- Footer -->
     <footer class="bg-white border-t border-slate-200/90 py-8 text-xs text-slate-500 mt-16 shadow-xs">
@@ -271,6 +346,7 @@
     <!-- Scripts -->
     <script src="{{ url_for('static', filename='js/auth_crypto.js') }}"></script>
     <script src="{{ url_for('static', filename='js/main.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/chatbot.js') }}"></script>
     <script>
         const mobileBtn = document.getElementById('mobile-menu-btn');
         const mobileMenu = document.getElementById('mobile-menu');
@@ -416,6 +492,11 @@
                     // Do not intercept clicks inside the admin password modal itself
                     const adminModal = document.getElementById('admin-password-modal');
                     if (adminModal && adminModal.contains(e.target)) {
+                        return;
+                    }
+
+                    // Do not intercept clicks inside the bottom-right Advisor Chatbot widget
+                    if (e.target.closest('#fde-advisor-chatbot')) {
                         return;
                     }
 

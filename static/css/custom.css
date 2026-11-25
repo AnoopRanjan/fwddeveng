@@ -380,3 +380,381 @@ code:not(pre code) {
     border: 1px solid #cbd5e1 !important;
     box-shadow: 0 10px 25px -5px rgba(15, 23, 42, 0.15) !important;
 }
+
+/* ==========================================================================
+   Virtual FDE + AI + Cybersecurity Advisor Chatbot (Bottom-Right Corner)
+   ========================================================================== */
+
+#fde-advisor-chatbot {
+    position: fixed;
+    right: 20px;
+    bottom: 20px;
+    z-index: 60;
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+}
+
+.fde-chat-hidden {
+    display: none !important;
+}
+
+/* Minimized Corner Launcher Pill */
+.fde-chat-launcher {
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    padding: 9px 15px 9px 10px;
+    border-radius: 9999px;
+    border: 1px solid rgba(59, 130, 246, 0.35);
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 55%, #0284c7 100%);
+    color: #ffffff;
+    box-shadow: 0 12px 28px -6px rgba(15, 23, 42, 0.35), 0 4px 10px rgba(2, 132, 199, 0.25);
+    cursor: pointer;
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.fde-chat-launcher:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 16px 32px -6px rgba(15, 23, 42, 0.42), 0 6px 14px rgba(2, 132, 199, 0.35);
+}
+
+.fde-chat-launcher-avatar {
+    position: relative;
+    width: 34px;
+    height: 34px;
+    border-radius: 9999px;
+    background: rgba(255, 255, 255, 0.16);
+    border: 1px solid rgba(255, 255, 255, 0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 16px;
+    color: #ffffff;
+    flex-shrink: 0;
+}
+
+.fde-chat-status-dot {
+    position: absolute;
+    right: -1px;
+    bottom: -1px;
+    width: 10px;
+    height: 10px;
+    border-radius: 9999px;
+    background-color: #10b981;
+    border: 2px solid #0f172a;
+}
+
+.fde-chat-launcher-text {
+    display: flex;
+    flex-direction: column;
+    text-align: left;
+    line-height: 1.15;
+}
+
+.fde-chat-launcher-title {
+    font-size: 12px;
+    font-weight: 700;
+    color: #ffffff;
+    letter-spacing: 0.01em;
+}
+
+.fde-chat-launcher-sub {
+    font-size: 10px;
+    color: #bae6fd;
+    font-weight: 500;
+}
+
+/* Expanded Chatbot Window */
+.fde-chat-panel {
+    width: 350px;
+    max-width: calc(100vw - 24px);
+    height: 440px;
+    max-height: calc(100vh - 36px);
+    background-color: #ffffff;
+    border: 1px solid #cbd5e1;
+    border-radius: 18px;
+    box-shadow: 0 22px 48px -10px rgba(15, 23, 42, 0.28), 0 8px 18px -4px rgba(15, 23, 42, 0.12);
+    display: flex;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+@keyframes fdeChatPopIn {
+    from {
+        opacity: 0;
+        transform: translateY(12px) scale(0.96);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0) scale(1);
+    }
+}
+
+.fde-chat-pop-in {
+    animation: fdeChatPopIn 0.2s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+.fde-chat-header {
+    background: linear-gradient(135deg, #0f172a 0%, #1e3a8a 60%, #0369a1 100%);
+    color: #ffffff;
+    padding: 11px 13px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    flex-shrink: 0;
+}
+
+.fde-chat-header-info {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    min-width: 0;
+}
+
+.fde-chat-header-title {
+    font-size: 12.5px;
+    font-weight: 700;
+    color: #ffffff;
+    margin: 0;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fde-chat-header-sub {
+    font-size: 10px;
+    color: #bae6fd;
+    display: flex;
+    align-items: center;
+    gap: 5px;
+}
+
+.fde-chat-header-actions {
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    flex-shrink: 0;
+}
+
+.fde-chat-icon-btn {
+    width: 28px;
+    height: 28px;
+    border-radius: 8px;
+    border: 0;
+    background: rgba(255, 255, 255, 0.14);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 13px;
+    transition: background-color 0.15s ease;
+}
+
+.fde-chat-icon-btn:hover {
+    background: rgba(255, 255, 255, 0.26);
+}
+
+.fde-chat-messages {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    padding: 12px;
+    background-color: #f8fafc;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.fde-chat-row {
+    display: flex;
+    align-items: flex-end;
+    gap: 7px;
+}
+
+.fde-chat-row-user {
+    justify-content: flex-end;
+}
+
+.fde-chat-row-bot {
+    justify-content: flex-start;
+}
+
+.fde-chat-avatar-mini {
+    width: 26px;
+    height: 26px;
+    border-radius: 9999px;
+    background: linear-gradient(135deg, #1d4ed8, #0284c7);
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 12px;
+    flex-shrink: 0;
+}
+
+.fde-chat-bubble {
+    max-width: 82%;
+    padding: 8px 11px;
+    border-radius: 13px;
+    font-size: 12.5px;
+    line-height: 1.45;
+    word-wrap: break-word;
+}
+
+.fde-chat-bubble-bot {
+    background-color: #ffffff;
+    color: #0f172a;
+    border: 1px solid #e2e8f0;
+    border-bottom-left-radius: 4px;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.05);
+}
+
+.fde-chat-bubble-user {
+    background: linear-gradient(135deg, #2563eb, #1d4ed8);
+    color: #ffffff;
+    border-bottom-right-radius: 4px;
+    box-shadow: 0 2px 6px rgba(37, 99, 235, 0.25);
+}
+
+.fde-chat-meta {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 5px;
+    margin-top: 6px;
+    padding-top: 5px;
+    border-top: 1px solid #f1f5f9;
+}
+
+.fde-chat-tag {
+    font-size: 9.5px;
+    font-weight: 700;
+    padding: 1px 6px;
+    border-radius: 9999px;
+    text-transform: uppercase;
+    letter-spacing: 0.03em;
+}
+
+.fde-chat-tag-gemini {
+    background-color: #dbeafe;
+    color: #1d4ed8;
+}
+
+.fde-chat-tag-rag {
+    background-color: #d1fae5;
+    color: #065f46;
+}
+
+.fde-chat-tag-oos {
+    background-color: #ffe4e6;
+    color: #be123c;
+}
+
+.fde-chat-source {
+    font-size: 9.5px;
+    color: #64748b;
+    max-width: 155px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+.fde-chat-quick-prompts {
+    padding: 7px 11px;
+    background-color: #f8fafc;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    flex-shrink: 0;
+}
+
+.fde-chat-chip {
+    font-size: 10.5px;
+    font-weight: 600;
+    color: #1e40af;
+    background-color: #eff6ff;
+    border: 1px solid #bfdbfe;
+    border-radius: 9999px;
+    padding: 3px 9px;
+    cursor: pointer;
+    transition: background-color 0.15s ease, border-color 0.15s ease;
+}
+
+.fde-chat-chip:hover {
+    background-color: #dbeafe;
+    border-color: #93c5fd;
+}
+
+.fde-chat-form {
+    padding: 9px 10px;
+    background-color: #ffffff;
+    border-top: 1px solid #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 7px;
+    flex-shrink: 0;
+}
+
+.fde-chat-input {
+    flex: 1 1 auto;
+    font-size: 12.5px !important;
+    padding: 7px 11px !important;
+    border-radius: 10px !important;
+    border: 1px solid #cbd5e1 !important;
+    background-color: #f8fafc !important;
+    color: #0f172a !important;
+}
+
+.fde-chat-send-btn {
+    width: 34px;
+    height: 34px;
+    border-radius: 10px;
+    border: 0;
+    background: linear-gradient(135deg, #2563eb, #0284c7);
+    color: #ffffff;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: opacity 0.15s ease, transform 0.15s ease;
+}
+
+.fde-chat-send-btn:hover:not(:disabled) {
+    transform: scale(1.04);
+}
+
+.fde-chat-send-btn:disabled {
+    opacity: 0.55;
+    cursor: not-allowed;
+}
+
+/* Typing indicator dots */
+.fde-chat-typing-bubble {
+    display: inline-flex;
+    align-items: center;
+    gap: 4px;
+    padding: 10px 12px;
+}
+
+.fde-dot {
+    width: 6px;
+    height: 6px;
+    border-radius: 9999px;
+    background-color: #64748b;
+    animation: fdeBounce 1.2s infinite ease-in-out;
+}
+
+.fde-dot:nth-child(2) {
+    animation-delay: 0.15s;
+}
+
+.fde-dot:nth-child(3) {
+    animation-delay: 0.3s;
+}
+
+@keyframes fdeBounce {
+    0%, 80%, 100% { transform: scale(0.7); opacity: 0.45; }
+    40% { transform: scale(1.1); opacity: 1; }
+}

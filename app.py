@@ -18,6 +18,7 @@ from data.kql_queries import KQL_QUERIES, MOCK_LOGS, get_kql_by_id
 from data.interview_prep import POSITIONING_STRATEGY, ELEVATOR_PITCH, INTERVIEW_QUESTIONS, get_questions_by_category
 from data.fde_masterclass import FDE_MASTER_COURSE, PROJECT_EXPLORATION_PILLARS, FDE_BRIEFING_10MIN
 from data.outreach import parse_institutes_from_upload, generate_sales_email, get_sample_csv_template, SAMPLE_INSTITUTIONS, DEFAULT_SENDER, SIGN_OFF_NAME
+from data.advisor_rag import answer_advisor_question, is_gemini_configured
 from data.google_auth import (
     ADMIN_EMAIL,
     ADMIN_NAME,
@@ -236,7 +237,8 @@ def inject_global_metrics():
         admin_email=ADMIN_EMAIL,
         access_email=ADMIN_EMAIL,
         outreach_sender=DEFAULT_SENDER,
-        outreach_sign_off=SIGN_OFF_NAME
+        outreach_sign_off=SIGN_OFF_NAME,
+        advisor_gemini_enabled=is_gemini_configured()
     )
 
 
@@ -258,6 +260,7 @@ def check_portal_access():
         "/api/admin/verify-password",
         "/api/lock-portal",
         "/api/admin/lock",
+        "/api/advisor-chat",
     }
 
     if (
@@ -869,6 +872,29 @@ def delete_note(note_id):
     conn.commit()
     conn.close()
     return redirect(url_for("notes_view"))
+
+
+# ================= VIRTUAL FDE + AI + CYBERSECURITY ADVISOR CHATBOT =================
+
+@app.route("/api/advisor-chat", methods=["POST"])
+def advisor_chat_api():
+    """Answers concise FDE + AI + Cybersecurity Advisor questions via Gemini LLM + RAG."""
+    data = request.get_json(silent=True) or {}
+    message = (data.get("message") or data.get("question") or "").strip()
+    history = data.get("history") if isinstance(data.get("history"), list) else []
+
+    if len(message) > 800:
+        message = message[:800]
+
+    result = answer_advisor_question(message, history=history)
+    return jsonify({
+        "success": True,
+        "answer": result["answer"],
+        "in_scope": result["in_scope"],
+        "mode": result["mode"],
+        "model": result.get("model"),
+        "sources": result.get("sources", []),
+    })
 
 
 if __name__ == "__main__":

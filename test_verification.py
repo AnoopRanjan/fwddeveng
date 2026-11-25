@@ -206,6 +206,98 @@ def test_routes_and_encrypted_admin_access():
     client.get("/api/lock-portal")
     assert client.get("/courses").status_code == 302
     print("PASS: Portal re-locked back to Home-only display.")
+
+
+def test_advisor_chatbot_rag_and_gemini():
+    """Verify minimized bottom-right chatbot UI, RAG Q&A, out-of-scope guardrails, and Gemini+RAG integration."""
+    from unittest.mock import patch, MagicMock
+    import data.advisor_rag as advisor_rag
+
+    client = app.test_client()
+    client.get("/api/lock-portal")
+
+    # 1. Home page includes minimized bottom-right chatbot UI even when locked
+    res_home = client.get("/")
+    assert res_home.status_code == 200
+    html = res_home.data.decode("utf-8")
+    assert 'id="fde-advisor-chatbot"' in html
+    assert 'id="fde-chat-launcher"' in html
+    assert 'id="fde-chat-panel"' in html
+    assert 'class="fde-chat-panel fde-chat-hidden"' in html
+    assert "How can I help you?" in html
+    assert "chatbot.js" in html
+    print("PASS: Minimized bottom-right chatbot widget embedded in Home page.")
+
+    # 2. Greeting works publicly without unlock
+    greet_res = client.post("/api/advisor-chat", json={"message": "hi"})
+    assert greet_res.status_code == 200
+    greet_data = greet_res.get_json()
+    assert greet_data["success"] is True
+    assert greet_data["in_scope"] is True
+    assert "how can i help you" in greet_data["answer"].lower()
+    print("PASS: Chatbot greeting responds with 'How can I help you?'.")
+
+    # 3. In-scope FDE, AI, and Cybersecurity concise RAG answers
+    in_scope_prompts = [
+        "What does a Forward Deployed Engineer do?",
+        "How does RAG reduce AI hallucinations?",
+        "Explain Zero Trust in Azure",
+        "What is KQL in Sentinel?",
+        "What is MFA?",
+    ]
+    for q in in_scope_prompts:
+        r = client.post("/api/advisor-chat", json={"message": q})
+        assert r.status_code == 200
+        d = r.get_json()
+        assert d["success"] is True
+        assert d["in_scope"] is True, f"Expected in_scope=True for: {q}"
+        assert 20 <= len(d["answer"]) <= 350, f"Expected concise answer for '{q}', got len={len(d['answer'])}"
+    print("PASS: In-scope FDE + AI + Cybersecurity questions return concise RAG-grounded answers.")
+
+    # 4. Out-of-scope questions are rejected politely as out of scope
+    out_of_scope_prompts = [
+        "What is the best recipe for chocolate cake?",
+        "Who won the cricket world cup?",
+        "Recommend a romantic movie for tonight",
+    ]
+    for q in out_of_scope_prompts:
+        r = client.post("/api/advisor-chat", json={"message": q})
+        assert r.status_code == 200
+        d = r.get_json()
+        assert d["in_scope"] is False, f"Expected in_scope=False for: {q}"
+        assert d["mode"] == "out_of_scope"
+        assert "out of scope" in d["answer"].lower()
+    print("PASS: Out-of-scope questions cleanly rejected as out of scope.")
+
+    # 5. Gemini LLM + RAG path when GEMINI_API_KEY is configured
+    fake_gemini_resp = json.dumps({
+        "candidates": [{
+            "content": {
+                "parts": [{
+                    "text": "An FDE embeds with clients to build rapid 48-hour PoCs and ship secure cloud & AI systems."
+                }]
+            }
+        }]
+    }).encode("utf-8")
+
+    mock_resp = MagicMock()
+    mock_resp.read.return_value = fake_gemini_resp
+    mock_resp.__enter__.return_value = mock_resp
+    mock_resp.__exit__.return_value = False
+
+    with patch.dict(os.environ, {"GEMINI_API_KEY": "test-fake-key"}), \
+         patch.object(advisor_rag.urllib.request, "urlopen", return_value=mock_resp) as mock_urlopen:
+        r_gem = client.post("/api/advisor-chat", json={"message": "What is an FDE?"})
+        assert r_gem.status_code == 200
+        d_gem = r_gem.get_json()
+        assert d_gem["in_scope"] is True
+        assert d_gem["mode"] == "gemini_rag"
+        assert "48-hour" in d_gem["answer"]
+        assert mock_urlopen.called
+        req_sent = mock_urlopen.call_args[0][0]
+        sent_payload = json.loads(req_sent.data.decode("utf-8"))
+        assert "RAG Context:" in sent_payload["contents"][-1]["parts"][0]["text"]
+    print("PASS: Gemini LLM + RAG integration sends retrieved context and returns concise reply.")
     print("\nALL VERIFICATION TESTS PASSED SUCCESSFULLY!")
 
 
@@ -213,3 +305,4 @@ if __name__ == "__main__":
     test_native_xlsx_parsing()
     test_topics_and_roadmap()
     test_routes_and_encrypted_admin_access()
+    test_advisor_chatbot_rag_and_gemini()
